@@ -4,6 +4,7 @@ import {
 } from "react-router";
 import ProtectedRoute from './routes/ProtectedRoute';
 import OnboardingPage from './features/onboarding/pages/OnboardingPage';
+import { PersonaSelectionPage } from './features/persona-selection';
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/onboarding",
     element: <OnboardingPage />,
+  },
+  {
+    path: "/persona-selection",
+    element: <PersonaSelectionPage />,
   },
   {
     path: "/login",

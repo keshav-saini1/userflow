@@ -3,7 +3,6 @@ import { useOnboardingContext } from '../context/OnboardingContext';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
-import OnboardingProgress from './OnboardingProgress';
 
 const OnboardingFlow: React.FC = () => {
   const { 
@@ -47,22 +46,10 @@ const OnboardingFlow: React.FC = () => {
     }
   };
 
-  // Don't show progress - each step has its own design
-  const showProgress = false;
-
+  
   return (
     <div className="min-h-screen bg-white w-screen">
-      {showProgress && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 lg:px-8">
-            <OnboardingProgress 
-              steps={data.steps} 
-              currentStep={data.currentStep} 
-            />
-          </div>
-        </div>
-      )}
-      <div className={showProgress ? 'pt-20 lg:pt-24' : ''}>
+      <div>
         <div className="w-full">
           {renderCurrentStep()}
         </div>

@@ -228,8 +228,8 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                   </div>
                   <div className="text-center">
                     <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                      <span className="font-semibold text-[#5a5a69]">+91 {phoneNumber}</span>
-                      <span className="ml-3">Edit</span>
+                      <span className="font-semibold text-[#5a5a69]">{phoneNumber}</span>
+                      <span className="ml-3" onClick={onPrev}>Edit</span>
                     </p>
                   </div>
                 </div>
