@@ -2,6 +2,7 @@ import React from "react";
 import type { PropertyDetails } from "../types";
 import { FiArrowRight } from "react-icons/fi";
 import { CiCalendar } from "react-icons/ci";
+import { BiHeart } from "react-icons/bi";
 
 interface PropertyCardProps {
    property: PropertyDetails;
@@ -39,17 +40,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                {property.isRecommended && (
                   <div className="absolute top-[13.75px] left-3.5">
                      <div className="bg-gradient-to-r from-[#fb2c36] to-[#f6339a] backdrop-blur-sm px-[10.5px] py-[5.25px] rounded-full shadow-[0px_10px_15px_-3px_rgba(251,44,54,0.25),0px_4px_6px_-4px_rgba(251,44,54,0.25)] flex items-center gap-[5.25px]">
-                        <svg
-                           className="w-[12.25px] h-[12.25px] text-white"
-                           viewBox="0 0 24 24"
-                           fill="none"
-                        >
-                           <path
-                              d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                           />
-                        </svg>
+                        <BiHeart />
                         <span className="text-white text-[12.3px] font-semibold leading-[17.5px]">
                            Recommended
                         </span>
