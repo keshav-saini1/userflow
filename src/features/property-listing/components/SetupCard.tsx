@@ -24,9 +24,9 @@ export const SetupCard: React.FC<SetupCardProps> = ({ onSetupClick }) => {
           {/* Text Content */}
           <div className="flex-1 flex flex-col gap-[21px]">
             <div className="flex flex-col gap-[3.5px]">
-              <h3 className="text-[#101828] text-[15.8px] font-semibold leading-[24.5px]">
+              <p className="text-[#101828] text-[15.8px] font-semibold leading-[24.5px]">
                 Let's Find Your Perfect Spot
-              </h3>
+              </p>
               <p className="text-[#4a5565] text-[12.3px] font-normal leading-[17.5px] w-[303px]">
                 Add your preferences to see the most relevant rooms for you.
               </p>
@@ -37,7 +37,7 @@ export const SetupCard: React.FC<SetupCardProps> = ({ onSetupClick }) => {
         {/* Setup Button */}
         <button 
           onClick={onSetupClick}
-          className="bg-[#101828] rounded-[14px] h-[46px] px-0 py-3.5 flex items-center justify-center w-[340px]"
+          className="bg-[#101828] rounded-[14px] h-[46px] px-0 py-3.5 flex items-center justify-center w-full"
         >
           <span className="text-white text-[14px] font-semibold leading-[21px]">
             Setup Now
