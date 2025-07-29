@@ -8,6 +8,7 @@ import OnboardingPage from './features/onboarding/pages/OnboardingPage';
 import { PersonaSelectionPage } from './features/persona-selection';
 import { PropertyListingPage, PropertyDetailsPage, samplePropertyDetailData } from './features/property-listing';
 import { samplePropertyListing } from './features/property-listing/data/sampleData';
+import { WebCheckinPage } from './features/webcheckin';
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
   {
     path: "/property-details/:propertyId",
     element: <PropertyDetailsWrapper />,
+  },
+  {
+    path: "/webcheckin",
+    element: <WebCheckinPage />,
   },
   {
     path: "/login",
