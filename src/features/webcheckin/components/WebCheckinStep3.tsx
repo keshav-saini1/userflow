@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { WebCheckinStepProps } from '../types';
+import { PaidFlowUploadSheet } from '../document-uploads';
 
 interface DocumentItem {
   id: string;
@@ -12,6 +13,9 @@ interface DocumentItem {
 }
 
 const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
+  
   const [documents, setDocuments] = useState<DocumentItem[]>([
     {
       id: 'aadhaar',
@@ -60,21 +64,26 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
     }
   ]);
 
-  const handleDocumentUpload = (documentId: string) => {
-    setDocuments(prev => prev.map(doc => 
-      doc.id === documentId 
-        ? { ...doc, uploadStatus: 'uploading' as const }
-        : doc
-    ));
+  const handleDocumentClick = (document: DocumentItem) => {
+    if (document.uploadStatus === 'pending') {
+      setSelectedDocument(document);
+      setIsBottomSheetOpen(true);
+    }
+  };
 
-    // Simulate upload process
-    setTimeout(() => {
+  const handleUploadComplete = () => {
+    if (selectedDocument) {
       setDocuments(prev => prev.map(doc => 
-        doc.id === documentId 
+        doc.id === selectedDocument.id 
           ? { ...doc, uploadStatus: 'uploaded' as const, isUploaded: true }
           : doc
       ));
-    }, 2000);
+    }
+  };
+
+  const handleChooseDifferentDocument = () => {
+    setIsBottomSheetOpen(false);
+    setSelectedDocument(null);
   };
 
   const getIconComponent = (iconName: string) => {
@@ -127,11 +136,7 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
         className={`bg-white rounded-[14px] border border-gray-200 p-[15px] cursor-pointer transition-all duration-200 ${
           doc.uploadStatus === 'pending' ? 'hover:shadow-md hover:border-[#155dfc]' : ''
         }`}
-        onClick={() => {
-          if (doc.uploadStatus === 'pending') {
-            handleDocumentUpload(doc.id);
-          }
-        }}
+        onClick={() => handleDocumentClick(doc)}
       >
         <div className="flex items-start gap-3.5">
           <div className="bg-gray-100 rounded-[12.75px] size-[42px] flex items-center justify-center">
@@ -272,6 +277,18 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
           </button>
         </div>
       </div>
+
+      {/* Document Upload Bottom Sheet */}
+      <PaidFlowUploadSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => {
+          setIsBottomSheetOpen(false);
+          setSelectedDocument(null);
+        }}
+        documentName={selectedDocument?.name || ''}
+        onUploadComplete={handleUploadComplete}
+        onChooseDifferentDocument={handleChooseDifferentDocument}
+      />
     </div>
   );
 };
