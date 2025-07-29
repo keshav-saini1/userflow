@@ -3,6 +3,7 @@ import { useOnboardingContext } from '../context/OnboardingContext';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
+import OnboardingStep4 from './OnboardingStep4';
 
 const OnboardingFlow: React.FC = () => {
   const { 
@@ -46,6 +47,11 @@ const OnboardingFlow: React.FC = () => {
       {/* Overlay for Step 3 */}
       {data.currentStep === 3 && (
         <OnboardingStep3 {...stepProps} />
+      )}
+
+      {/* Overlay for Step 4 */}
+      {data.currentStep === 4 && (
+        <OnboardingStep4 {...stepProps} />
       )}
     </div>
   );

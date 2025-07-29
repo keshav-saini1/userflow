@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { animate, inView, stagger } from "motion";
 import type { OnboardingStepComponent } from "../types";
-import { CountryCodePicker } from "@/components";
 import { useButtonAnimation } from "../hooks/useOnboarding";
 
 interface FormData {
    name: string;
-   phone: string;
 }
 
 const OnboardingStep2: OnboardingStepComponent = ({
@@ -19,115 +17,21 @@ const OnboardingStep2: OnboardingStepComponent = ({
    const { animateButton, animateSuccess } = useButtonAnimation();
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
 
-   // Initialize country code from existing data or default to +91
-   const initializeCountryCode = () => {
-      const existingPhone = currentData.personalInfo?.phone;
-      if (existingPhone) {
-         // Extract country code from existing phone number
-         if (existingPhone.startsWith('+91')) return '+91';
-         if (existingPhone.startsWith('+1')) return '+1';
-         if (existingPhone.startsWith('+44')) return '+44';
-         if (existingPhone.startsWith('+61')) return '+61';
-         if (existingPhone.startsWith('+49')) return '+49';
-         if (existingPhone.startsWith('+33')) return '+33';
-         if (existingPhone.startsWith('+39')) return '+39';
-         if (existingPhone.startsWith('+34')) return '+34';
-         if (existingPhone.startsWith('+31')) return '+31';
-         if (existingPhone.startsWith('+65')) return '+65';
-         if (existingPhone.startsWith('+971')) return '+971';
-         if (existingPhone.startsWith('+81')) return '+81';
-         if (existingPhone.startsWith('+82')) return '+82';
-         if (existingPhone.startsWith('+86')) return '+86';
-         if (existingPhone.startsWith('+55')) return '+55';
-         if (existingPhone.startsWith('+52')) return '+52';
-         if (existingPhone.startsWith('+27')) return '+27';
-         if (existingPhone.startsWith('+234')) return '+234';
-         if (existingPhone.startsWith('+20')) return '+20';
-      }
-      return '+91';
-   };
-
-   const [selectedCountryCode, setSelectedCountryCode] = useState(initializeCountryCode());
-
-   // Extract local phone number (without country code) for the input field
-   const getLocalPhoneNumber = () => {
-      const existingPhone = currentData.personalInfo?.phone;
-      if (existingPhone) {
-         // Remove country code prefix to show only local number
-         const countryCode = initializeCountryCode();
-         if (existingPhone.startsWith(countryCode)) {
-            return existingPhone.slice(countryCode.length);
-         }
-      }
-      return "";
-   };
-
    const {
       register,
       handleSubmit,
       formState: { errors, isValid },
       watch,
-      trigger,
    } = useForm<FormData>({
       mode: "onChange",
       defaultValues: {
          name: currentData.personalInfo?.name || "",
-         phone: getLocalPhoneNumber(),
       },
    });
 
-   // Revalidate phone field when country code changes
-   useEffect(() => {
-      trigger("phone");
-   }, [selectedCountryCode, trigger]);
-
    // Watch form values to enable/disable button
    const formValues = watch();
-   const isFormValid = formValues.name?.trim() && formValues.phone?.trim() && isValid;
-
-   // Get validation pattern and placeholder based on selected country
-   const getPhoneValidation = (countryCode: string) => {
-      switch (countryCode) {
-         case '+1': // US/Canada
-            return {
-               pattern: /^[2-9]\d{9}$/,
-               message: "Please enter a valid 10-digit phone number",
-               placeholder: "123 456 7890"
-            };
-         case '+44': // UK
-            return {
-               pattern: /^[1-9]\d{9,10}$/,
-               message: "Please enter a valid UK phone number",
-               placeholder: "1234 567890"
-            };
-         case '+91': // India
-            return {
-               pattern: /^[6-9]\d{9}$/,
-               message: "Please enter a valid 10-digit Indian phone number",
-               placeholder: "98765 43210"
-            };
-         case '+61': // Australia
-            return {
-               pattern: /^[2-9]\d{8}$/,
-               message: "Please enter a valid 9-digit Australian phone number",
-               placeholder: "123 456 789"
-            };
-         case '+49': // Germany
-            return {
-               pattern: /^[1-9]\d{9,11}$/,
-               message: "Please enter a valid German phone number",
-               placeholder: "123 456 7890"
-            };
-         default:
-            return {
-               pattern: /^\d{7,15}$/,
-               message: "Please enter a valid phone number",
-               placeholder: "Enter phone number"
-            };
-      }
-   };
-
-   const phoneValidation = getPhoneValidation(selectedCountryCode);
+   const isFormValid = formValues.name?.trim() && isValid;
 
    const onSubmit = (data: FormData) => {
       if (submitButtonRef.current) {
@@ -138,7 +42,6 @@ const OnboardingStep2: OnboardingStepComponent = ({
          personalInfo: {
             ...currentData.personalInfo,
             name: data.name.trim(),
-            phone: `${selectedCountryCode}${data.phone.trim()}`,
          },
       });
       
@@ -232,7 +135,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
          {/* Bottom sheet (mobile) / Centered modal (desktop) */}
          <div 
             ref={sheetRef}
-            className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[70vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
+            className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[60vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
          >
             {/* Handle - mobile only */}
             <div className="flex justify-center pt-[10.5px] pb-[7px] lg:hidden">
@@ -307,7 +210,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                   {/* Welcome heading */}
                   <div className="text-center mb-4 lg:mb-10 animate-form-element">
                      <span className="text-[#030213] text-2xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
-                        Welcome to Nirvana Rooms! 🏠
+                        What's your name? 👋
                      </span>
                   </div>
 
@@ -345,7 +248,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
 
                            <input
                               type="text"
-                              placeholder="Enter your name"
+                              placeholder="Enter your full name"
                               className="flex-1 bg-transparent text-[15.8px] lg:text-base text-[#030213] placeholder:text-[#717182]/60 border-none outline-none py-[3px]"
                               style={{
                                  fontFamily:
@@ -375,53 +278,12 @@ const OnboardingStep2: OnboardingStepComponent = ({
                            </div>
                         )}
                      </div>
-
-                     {/* Phone input */}
-                     <div className="bg-[#F5F5F5] p-[0.5px] rounded-[14px] lg:rounded-2xl h-auto animate-form-element">
-                        <div className="flex items-center gap-[14px] lg:gap-4 p-[10px] lg:p-4 min-h-[59px] lg:h-auto">
-                           {/* Country code selector */}
-                           <CountryCodePicker
-                              value={selectedCountryCode}
-                              onChange={(phoneCode: string) => {
-                                 setSelectedCountryCode(phoneCode);
-                              }}
-                           />
-
-                           <input
-                              type="tel"
-                              placeholder={phoneValidation.placeholder}
-                              className="flex-1 bg-transparent text-[15.8px] lg:text-base text-[#030213] placeholder:text-[#717182]/60 border-none outline-none py-[3px]"
-                              style={{
-                                 fontFamily:
-                                    "SF Pro Text, -apple-system, sans-serif",
-                              }}
-                              {...register("phone", {
-                                 required: "Phone number is required",
-                                 pattern: {
-                                    value: phoneValidation.pattern,
-                                    message: phoneValidation.message
-                                 }
-                              })}
-                           />
-                        </div>
-                        {errors.phone && (
-                           <div className="px-[17.5px] lg:px-4 pb-2">
-                              <p className="text-red-500 text-xs flex items-center gap-1">
-                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                 </svg>
-                                 {errors.phone.message}
-                              </p>
-                           </div>
-                        )}
-                     </div>
                   </div>
 
                   {/* Description */}
                   <div className="text-center mb-[21px] lg:mb-8 mt-4 lg:mt-6 animate-form-element">
                      <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[19.91px] lg:leading-relaxed">
-                        We'll use this to personalize your room recommendations at
-                        our Iffco Chowk property.
+                        We'll use this to personalize your experience and room recommendations.
                      </p>
                   </div>
                </div>
@@ -440,7 +302,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                      }`}
                   >
                      <span className="text-white text-[14px] lg:text-base font-medium leading-[21px]">
-                        Continue to verification
+                        Continue
                      </span>
                      <svg
                         width="18"

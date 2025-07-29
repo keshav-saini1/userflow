@@ -3,8 +3,9 @@ import type { OnboardingData, OnboardingStep } from '../types';
 
 const initialSteps: OnboardingStep[] = [
   { id: 1, title: 'Welcome', description: 'Get started with your journey', isCompleted: false, isActive: true },
-  { id: 2, title: 'Personal Info', description: 'Tell us about yourself', isCompleted: false, isActive: false },
-  { id: 3, title: 'Verification', description: 'Verify your phone number', isCompleted: false, isActive: false },
+  { id: 2, title: 'Your Name', description: 'Tell us your name', isCompleted: false, isActive: false },
+  { id: 3, title: 'Phone Number', description: 'Enter your phone number', isCompleted: false, isActive: false },
+  { id: 4, title: 'Verification', description: 'Verify your phone number', isCompleted: false, isActive: false },
 ];
 
 const initialData: OnboardingData = {
