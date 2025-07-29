@@ -26,34 +26,27 @@ const OnboardingFlow: React.FC = () => {
     updateUserData(newData);
   };
 
-  const renderCurrentStep = () => {
-    const stepProps = {
-      onNext: handleNext,
-      onPrev: handlePrev,
-      onUpdateData: handleUpdateData,
-      currentData: data.userData,
-    };
-
-    switch (data.currentStep) {
-      case 1:
-        return <OnboardingStep1 {...stepProps} />;
-      case 2:
-        return <OnboardingStep2 {...stepProps} />;
-      case 3:
-        return <OnboardingStep3 {...stepProps} />;
-      default:
-        return <OnboardingStep1 {...stepProps} />;
-    }
+  const stepProps = {
+    onNext: handleNext,
+    onPrev: handlePrev,
+    onUpdateData: handleUpdateData,
+    currentData: data.userData,
   };
 
-  
   return (
-    <div className="min-h-screen bg-white w-screen">
-      <div>
-        <div className="w-full">
-          {renderCurrentStep()}
-        </div>
-      </div>
+    <div className="min-h-screen bg-white w-screen relative">
+      {/* Base screen - Always render Step 1 */}
+      <OnboardingStep1 {...stepProps} />
+      
+      {/* Overlay for Step 2 */}
+      {data.currentStep === 2 && (
+        <OnboardingStep2 {...stepProps} />
+      )}
+      
+      {/* Overlay for Step 3 */}
+      {data.currentStep === 3 && (
+        <OnboardingStep3 {...stepProps} />
+      )}
     </div>
   );
 };

@@ -1,6 +1,7 @@
-export { HeroSection } from './HeroSection';
 export { PropertyCard } from './PropertyCard';
-export { LocationSection } from './LocationSection';
 export { PropertyHeader } from './PropertyHeader';
+export { LocationSection } from './LocationSection';
+export { HeroSection } from './HeroSection';
+export { SetupCard } from './SetupCard';
 export { AvailabilityAlert } from './AvailabilityAlert';
-export { SetupCard } from './SetupCard'; 
+export { default as ImageGallery } from './ImageGallery'; 

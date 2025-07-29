@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { animate, inView, stagger } from 'motion';
 import type { OnboardingStepComponent } from '../types';
+import { useButtonAnimation } from '../hooks/useOnboarding';
 
 interface OtpFormData {
   otp0: string;
@@ -15,6 +17,12 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const { animateButton, animateSuccess } = useButtonAnimation();
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Animation refs
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   const {
     control,
@@ -50,6 +58,74 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       setCanResend(true);
     }
   }, [resendTimer]);
+
+  // Animate in on mount
+  useEffect(() => {
+    if (overlayRef.current && sheetRef.current) {
+      // Animate overlay fade in
+      animate(overlayRef.current, 
+        { opacity: [0, 1] },
+        { duration: 0.3, easing: "ease-out" }
+      );
+
+      // Animate bottom sheet slide up
+      animate(sheetRef.current, 
+        { 
+          y: ["100%", "0%"],
+          opacity: [0, 1]
+        },
+        { 
+          duration: 0.4, 
+          easing: "ease-out",
+          delay: 0.1
+        }
+      );
+
+      // Stagger animate form elements
+      const formElements = sheetRef.current.querySelectorAll('.animate-form-element');
+      animate(formElements, 
+        { 
+          opacity: [0, 1],
+          y: [20, 0]
+        },
+        { 
+          duration: 0.3, 
+          easing: "ease-out",
+          delay: stagger(0.1, { startDelay: 0.3 })
+        }
+      );
+    }
+  }, []);
+
+  const handleClose = () => {
+    if (overlayRef.current && sheetRef.current) {
+      // Animate bottom sheet slide down
+      animate(sheetRef.current, 
+        { 
+          y: ["0%", "100%"],
+          opacity: [1, 0]
+        },
+        { 
+          duration: 0.3, 
+          easing: "ease-in"
+        }
+      );
+
+      // Animate overlay fade out
+      animate(overlayRef.current, 
+        { opacity: [1, 0] },
+        { 
+          duration: 0.2, 
+          easing: "ease-in",
+          delay: 0.1
+        }
+      ).finished.then(() => {
+        onPrev();
+      });
+    } else {
+      onPrev();
+    }
+  };
 
   const handleOtpChange = (index: number, value: string, onChange: (value: string) => void) => {
     if (value.length > 1) return; // Only allow single digit
@@ -96,6 +172,10 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
     // Simulate OTP verification
     if (otp === '123456') {
+      if (submitButtonRef.current) {
+        animateSuccess(submitButtonRef.current);
+      }
+      
       onUpdateData({ 
         personalInfo: {
           ...currentData.personalInfo,
@@ -103,8 +183,10 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
         }
       });
       
-      // Complete onboarding
-      alert('Phone verified successfully! Welcome to your coliving journey!');
+      // Delay to show success animation
+      setTimeout(() => {
+        alert('Phone verified successfully! Welcome to your coliving journey!');
+      }, 400);
     } else {
       setError('root', { message: 'Invalid OTP. Please try again.' });
     }
@@ -135,12 +217,16 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     <div className="fixed inset-0 z-50 flex items-end lg:items-center lg:justify-center">
       {/* Background overlay */}
       <div
+        ref={overlayRef}
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onPrev}
+        onClick={handleClose}
       />
 
       {/* Bottom sheet (mobile) / Centered modal (desktop) */}
-      <div className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[75vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl">
+      <div 
+        ref={sheetRef}
+        className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[75vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
+      >
         {/* Handle - mobile only */}
         <div className="flex justify-center pt-[10.5px] pb-[7px] lg:hidden">
           <div className="w-[35px] h-[3.5px] bg-[#DBEAFE] rounded-full" />
@@ -186,7 +272,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
           {/* Close button */}
           <button
-            onClick={onPrev}
+            onClick={handleClose}
             className="w-7 h-7 lg:w-8 lg:h-8 bg-[#ECECF0]/60 rounded-full flex items-center justify-center hover:bg-[#ECECF0]/80 transition-colors"
           >
             <svg
@@ -213,7 +299,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
           <div className="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-[84px] lg:pb-8 h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
             <div className="flex flex-col gap-[35px] lg:gap-10">
               {/* Heading section */}
-              <div className="flex flex-col gap-[10.5px] lg:gap-4">
+              <div className="flex flex-col gap-[10.5px] lg:gap-4 animate-form-element">
                 <div className="text-center">
                   <span className="text-[#030213] text-[21px] lg:text-3xl font-medium leading-[26.25px] lg:leading-tight" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
                     Enter verification code 📱
@@ -229,7 +315,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                   <div className="text-center">
                     <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
                       <span className="font-semibold text-[#5a5a69]">{phoneNumber}</span>
-                      <span className="ml-3" onClick={onPrev}>Edit</span>
+                      <span className="ml-3" onClick={handleClose}>Edit</span>
                     </p>
                   </div>
                 </div>
@@ -238,7 +324,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
               {/* OTP and resend section */}
               <div className="flex flex-col gap-[21px] lg:gap-8">
                 {/* OTP Input */}
-                <div className="flex justify-center gap-[10.5px] lg:gap-3">
+                <div className="flex justify-center gap-[10.5px] lg:gap-3 animate-form-element">
                   {otpFields.map((fieldName, index) => (
                     <Controller
                       key={fieldName}
@@ -276,7 +362,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
                 {/* Error Message */}
                 {errors.root && (
-                  <div className="mb-4 p-3 lg:p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="mb-4 p-3 lg:p-4 bg-red-50 border border-red-200 rounded-lg animate-form-element">
                     <p className="text-sm text-red-600 flex items-center">
                       <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -287,7 +373,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                 )}
 
                 {/* Resend Section */}
-                <div className="flex flex-col gap-[10.5px] lg:gap-3">
+                <div className="flex flex-col gap-[10.5px] lg:gap-3 animate-form-element">
                   <div className="text-center">
                     <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
                       Didn't receive the code?
@@ -319,12 +405,13 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
             <div className="hidden lg:flex space-x-4 mb-4">
               <button
                 type="button"
-                onClick={onPrev}
+                onClick={handleClose}
                 className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
               >
                 Back
               </button>
               <button
+                ref={submitButtonRef}
                 type="submit"
                 disabled={!isOtpComplete}
                 className="flex-2 py-3 px-8 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -335,6 +422,7 @@ const OnboardingStep3: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
             {/* Mobile continue button */}
             <button
+              ref={submitButtonRef}
               type="submit"
               disabled={!isOtpComplete}
               className={`lg:hidden w-full h-[49px] rounded-[14px] flex items-center justify-center gap-[10.5px] mb-[10.5px] transition-all hover:scale-[1.02] active:scale-[0.98] ${

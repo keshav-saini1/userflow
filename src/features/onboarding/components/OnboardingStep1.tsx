@@ -5,6 +5,7 @@ import { FaArrowRight } from "react-icons/fa";
 
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
    const handleContinue = () => {
+      // Trigger Step 2 overlay
       onNext();
    };
 

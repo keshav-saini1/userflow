@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { animate, inView, stagger } from "motion";
 import type { OnboardingStepComponent } from "../types";
 import { CountryCodePicker } from "@/components";
+import { useButtonAnimation } from "../hooks/useOnboarding";
 
 interface FormData {
    name: string;
@@ -14,6 +16,9 @@ const OnboardingStep2: OnboardingStepComponent = ({
    onUpdateData,
    currentData,
 }) => {
+   const { animateButton, animateSuccess } = useButtonAnimation();
+   const submitButtonRef = React.useRef<HTMLButtonElement>(null);
+
    // Initialize country code from existing data or default to +91
    const initializeCountryCode = () => {
       const existingPhone = currentData.personalInfo?.phone;
@@ -125,6 +130,10 @@ const OnboardingStep2: OnboardingStepComponent = ({
    const phoneValidation = getPhoneValidation(selectedCountryCode);
 
    const onSubmit = (data: FormData) => {
+      if (submitButtonRef.current) {
+         animateSuccess(submitButtonRef.current);
+      }
+      
       onUpdateData({
          personalInfo: {
             ...currentData.personalInfo,
@@ -132,19 +141,99 @@ const OnboardingStep2: OnboardingStepComponent = ({
             phone: `${selectedCountryCode}${data.phone.trim()}`,
          },
       });
-      onNext();
+      
+      // Delay the next step to show the success animation
+      setTimeout(() => {
+         onNext();
+      }, 400);
+   };
+
+   // Animation refs
+   const overlayRef = React.useRef<HTMLDivElement>(null);
+   const sheetRef = React.useRef<HTMLDivElement>(null);
+
+   // Animate in on mount
+   useEffect(() => {
+      if (overlayRef.current && sheetRef.current) {
+         // Animate overlay fade in
+         animate(overlayRef.current, 
+            { opacity: [0, 1] },
+            { duration: 0.3, easing: "ease-out" }
+         );
+
+         // Animate bottom sheet slide up
+         animate(sheetRef.current, 
+            { 
+               y: ["100%", "0%"],
+               opacity: [0, 1]
+            },
+            { 
+               duration: 0.4, 
+               easing: "ease-out",
+               delay: 0.1
+            }
+         );
+
+         // Stagger animate form elements
+         const formElements = sheetRef.current.querySelectorAll('.animate-form-element');
+         animate(formElements, 
+            { 
+               opacity: [0, 1],
+               y: [20, 0]
+            },
+            { 
+               duration: 0.3, 
+               easing: "ease-out",
+               delay: stagger(0.1, { startDelay: 0.3 })
+            }
+         );
+      }
+   }, []);
+
+   const handleClose = () => {
+      if (overlayRef.current && sheetRef.current) {
+         // Animate bottom sheet slide down
+         animate(sheetRef.current, 
+            { 
+               y: ["0%", "100%"],
+               opacity: [1, 0]
+            },
+            { 
+               duration: 0.3, 
+               easing: "ease-in"
+            }
+         );
+
+         // Animate overlay fade out
+         animate(overlayRef.current, 
+            { opacity: [1, 0] },
+            { 
+               duration: 0.2, 
+               easing: "ease-in",
+               delay: 0.1
+            }
+         ).finished.then(() => {
+            onPrev();
+         });
+      } else {
+         onPrev();
+      }
    };
 
    return (
       <div className="fixed inset-0 z-50 flex items-end lg:items-center lg:justify-center">
          {/* Background overlay */}
          <div
+            ref={overlayRef}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={onPrev}
+            onClick={handleClose}
          />
 
          {/* Bottom sheet (mobile) / Centered modal (desktop) */}
-         <div className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[70vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl">
+         <div 
+            ref={sheetRef}
+            className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[70vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
+         >
             {/* Handle - mobile only */}
             <div className="flex justify-center pt-[10.5px] pb-[7px] lg:hidden">
                <div className="w-[35px] h-[3.5px] bg-black/30 rounded-full" />
@@ -190,7 +279,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
 
                {/* Close button */}
                <button
-                  onClick={onPrev}
+                  onClick={handleClose}
                   className="w-7 h-7 lg:w-8 lg:h-8 bg-[#ECECF0]/60 rounded-full flex items-center justify-center hover:bg-[#ECECF0]/80 transition-colors"
                >
                   <svg
@@ -216,7 +305,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                {/* Main content */}
                <div className="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-6 lg:pb-8 h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
                   {/* Welcome heading */}
-                  <div className="text-center mb-4 lg:mb-10">
+                  <div className="text-center mb-4 lg:mb-10 animate-form-element">
                      <span className="text-[#030213] text-2xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
                         Welcome to Nirvana Rooms! 🏠
                      </span>
@@ -225,7 +314,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                   {/* Form fields */}
                   <div className="space-y-3 lg:space-y-4">
                      {/* Name input */}
-                     <div className="bg-[#F5F5F5] p-[2px] rounded-[14px] lg:rounded-2xl">
+                     <div className="bg-[#F5F5F5] p-[2px] rounded-[14px] lg:rounded-2xl animate-form-element">
                         <div className="flex items-center gap-[14px] lg:gap-4 p-[12.5px] lg:p-4">
                            {/* Person icon */}
                            <div className="w-[17.5px] h-[17.5px] lg:w-5 lg:h-5">
@@ -288,7 +377,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                      </div>
 
                      {/* Phone input */}
-                     <div className="bg-[#F5F5F5] p-[0.5px] rounded-[14px] lg:rounded-2xl h-auto">
+                     <div className="bg-[#F5F5F5] p-[0.5px] rounded-[14px] lg:rounded-2xl h-auto animate-form-element">
                         <div className="flex items-center gap-[14px] lg:gap-4 p-[10px] lg:p-4 min-h-[59px] lg:h-auto">
                            {/* Country code selector */}
                            <CountryCodePicker
@@ -329,7 +418,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                   </div>
 
                   {/* Description */}
-                  <div className="text-center mb-[21px] lg:mb-8 mt-4 lg:mt-6">
+                  <div className="text-center mb-[21px] lg:mb-8 mt-4 lg:mt-6 animate-form-element">
                      <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[19.91px] lg:leading-relaxed">
                         We'll use this to personalize your room recommendations at
                         our Iffco Chowk property.
@@ -341,6 +430,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                <div className="absolute lg:relative bottom-0 left-0 right-0 bg-white/95 lg:bg-white backdrop-blur lg:backdrop-blur-none rounded-t-[14px] lg:rounded-none px-[14px] lg:px-8 pt-3 lg:pt-0 pb-4 lg:pb-8 border-t lg:border-t-0 border-gray-100">
                   {/* Continue button */}
                   <button
+                     ref={submitButtonRef}
                      type="submit"
                      disabled={!isFormValid}
                      className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${

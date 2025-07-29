@@ -2,33 +2,19 @@ import { useState, useCallback } from 'react';
 import type { OnboardingData, OnboardingStep } from '../types';
 
 const initialSteps: OnboardingStep[] = [
-  {
-    id: 1,
-    title: 'Find Your Space',
-    description: 'Discover your perfect coliving space',
-    isCompleted: false,
-    isActive: true,
-  },
-  {
-    id: 2,
-    title: 'Tell Us About You',
-    description: 'Share your preferences and requirements',
-    isCompleted: false,
-    isActive: false,
-  },
-  {
-    id: 3,
-    title: 'Schedule Your Visit',
-    description: 'Book a tour and move-in details',
-    isCompleted: false,
-    isActive: false,
-  },
+  { id: 1, title: 'Welcome', description: 'Get started with your journey', isCompleted: false, isActive: true },
+  { id: 2, title: 'Personal Info', description: 'Tell us about yourself', isCompleted: false, isActive: false },
+  { id: 3, title: 'Verification', description: 'Verify your phone number', isCompleted: false, isActive: false },
 ];
 
 const initialData: OnboardingData = {
   currentStep: 1,
   steps: initialSteps,
-  userData: {},
+  userData: {
+    preferences: {},
+    personalInfo: {},
+    moveInDetails: {},
+  },
 };
 
 export const useOnboarding = () => {
@@ -89,4 +75,30 @@ export const useOnboarding = () => {
     completeStep,
     resetOnboarding,
   };
+};
+
+// Custom hook for button animations
+export const useButtonAnimation = () => {
+  const animateButton = (element: HTMLElement, scale: number = 1.02) => {
+    import('motion').then(({ animate }) => {
+      animate(element, 
+        { scale: [1, scale, 1] },
+        { duration: 0.2, easing: "ease-out" }
+      );
+    });
+  };
+
+  const animateSuccess = (element: HTMLElement) => {
+    import('motion').then(({ animate }) => {
+      animate(element, 
+        { 
+          scale: [1, 1.05, 1],
+          backgroundColor: ["#030213", "#00A63E", "#030213"]
+        },
+        { duration: 0.4, easing: "ease-out" }
+      );
+    });
+  };
+
+  return { animateButton, animateSuccess };
 }; 
