@@ -3,7 +3,7 @@ export interface BookingDetails {
   roomNumber: string;
   roomType: string;
   moveInDate: string;
-  status: 'pending' | 'confirmed' | 'active';
+  status: 'pending' | 'approved' | 'cancelled';
   tokenPaid: number;
   daysUntilMoveIn: number;
   propertyImage: string;

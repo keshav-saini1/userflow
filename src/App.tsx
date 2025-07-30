@@ -15,6 +15,11 @@ import { BookVisitPage, BookVisitSuccessPage } from './features/book-visit';
 import { ReservationPage } from './features/reservation';
 import { ConfirmedBookingPage } from './features/confirmed-booking';
 import { sampleConfirmedBookingData } from './features/confirmed-booking/data/sampleData';
+import ModifyBookingPage from './features/modify-booking/pages/ModifyBookingPage';
+import ChangeRoomPage from './features/modify-booking/pages/ChangeRoomPage';
+import CancelBookingExample from './features/modify-booking/examples/CancelBookingExample';
+import ChangeRoomExample from './features/modify-booking/examples/ChangeRoomExample';
+import ReservationIntegrationExample from './features/modify-booking/examples/ReservationIntegrationExample';
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -31,10 +36,10 @@ const PropertyListingWrapper = () => {
       onBackClick={() => window.history.back()}
       onShareClick={() => console.log('Share clicked')}
       onSetupClick={() => console.log('Setup clicked')}
-      onReserve={(propertyId) => navigate('/reservation')}
+      onReserve={(_propertyId: string) => navigate('/reservation')}
       onBookVisit={() => navigate('/book-visit')}
       onMapClick={() => console.log('Map clicked')}
-      onPropertyClick={(propertyId) => navigate(`/property-details/${propertyId}`)}
+      onPropertyClick={(propertyId: string) => navigate(`/property-details/${propertyId}`)}
     />
   );
 };
@@ -137,6 +142,18 @@ const ConfirmedBookingWrapper = () => {
     // navigate('/commute');
   };
 
+  const handleModifyBooking = () => {
+    console.log('Modify booking clicked');
+    // Navigate to booking modification flow
+    navigate('/modify-booking');
+  };
+
+  const handleRequestRefund = () => {
+    console.log('Request refund clicked');
+    // Navigate to refund request flow
+    // navigate('/request-refund');
+  };
+
   return (
     <ConfirmedBookingPage
       data={sampleConfirmedBookingData}
@@ -147,6 +164,8 @@ const ConfirmedBookingWrapper = () => {
       onViewAllPayments={handleViewAllPayments}
       onSupportAction={handleSupportAction}
       onExploreCommute={handleExploreCommute}
+      onModifyBooking={handleModifyBooking}
+      onRequestRefund={handleRequestRefund}
     />
   );
 };
@@ -191,6 +210,26 @@ const router = createBrowserRouter([
   {
     path: "/bookings",
     element: <ConfirmedBookingWrapper />,
+  },
+  {
+    path: "/modify-booking",
+    element: <ModifyBookingPage />,
+  },
+  {
+    path: "/modify-booking/change-room",
+    element: <ChangeRoomPage />,
+  },
+  {
+    path: "/modify-booking/cancel-example",
+    element: <CancelBookingExample />,
+  },
+  {
+    path: "/modify-booking/change-room-example",
+    element: <ChangeRoomExample />,
+  },
+  {
+    path: "/modify-booking/reservation-integration-example",
+    element: <ReservationIntegrationExample />,
   },
   {
     path: "/login",

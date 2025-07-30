@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import type { ReservationContextType, ReservationForm } from '../types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReservationContextType, ReservationForm, RoomChangeData } from '../types';
 
 const initialForm: ReservationForm = {
   selectedDate: null,
@@ -9,6 +9,7 @@ const initialForm: ReservationForm = {
   selectedPaymentMethod: null,
   currentStep: 1,
   totalSteps: 5,
+  roomChangeData: null,
 };
 
 const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
@@ -19,6 +20,22 @@ interface ReservationProviderProps {
 
 export const ReservationProvider: React.FC<ReservationProviderProps> = ({ children }) => {
   const [form, setForm] = useState<ReservationForm>(initialForm);
+
+  // Load room change data from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const roomData = sessionStorage.getItem('selectedRoomForReservation');
+      if (roomData) {
+        const parsedRoomData = JSON.parse(roomData);
+        setForm(prev => ({
+          ...prev,
+          roomChangeData: parsedRoomData
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading room change data:', error);
+    }
+  }, []);
 
   const updateForm = (updates: Partial<ReservationForm>) => {
     setForm(prev => ({ ...prev, ...updates }));
@@ -44,6 +61,13 @@ export const ReservationProvider: React.FC<ReservationProviderProps> = ({ childr
 
   const resetForm = () => {
     setForm(initialForm);
+    // Clear room change data from sessionStorage
+    sessionStorage.removeItem('selectedRoomForReservation');
+  };
+
+  const clearRoomChangeData = () => {
+    setForm(prev => ({ ...prev, roomChangeData: null }));
+    sessionStorage.removeItem('selectedRoomForReservation');
   };
 
   const value: ReservationContextType = {
@@ -53,6 +77,7 @@ export const ReservationProvider: React.FC<ReservationProviderProps> = ({ childr
     previousStep,
     goToStep,
     resetForm,
+    clearRoomChangeData,
   };
 
   return (

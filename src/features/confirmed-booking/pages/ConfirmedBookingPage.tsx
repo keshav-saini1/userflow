@@ -5,6 +5,10 @@ import timer from "@/assets/onboarding/timer.svg";
 import train from "@/assets/onboarding/train.svg";
 import food from "@/assets/onboarding/food.svg";
 import building from "@/assets/onboarding/building.svg";
+import red_clock from '@/assets/red_clock.svg';
+import edit_btn from '@/assets/edit_btn.svg';
+import { IoEyeOutline } from 'react-icons/io5';
+import { FiCreditCard } from 'react-icons/fi';
 
 interface ConfirmedBookingPageProps {
   data: ConfirmedBookingData;
@@ -15,6 +19,8 @@ interface ConfirmedBookingPageProps {
   onViewAllPayments: () => void;
   onSupportAction: (action: 'chat' | 'call') => void;
   onExploreCommute: () => void;
+  onModifyBooking: () => void;
+  onRequestRefund: () => void;
 }
 
 export default function ConfirmedBookingPage({
@@ -25,7 +31,9 @@ export default function ConfirmedBookingPage({
   onPayNow,
   onViewAllPayments,
   onSupportAction,
-  onExploreCommute
+  onExploreCommute,
+  onModifyBooking,
+  onRequestRefund
 }: ConfirmedBookingPageProps) {
   const { bookingDetails, paymentSummary, supportOptions, propertyInfo } = data;
 
@@ -33,10 +41,10 @@ export default function ConfirmedBookingPage({
     switch (status) {
       case 'pending':
         return 'bg-orange-50 text-orange-700 border-orange-200';
-      case 'confirmed':
+      case 'approved':
         return 'bg-green-50 text-green-700 border-green-200';
-      case 'active':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'cancelled':
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
         return 'bg-gray-50 text-gray-700 border-gray-200';
     }
@@ -46,10 +54,10 @@ export default function ConfirmedBookingPage({
     switch (status) {
       case 'pending':
         return 'bg-orange-500';
-      case 'confirmed':
+      case 'approved':
         return 'bg-green-500';
-      case 'active':
-        return 'bg-blue-500';
+      case 'cancelled':
+        return 'bg-red-500';
       default:
         return 'bg-gray-500';
     }
@@ -209,18 +217,41 @@ export default function ConfirmedBookingPage({
 
               {/* Action Buttons */}
               <div className="flex gap-2.5 lg:gap-4 mt-4 lg:mt-6">
-                <button className="bg-blue-50 rounded-xl p-2.5 lg:p-3 flex items-center justify-center hover:bg-blue-100 transition-colors">
-                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                    <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 bg-blue-600 rounded-full" />
-                  </div>
-                </button>
-                <button
-                  onClick={onSendReminder}
-                  className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-gray-800 transition-colors"
-                >
-                  Send Reminder
-                  <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
-                </button>
+                {
+                  bookingDetails.status === 'pending' && (
+                    <img src={edit_btn} alt="edit" className="" />
+                  )
+                }
+                
+                {bookingDetails.status === 'pending' && (
+                  <button
+                    onClick={onSendReminder}
+                    className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-gray-800 transition-colors"
+                  >
+                    Send Reminder
+                    <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
+                  </button>
+                )}
+                
+                {bookingDetails.status === 'approved' && (
+                  <button
+                    onClick={onModifyBooking}
+                    className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Modify Booking
+                    <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
+                  </button>
+                )}
+                
+                {bookingDetails.status === 'cancelled' && (
+                  <button
+                    onClick={onRequestRefund}
+                    className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-red-700 transition-colors"
+                  >
+                    Request Refund
+                    <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -232,9 +263,7 @@ export default function ConfirmedBookingPage({
 
               {/* Payment Alert */}
               <div className="flex gap-2.5 lg:gap-4 items-start mb-5 lg:mb-6">
-                <div className="w-[42px] h-[42px] lg:w-12 lg:h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-red-500 rounded-full" />
-                </div>
+                <img src={red_clock} alt="red_clock" className="" />
                 <div className="flex-1">
                   <h4 className="text-sm lg:text-base font-medium text-gray-900 mb-1 lg:mb-2">
                     Payment Due Soon
@@ -275,14 +304,14 @@ export default function ConfirmedBookingPage({
                   onClick={onViewAllPayments}
                   className="flex-1 bg-gray-50 text-gray-700 rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2 lg:gap-3 text-xs lg:text-sm font-semibold hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 bg-gray-600 rounded-full" />
+                  <IoEyeOutline className='w-5 h-5 lg:w-5 lg:h-5' />
                   View All
                 </button>
                 <button
                   onClick={onPayNow}
                   className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2 lg:gap-3 text-xs lg:text-sm font-semibold hover:bg-gray-800 transition-colors"
                 >
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 bg-white rounded-full" />
+                 <FiCreditCard className='w-5 h-5 lg:w-5 lg:h-5' />
                   Pay Now
                 </button>
               </div>

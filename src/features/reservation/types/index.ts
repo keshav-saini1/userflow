@@ -30,6 +30,16 @@ export interface CalendarDay {
   hasEvents: boolean;
 }
 
+export interface RoomChangeData {
+  roomId: string;
+  roomNumber: string;
+  roomType: string;
+  sharingType: string;
+  price: number;
+  amenities: string[];
+  image: string;
+}
+
 export interface ReservationForm {
   selectedDate: Date | null;
   moveInOption: string | null;
@@ -38,6 +48,7 @@ export interface ReservationForm {
   selectedPaymentMethod?: string | null;
   currentStep: number;
   totalSteps: number;
+  roomChangeData?: RoomChangeData | null;
 }
 
 export interface ReservationContextType {
@@ -47,4 +58,5 @@ export interface ReservationContextType {
   previousStep: () => void;
   goToStep: (step: number) => void;
   resetForm: () => void;
+  clearRoomChangeData: () => void;
 } 

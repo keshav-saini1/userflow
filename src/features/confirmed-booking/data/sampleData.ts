@@ -6,7 +6,7 @@ export const sampleConfirmedBookingData: ConfirmedBookingData = {
     roomNumber: 'A-203',
     roomType: 'Premium Deluxe Room',
     moveInDate: '15 Jan 2025',
-    status: 'pending',
+    status: 'approved', // Options: 'pending', 'approved', 'cancelled'
     tokenPaid: 5000,
     daysUntilMoveIn: 7,
     propertyImage: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
