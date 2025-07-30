@@ -31,7 +31,7 @@ const PersonaSelectionPage: React.FC = () => {
          title: "I'm an existing tenant",
          description: "But I'm using a different phone number now",
          icon: existingTenant,
-         href: "/property-listing",
+         href: "/bookings",
       },
       {
          id: "not-added",

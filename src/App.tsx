@@ -13,6 +13,8 @@ import { samplePropertyListing } from './features/property-listing/data/sampleDa
 import { WebCheckinPage } from './features/webcheckin';
 import { BookVisitPage, BookVisitSuccessPage } from './features/book-visit';
 import { ReservationPage } from './features/reservation';
+import { ConfirmedBookingPage } from './features/confirmed-booking';
+import { sampleConfirmedBookingData } from './features/confirmed-booking/data/sampleData';
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -96,6 +98,59 @@ const BookVisitSuccessWrapper = () => {
   );
 };
 
+// Confirmed Booking Wrapper to handle navigation and actions
+const ConfirmedBookingWrapper = () => {
+  const navigate = useNavigate();
+  
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
+  const handleShareClick = () => {
+    console.log('Share clicked');
+  };
+
+  const handleSendReminder = () => {
+    console.log('Send reminder clicked');
+  };
+
+  const handlePayNow = () => {
+    console.log('Pay now clicked');
+    // Navigate to payment flow
+    // navigate('/payment');
+  };
+
+  const handleViewAllPayments = () => {
+    console.log('View all payments clicked');
+    // Navigate to payments page
+    // navigate('/payments');
+  };
+
+  const handleSupportAction = (action: 'chat' | 'call') => {
+    console.log('Support action clicked:', action);
+    // Handle support action (open chat or initiate call)
+  };
+
+  const handleExploreCommute = () => {
+    console.log('Explore commute clicked');
+    // Navigate to commute/map view
+    // navigate('/commute');
+  };
+
+  return (
+    <ConfirmedBookingPage
+      data={sampleConfirmedBookingData}
+      onBackClick={handleBackClick}
+      onShareClick={handleShareClick}
+      onSendReminder={handleSendReminder}
+      onPayNow={handlePayNow}
+      onViewAllPayments={handleViewAllPayments}
+      onSupportAction={handleSupportAction}
+      onExploreCommute={handleExploreCommute}
+    />
+  );
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -132,6 +187,10 @@ const router = createBrowserRouter([
   {
     path: "/reservation",
     element: <ReservationPage />,
+  },
+  {
+    path: "/bookings",
+    element: <ConfirmedBookingWrapper />,
   },
   {
     path: "/login",
