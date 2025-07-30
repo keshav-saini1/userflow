@@ -35,7 +35,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="flex flex-col items-center gap-3 lg:gap-4">
                 {/* Property Name */}
                 <div className="w-full">
-                  <p className="text-white text-[21px] md:text-3xl lg:text-4xl font-bold leading-tight tracking-[-0.525px]">
+                  <p className="text-white text-[21px] md:text-3xl lg:text-6xl font-bold leading-tight tracking-[-0.525px]">
                     Your New Home Awaits
                   </p>
                 </div>
@@ -69,8 +69,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 
                 {/* Content */}
-                <div className="flex-1 flex flex-col gap-1.5 lg:gap-2 min-w-0">
-                  <div className="w-full">
+                <div className="flex-1 flex flex-col items-start gap-1.5 lg:gap-2 min-w-0 lg:w-[30vw]">
+                  <div className="w-full flex items-center justify-start">
                     <p className="text-white text-[12px] lg:text-sm font-medium leading-[14px] lg:leading-5">
                       Find Nearby Spots
                     </p>

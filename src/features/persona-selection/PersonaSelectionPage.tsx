@@ -4,17 +4,19 @@ import newPlace from "../../assets/persona/newplace.svg";
 import existingTenant from "../../assets/persona/existingtenant.svg";
 import app from "../../assets/persona/app.svg";
 import { FiArrowRight } from "react-icons/fi";
-
+import { useNavigate } from "react-router";
 
 interface PersonaOption {
    id: string;
    title: string;
    description: string;
    icon: string;
+   href: string;
 }
 
 const PersonaSelectionPage: React.FC = () => {
    const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+   const navigate = useNavigate();
 
    const personaOptions: PersonaOption[] = [
       {
@@ -22,18 +24,21 @@ const PersonaSelectionPage: React.FC = () => {
          title: "I'm looking for a new place",
          description: "Find and book the perfect rental for me",
          icon: newPlace,
+         href: "/property-listing",
       },
       {
          id: "existing-tenant",
          title: "I'm an existing tenant",
          description: "But I'm using a different phone number now",
          icon: existingTenant,
+         href: "/property-listing",
       },
       {
          id: "not-added",
          title: "I wasn't added to the app",
          description: "I'm living here but not registered yet",
          icon: app,
+         href: "/property-listing",
       },
    ];
 
@@ -42,6 +47,9 @@ const PersonaSelectionPage: React.FC = () => {
       // Handle navigation or API call here
       console.log("Selected persona:", personaId);
       // TODO: Add navigation or API integration
+      navigate(
+         personaOptions.find((option) => option.id === personaId)?.href || "/"
+      );
    };
 
    const handleBack = () => {

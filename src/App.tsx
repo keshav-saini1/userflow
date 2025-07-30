@@ -12,6 +12,7 @@ import { PropertyListingPage, PropertyDetailsPage, samplePropertyDetailData } fr
 import { samplePropertyListing } from './features/property-listing/data/sampleData';
 import { WebCheckinPage } from './features/webcheckin';
 import { BookVisitPage, BookVisitSuccessPage } from './features/book-visit';
+import { ReservationPage } from './features/reservation';
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -28,7 +29,7 @@ const PropertyListingWrapper = () => {
       onBackClick={() => window.history.back()}
       onShareClick={() => console.log('Share clicked')}
       onSetupClick={() => console.log('Setup clicked')}
-      onReserve={(propertyId) => console.log('Reserve clicked:', propertyId)}
+      onReserve={(propertyId) => navigate('/reservation')}
       onBookVisit={() => navigate('/book-visit')}
       onMapClick={() => console.log('Map clicked')}
       onPropertyClick={(propertyId) => navigate(`/property-details/${propertyId}`)}
@@ -127,6 +128,10 @@ const router = createBrowserRouter([
   {
     path: "/book-visit/success",
     element: <BookVisitSuccessWrapper />,
+  },
+  {
+    path: "/reservation",
+    element: <ReservationPage />,
   },
   {
     path: "/login",

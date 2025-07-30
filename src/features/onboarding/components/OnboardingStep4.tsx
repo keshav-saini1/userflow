@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { animate, inView, stagger } from 'motion';
 import type { OnboardingStepComponent } from '../types';
 import { useButtonAnimation } from '../hooks/useOnboarding';
+import { useNavigate } from 'react-router';
 
 interface OtpFormData {
   otp0: string;
@@ -18,6 +19,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { animateButton, animateSuccess } = useButtonAnimation();
+  const navigate = useNavigate();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Animation refs
@@ -185,7 +187,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       
       // Delay to show success animation
       setTimeout(() => {
-        alert('Phone verified successfully! Welcome to your coliving journey!');
+        navigate('/persona-selection')
       }, 400);
     } else {
       setError('root', { message: 'Invalid OTP. Please try again.' });

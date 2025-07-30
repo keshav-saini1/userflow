@@ -1,6 +1,14 @@
 import React from "react";
 import type { OnboardingStepComponent } from "../types";
 import timer from "@/assets/onboarding/timer.svg";
+import train from "@/assets/onboarding/train.svg";
+import food from "@/assets/onboarding/food.svg";
+import building from "@/assets/onboarding/building.svg";
+import verified from "@/assets/onboarding/verified.svg";
+import check from "@/assets/onboarding/check.svg";
+import room from "@/assets/onboarding/room.svg";
+import crew from "@/assets/onboarding/crew.svg";
+import adulting from "@/assets/onboarding/adulting.svg";
 import { FaArrowRight } from "react-icons/fa";
 
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
@@ -53,19 +61,31 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                               <div className="flex items-center justify-start lg:justify-center mb-2">
                                  <div className="flex items-center space-x-3 lg:space-x-14">
                                     <div className="flex items-center space-x-1">
-                                       <div className="w-3 h-3 lg:w-4 lg:h-4 rounded bg-blue-500"></div>
+                                       <img
+                                          src={building}
+                                          alt="building"
+                                          className="w-4 h-4 lg:w-6 lg:h-6"
+                                       />
                                        <span className="text-white/90 text-xs lg:text-sm">
                                           15-25 min
                                        </span>
                                     </div>
                                     <div className="flex items-center space-x-1">
-                                       <div className="w-3 h-3 lg:w-4 lg:h-4 rounded bg-green-500"></div>
+                                       <img
+                                          src={train}
+                                          alt="building"
+                                          className="w-4 h-4 lg:w-6 lg:h-6"
+                                       />
                                        <span className="text-white/90 text-xs lg:text-sm">
                                           2 min walk
                                        </span>
                                     </div>
                                     <div className="flex items-center space-x-1">
-                                       <div className="w-3 h-3 lg:w-4 lg:h-4 rounded bg-orange-500"></div>
+                                       <img
+                                          src={food}
+                                          alt="building"
+                                          className="w-4 h-4 lg:w-6 lg:h-6"
+                                       />
                                        <span className="text-white/90 text-xs lg:text-sm">
                                           5-8 min
                                        </span>
@@ -87,7 +107,11 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                      {/* Tags */}
                      <div className="flex flex-wrap gap-2 lg:gap-3 mt-3 lg:mt-4 lg:justify-center">
                         <div className="backdrop-blur-md bg-white/15 px-3 py-1 lg:px-4 lg:py-2 rounded-full flex items-center space-x-2">
-                           <div className="w-3 h-3 lg:w-4 lg:h-4 bg-green-500 rounded"></div>
+                           <img
+                              src={verified}
+                              alt="building"
+                              className="w-4 h-4 lg:w-6 lg:h-6"
+                           />
                            <span className="text-white text-xs lg:text-sm font-medium">
                               Verified
                            </span>
@@ -96,7 +120,11 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                            </span>
                         </div>
                         <div className="backdrop-blur-md bg-white/15 px-3 py-1 lg:px-4 lg:py-2 rounded-full flex items-center space-x-2">
-                           <div className="w-3 h-3 lg:w-4 lg:h-4 bg-blue-500 rounded"></div>
+                           <img
+                              src={check}
+                              alt="building"
+                              className="w-4 h-4 lg:w-6 lg:h-6"
+                           />
                            <span className="text-white text-xs lg:text-sm font-medium">
                               Move-in
                            </span>
@@ -129,21 +157,7 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                   <div className="bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100 lg:shadow-md hover:shadow-lg transition-shadow">
                      <div className="flex space-x-3 lg:space-x-4">
                         <div className="bg-gray-50 p-3 lg:p-4 rounded-xl w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center flex-shrink-0">
-                           <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <svg
-                                 className="w-4 h-4 lg:w-5 lg:h-5 text-blue-600"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24"
-                              >
-                                 <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                                 />
-                              </svg>
-                           </div>
+                           <img src={room} alt="" className="w-4 h-4 lg:w-32 lg:h-32" />
                         </div>
                         <div className="flex-1">
                            <h3 className="font-bold text-gray-900 text-sm lg:text-lg mb-1 lg:mb-2">

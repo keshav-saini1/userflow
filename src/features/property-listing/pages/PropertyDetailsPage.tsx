@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaChevronLeft, FaShareAlt, FaHeart, FaPlay, FaCheck } from 'react-icons/fa';
 import type { PropertyDetailPageData } from '../types';
-import ImageGallery, { type GalleryImage } from '../components/ImageGallery';
+import ImageGallery, { type GalleryCategory } from '../../../components/ImageGallery';
 
 interface PropertyDetailsPageProps {
   propertyData: PropertyDetailPageData;
@@ -21,25 +21,43 @@ export default function PropertyDetailsPage({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
-  // Convert property data to gallery format
-  const galleryImages: GalleryImage[] = [
-    // Photos from the property data
-    ...propertyData.photos.map((photo, index) => ({
-      id: `photo-${index}`,
-      url: photo.url,
-      category: photo.category.toLowerCase().replace(' ', '-'),
-      title: photo.category,
-      isVideo: false
-    })),
-    // Videos from the property data
-    ...propertyData.videos.map((video, index) => ({
-      id: `video-${index}`,
-      url: video.thumbnail,
-      category: 'videos',
-      title: video.title,
-      isVideo: true,
-      thumbnail: video.thumbnail
-    }))
+  // Convert property data to gallery categories format
+  const galleryCategories: GalleryCategory[] = [
+    // Group photos by category if they have categories, otherwise show all photos
+    ...(() => {
+      const photoCategories = propertyData.photos.reduce((acc, photo) => {
+        const category = photo.category || 'General';
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push({
+          id: `photo-${photo.id}`,
+          src: photo.url,
+          alt: photo.category,
+          category: category.toLowerCase().replace(' ', '-')
+        });
+        return acc;
+      }, {} as Record<string, { id: string; src: string; alt: string; category: string }[]>);
+
+      return Object.entries(photoCategories).map(([categoryName, images]) => ({
+        id: categoryName.toLowerCase().replace(' ', '-'),
+        name: categoryName,
+        count: images.length,
+        images
+      }));
+    })(),
+    // Videos category
+    {
+      id: 'videos',
+      name: 'Videos',
+      count: propertyData.videos.length,
+      images: propertyData.videos.map((video, index) => ({
+        id: `video-${index}`,
+        src: video.thumbnail,
+        alt: video.title,
+        category: 'videos'
+      }))
+    }
   ];
 
   const handleViewAllPhotos = () => {
@@ -481,12 +499,28 @@ export default function PropertyDetailsPage({
       </div>
 
       {/* Image Gallery Modal */}
-      <ImageGallery
-        images={galleryImages}
-        isOpen={isGalleryOpen}
-        onClose={handleCloseGallery}
-        initialImageIndex={0}
-      />
+      {isGalleryOpen && (
+        <div className="fixed inset-0 z-50 w-full h-full">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/80" onClick={handleCloseGallery} />
+          
+          {/* Gallery Content */}
+          <div className="relative w-full h-full">
+            <ImageGallery
+              categories={galleryCategories}
+              onImageClick={(image) => console.log('Image clicked:', image)}
+              onCategoryChange={(category) => console.log('Category changed:', category)}
+              className="w-full h-full"
+            />
+            <button
+              onClick={handleCloseGallery}
+              className="absolute top-4 left-4 z-10 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+            >
+              <FaChevronLeft className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -1,5 +1,7 @@
 import React from 'react';
 import BookVisitForm from '../components/BookVisitForm';
+import { IoMdClose } from 'react-icons/io';
+import { useNavigate } from 'react-router';
 
 interface BookVisitPageProps {
   onSuccess: (bookingDetails: {
@@ -11,6 +13,7 @@ interface BookVisitPageProps {
 }
 
 const BookVisitPage: React.FC<BookVisitPageProps> = ({ onSuccess }) => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white w-screen">
       {/* Header */}
@@ -24,10 +27,8 @@ const BookVisitPage: React.FC<BookVisitPageProps> = ({ onSuccess }) => {
               Nirvana Rooms
             </p>
           </div>
-          <button className="w-8 h-8 sm:w-[35px] sm:h-[35px] bg-gray-100 rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 sm:w-[17.5px] sm:h-[17.5px] text-[#4a5565]">
-              ✕
-            </div>
+          <button className="w-8 h-8 cursor-pointer sm:w-[35px] sm:h-[35px] bg-gray-100 rounded-full flex items-center justify-center" onClick={() => navigate('/property-listing')}>
+            <IoMdClose className='text-neutral-700' />
           </button>
         </div>
       </div>
