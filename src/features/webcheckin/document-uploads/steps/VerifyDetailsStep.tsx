@@ -136,7 +136,7 @@ const VerifyDetailsStep: React.FC<DocumentUploadStepProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-[10.5px]">
+      <div className="flex gap-[10.5px] pb-2">
         <button
           onClick={handleRetakePhoto}
           className="flex-1 bg-white border border-[rgba(0,0,0,0.01)] rounded-[6.75px] px-[15px] py-2 h-12"

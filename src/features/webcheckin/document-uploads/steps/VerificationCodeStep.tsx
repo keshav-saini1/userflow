@@ -97,7 +97,7 @@ const VerificationCodeStep: React.FC<DocumentUploadStepProps> = ({
               value={digit}
               onChange={(e) => handleCodeChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-[42px] h-[49px] bg-neutral-100 rounded-[12.75px] text-center text-[18px] font-medium focus:outline-none focus:ring-2 focus:ring-[#155dfc] focus:bg-white"
+              className="w-[42px] h-[49px] text-black bg-neutral-100 rounded-[12.75px] text-center text-[18px] font-medium focus:outline-none focus:ring-2 focus:ring-[#155dfc] focus:bg-white"
               maxLength={1}
               inputMode="numeric"
             />
