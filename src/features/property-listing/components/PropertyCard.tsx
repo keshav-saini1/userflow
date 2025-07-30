@@ -3,6 +3,7 @@ import type { PropertyDetails } from "../types";
 import { FiArrowRight } from "react-icons/fi";
 import { CiCalendar } from "react-icons/ci";
 import { BiHeart } from "react-icons/bi";
+import { useNavigate } from "react-router";
 
 interface PropertyCardProps {
    property: PropertyDetails;
@@ -17,6 +18,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    onBookVisit,
    onPropertyClick,
 }) => {
+   const navigate = useNavigate();
+
    const formatPrice = (price: number) => {
       return new Intl.NumberFormat("en-IN", {
          style: "currency",
@@ -32,6 +35,11 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    const handleActionClick = (e: React.MouseEvent, action: () => void) => {
       e.stopPropagation(); // Prevent card click when action buttons are clicked
       action();
+   };
+
+   const handleBookVisitClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      navigate("/book-visit");
    };
 
    return (
@@ -152,7 +160,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                   </button>
 
                   <button
-                     onClick={(e) => handleActionClick(e, () => onBookVisit?.(property.id))}
+                     onClick={handleBookVisitClick}
                      className="bg-[#101828] rounded-[12.75px] px-[10.5px] py-[7px] flex items-center justify-center gap-[7px] w-[174.5px] lg:w-full h-[37.5px] lg:h-12 hover:bg-gray-800 transition-colors"
                   >
                      <div className="w-[21px] h-3.5 pl-0 pr-[7px] py-0 flex items-start justify-start">
