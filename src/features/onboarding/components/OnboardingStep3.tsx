@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { animate, inView, stagger } from "motion";
+import { animate, stagger } from "motion";
 import type { OnboardingStepComponent } from "../types";
 import { CountryCodePicker } from "@/components";
 import { useButtonAnimation } from "../hooks/useOnboarding";
@@ -15,7 +15,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
    onUpdateData,
    currentData,
 }) => {
-   const { animateButton, animateSuccess } = useButtonAnimation();
+   const { animateSuccess } = useButtonAnimation();
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
 
    // Initialize country code from existing data or default to +91

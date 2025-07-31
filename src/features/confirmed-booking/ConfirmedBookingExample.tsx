@@ -38,6 +38,8 @@ const ConfirmedBookingExample: React.FC = () => {
         onBackClick={handleBackClick}
         onShareClick={handleShareClick}
         onSendReminder={handleSendReminder}
+        onModifyBooking={() => { console.log('Modify booking clicked'); }}
+        onRequestRefund={() => { console.log('Request refund clicked'); }}
         onPayNow={handlePayNow}
         onViewAllPayments={handleViewAllPayments}
         onSupportAction={handleSupportAction}

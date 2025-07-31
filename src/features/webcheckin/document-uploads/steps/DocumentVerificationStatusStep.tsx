@@ -10,7 +10,6 @@ interface DocumentVerificationStatusStepProps extends DocumentUploadStepProps {
 const DocumentVerificationStatusStep: React.FC<DocumentVerificationStatusStepProps> = ({
   documentName,
   documentNumber,
-  onNext,
   onVerifyAnotherDocument,
 }) => {
   return (

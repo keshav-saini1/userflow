@@ -15,7 +15,6 @@ interface PropertyCardProps {
 export const PropertyCard: React.FC<PropertyCardProps> = ({
    property,
    onReserve,
-   onBookVisit,
    onPropertyClick,
 }) => {
    const navigate = useNavigate();

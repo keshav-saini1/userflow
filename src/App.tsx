@@ -1,6 +1,6 @@
 import {
   createBrowserRouter,
-  RouterProvider,
+  RouterProvider, 
   useNavigate,
   useLocation,
   Navigate,
@@ -36,7 +36,7 @@ const PropertyListingWrapper = () => {
       onBackClick={() => window.history.back()}
       onShareClick={() => console.log('Share clicked')}
       onSetupClick={() => console.log('Setup clicked')}
-      onReserve={(_propertyId: string) => navigate('/reservation')}
+      onReserve={() => navigate('/reservation')}
       onBookVisit={() => navigate('/book-visit')}
       onMapClick={() => console.log('Map clicked')}
       onPropertyClick={(propertyId: string) => navigate(`/property-details/${propertyId}`)}

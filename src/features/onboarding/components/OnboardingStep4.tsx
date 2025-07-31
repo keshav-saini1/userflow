@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { animate, inView, stagger } from 'motion';
+import { animate, stagger } from 'motion';
 import type { OnboardingStepComponent } from '../types';
 import { useButtonAnimation } from '../hooks/useOnboarding';
 import { useNavigate } from 'react-router';
@@ -18,7 +18,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const { animateButton, animateSuccess } = useButtonAnimation();
+  const { animateSuccess } = useButtonAnimation();
   const navigate = useNavigate();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 

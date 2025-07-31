@@ -1,4 +1,3 @@
-import React from "react";
 import type { OnboardingStepComponent } from "../types";
 import timer from "@/assets/onboarding/timer.svg";
 import train from "@/assets/onboarding/train.svg";
@@ -7,8 +6,6 @@ import building from "@/assets/onboarding/building.svg";
 import verified from "@/assets/onboarding/verified.svg";
 import check from "@/assets/onboarding/check.svg";
 import room from "@/assets/onboarding/room.svg";
-import crew from "@/assets/onboarding/crew.svg";
-import adulting from "@/assets/onboarding/adulting.svg";
 import { FaArrowRight } from "react-icons/fa";
 
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {

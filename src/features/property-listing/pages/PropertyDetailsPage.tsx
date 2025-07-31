@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaChevronLeft, FaShareAlt, FaHeart, FaPlay, FaCheck } from 'react-icons/fa';
 import type { PropertyDetailPageData } from '../types';
 import ImageGallery, { type GalleryCategory } from '../../../components/ImageGallery';

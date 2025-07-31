@@ -1,4 +1,3 @@
-import React from 'react';
 import { FaChevronLeft, FaShareAlt, FaArrowRight } from 'react-icons/fa';
 import type { ConfirmedBookingData } from '../types';
 import timer from "@/assets/onboarding/timer.svg";

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReservationContextType, ReservationForm, RoomChangeData } from '../types';
+import type { ReservationContextType, ReservationForm } from '../types';
 
 const initialForm: ReservationForm = {
   selectedDate: null,

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { animate, inView, stagger } from "motion";
+import { animate, stagger } from "motion";
 import type { OnboardingStepComponent } from "../types";
 import { useButtonAnimation } from "../hooks/useOnboarding";
 
@@ -14,7 +14,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
    onUpdateData,
    currentData,
 }) => {
-   const { animateButton, animateSuccess } = useButtonAnimation();
+   const { animateSuccess } = useButtonAnimation();
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
 
    const {

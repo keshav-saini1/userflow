@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { DocumentUploadStepProps } from '../types';
 
 const VerificationCodeStep: React.FC<DocumentUploadStepProps> = ({
-  documentName,
   onNext,
-  onPrev,
-  onClose,
 }) => {
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [countdown, setCountdown] = useState(30);

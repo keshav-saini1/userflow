@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import type { DocumentUploadStepProps, ExtractedDocumentData } from '../types';
 
 const VerifyDetailsStep: React.FC<DocumentUploadStepProps> = ({
-  documentName,
   onNext,
   onPrev,
   extractedData,

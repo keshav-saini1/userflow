@@ -144,7 +144,7 @@ const WebCheckinStep2: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
   ]);
 
   // Dummy data for documents
-  const [documents, setDocuments] = useState<DocumentCard[]>([
+  const [documents] = useState<DocumentCard[]>([
     {
       id: 'aadhaar',
       name: 'Aadhaar Card',

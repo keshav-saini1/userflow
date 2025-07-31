@@ -23,7 +23,6 @@ export interface ImageGalleryProps {
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({
   categories,
-  onImageClick,
   onCategoryChange,
   className = '',
 }) => {
@@ -36,9 +35,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     onCategoryChange?.(category);
   }, [onCategoryChange]);
 
-  const handleImageClick = useCallback((image: GalleryImage) => {
-    onImageClick?.(image);
-  }, [onImageClick]);
+  // Removed unused handleImageClick to fix lint error
 
   const handlePreviousImage = useCallback(() => {
     setCurrentImageIndex(prev => 
@@ -106,7 +103,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         {/* Category Tabs */}
         <div className="absolute top-16 sm:top-[70px] left-3 right-3 sm:left-3.5 sm:right-3.5 h-8 sm:h-[38.5px] overflow-x-auto">
           <div className="flex gap-1.5 sm:gap-2 h-full">
-            {categories.map((category, index) => (
+            {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category)}
