@@ -39,7 +39,6 @@ export const samplePropertyListing: PropertyListing = {
         currentPrice: 24000,
         originalPrice: 28000,
         savingsAmount: 4000,
-        currency: 'INR',
         period: 'per month'
       },
       amenities: [
@@ -71,7 +70,6 @@ export const samplePropertyListing: PropertyListing = {
         currentPrice: 18000,
         originalPrice: 22000,
         savingsAmount: 4000,
-        currency: 'INR',
         period: 'per month'
       },
       amenities: [
@@ -102,7 +100,6 @@ export const samplePropertyListing: PropertyListing = {
         currentPrice: 32000,
         originalPrice: 36000,
         savingsAmount: 4000,
-        currency: 'INR',
         period: 'per month'
       },
       amenities: [
@@ -133,7 +130,6 @@ export const samplePropertyListing: PropertyListing = {
         currentPrice: 15000,
         originalPrice: 18000,
         savingsAmount: 3000,
-        currency: 'INR',
         period: 'per month'
       },
       amenities: [
@@ -173,7 +169,6 @@ export const samplePropertyDetailData = {
     currentPrice: 24000,
     originalPrice: 28000,
     savingsAmount: 4000,
-    currency: 'INR',
     period: 'monthly'
   },
   deposit: 50000,

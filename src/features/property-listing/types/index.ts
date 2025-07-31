@@ -8,7 +8,6 @@ export interface PropertyPricing {
   currentPrice: number;
   originalPrice?: number;
   savingsAmount?: number;
-  currency: string;
   period: string;
 }
 
@@ -21,6 +20,9 @@ export interface PropertyDetails {
   amenities: PropertyAmenity[];
   image: string;
   isRecommended?: boolean;
+  location?: string;
+  availableFrom?: string;
+  status?: 'available' | 'booked';
 }
 
 export interface NearbySpot {

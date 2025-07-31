@@ -5,7 +5,8 @@ import {
   LocationSection,
   PropertyHeader,
   AvailabilityAlert,
-  SetupCard
+  SetupCard,
+  FloatingMenu
 } from '../components';
 import type { PropertyListing } from '../types';
 
@@ -28,7 +29,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
   onReserve,
   onBookVisit,
   onMapClick,
-  onPropertyClick
+  onPropertyClick,
 }) => {
   return (
     <div className="bg-white min-h-screen w-screen flex flex-col">
@@ -108,6 +109,9 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Floating Menu - Bottom Navigation */}
+      <FloatingMenu />
     </div>
   );
 }; 

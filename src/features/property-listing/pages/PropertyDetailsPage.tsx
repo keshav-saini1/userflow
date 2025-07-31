@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaChevronLeft, FaShareAlt, FaHeart, FaPlay, FaCheck } from 'react-icons/fa';
 import type { PropertyDetailPageData } from '../types';
 import ImageGallery, { type GalleryCategory } from '../../../components/ImageGallery';
+import { HighlightsBottomSheet } from '../components';
 
 interface PropertyDetailsPageProps {
   propertyData: PropertyDetailPageData;
@@ -20,6 +21,7 @@ export default function PropertyDetailsPage({
 }: PropertyDetailsPageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isHighlightsSheetOpen, setIsHighlightsSheetOpen] = useState(false);
 
   // Convert property data to gallery categories format
   const galleryCategories: GalleryCategory[] = [
@@ -66,6 +68,14 @@ export default function PropertyDetailsPage({
 
   const handleCloseGallery = () => {
     setIsGalleryOpen(false);
+  };
+
+  const handleViewAllHighlights = () => {
+    setIsHighlightsSheetOpen(true);
+  };
+
+  const handleCloseHighlightsSheet = () => {
+    setIsHighlightsSheetOpen(false);
   };
 
   return (
@@ -257,7 +267,15 @@ export default function PropertyDetailsPage({
 
             {/* Option Highlights */}
             <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-              <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-4">Option Highlights</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm lg:text-base font-semibold text-gray-900">Option Highlights</h3>
+                <button 
+                  onClick={handleViewAllHighlights}
+                  className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                >
+                  View all highlights
+                </button>
+              </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {propertyData.highlights.map((highlight) => (
                   <div key={highlight} className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
@@ -521,6 +539,16 @@ export default function PropertyDetailsPage({
           </div>
         </div>
       )}
+
+      {/* Highlights Bottom Sheet */}
+      <HighlightsBottomSheet
+        isOpen={isHighlightsSheetOpen}
+        onClose={handleCloseHighlightsSheet}
+        highlights={propertyData.highlights.map((highlight, index) => ({
+          id: `highlight-${index}`,
+          name: highlight
+        }))}
+      />
     </div>
   );
 } 
