@@ -173,7 +173,7 @@ const ConfirmedBookingWrapper = () => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Welcome to the App</div>,
+    element: <OnboardingPage />,
   },
   {
     path: "/onboarding",
