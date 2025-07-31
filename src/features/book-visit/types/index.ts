@@ -19,7 +19,7 @@ export interface TimeSection {
   slots: TimeSlot[];
 }
 
-export interface BookVisitForm {
+export interface BookVisitFormData {
   visitType: VisitType | null;
   selectedDate: Date | null;
   selectedTime: string | null;

@@ -1,4 +1,4 @@
-export interface BookingDetails {
+export interface ModifyBookingDetails {
   id: string;
   propertyName: string;
   roomNumber: string;
@@ -19,7 +19,7 @@ export interface ModifyBookingOption {
 }
 
 export interface ModifyBookingState {
-  bookingDetails: BookingDetails | null;
+  bookingDetails: ModifyBookingDetails | null;
   selectedOption: string | null;
   isLoading: boolean;
   error: string | null;

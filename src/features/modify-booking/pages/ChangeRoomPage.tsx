@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { BookingCard, RoomOptionCard } from '../components';
 import { sampleBookingDetails } from '../data/sampleData';
 import { availableRoomOptions } from '../data/roomOptions';
 
 const ChangeRoomPage: React.FC = () => {
-  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
-
   const handleBackClick = () => {
     // Handle back navigation
     console.log('Back clicked');
   };
 
   const handleRoomSelect = (roomId: string) => {
-    setSelectedRoom(roomId);
     console.log('Room selected:', roomId);
   };
 

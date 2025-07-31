@@ -81,24 +81,21 @@ export const useOnboarding = () => {
 // Custom hook for button animations
 export const useButtonAnimation = () => {
   const animateButton = (element: HTMLElement, scale: number = 1.02) => {
-    import('motion').then(({ animate }) => {
-      animate(element, 
-        { scale: [1, scale, 1] },
-        { duration: 0.2, easing: "ease-out" }
-      );
-    });
+    // Use CSS transitions instead of Motion API
+    element.style.transform = `scale(${scale})`;
+    setTimeout(() => {
+      element.style.transform = 'scale(1)';
+    }, 200);
   };
 
   const animateSuccess = (element: HTMLElement) => {
-    import('motion').then(({ animate }) => {
-      animate(element, 
-        { 
-          scale: [1, 1.05, 1],
-          backgroundColor: ["#030213", "#00A63E", "#030213"]
-        },
-        { duration: 0.4, easing: "ease-out" }
-      );
-    });
+    // Use CSS transitions instead of Motion API
+    element.style.transform = 'scale(1.05)';
+    element.style.backgroundColor = '#00A63E';
+    setTimeout(() => {
+      element.style.transform = 'scale(1)';
+      element.style.backgroundColor = '#030213';
+    }, 400);
   };
 
   return { animateButton, animateSuccess };

@@ -1,6 +1,6 @@
-import type { BookingDetails, ModifyBookingOption } from '../types';
+import type { ModifyBookingDetails, ModifyBookingOption } from '../types';
 
-export const sampleBookingDetails: BookingDetails = {
+export const sampleBookingDetails: ModifyBookingDetails = {
   id: 'BK001',
   propertyName: 'Nirvana Rooms - Sector 50',
   roomNumber: 'A-203',

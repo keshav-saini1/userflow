@@ -1,4 +1,4 @@
-export interface BookingDetails {
+export interface ConfirmedBookingDetails {
   id: string;
   roomNumber: string;
   roomType: string;
@@ -45,7 +45,7 @@ export interface PropertyInfo {
 }
 
 export interface ConfirmedBookingData {
-  bookingDetails: BookingDetails;
+  bookingDetails: ConfirmedBookingDetails;
   paymentSummary: PaymentSummary;
   supportOptions: SupportOption[];
   propertyInfo: PropertyInfo;

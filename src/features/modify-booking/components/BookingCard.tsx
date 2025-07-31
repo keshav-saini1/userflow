@@ -1,8 +1,8 @@
 import React from 'react';
-import type { BookingDetails } from '../types';
+import type { ModifyBookingDetails } from '../types';
 
 interface BookingCardProps {
-  booking: BookingDetails;
+  booking: ModifyBookingDetails;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {

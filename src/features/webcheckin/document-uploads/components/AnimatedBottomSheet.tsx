@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { animate } from "motion";
 
 interface AnimatedBottomSheetProps {
   isOpen: boolean;
@@ -20,45 +19,20 @@ const AnimatedBottomSheet: React.FC<AnimatedBottomSheetProps> = ({
 
   useEffect(() => {
     if (isOpen && overlayRef.current) {
-      // Animate overlay
-      animate(
-        overlayRef.current,
-        { opacity: [0, 0.5] },
-        { duration: 0.3, easing: [0.4, 0, 0.2, 1] }
-      );
-
+      // Use CSS transitions instead of Motion API
+      overlayRef.current.style.opacity = '0.5';
+      
       // Check if desktop (width > 768px)
       const isDesktop = window.innerWidth > 768;
       
       if (isDesktop && desktopModalRef.current) {
-        // Desktop: Modal animation (scale and fade)
-        animate(
-          desktopModalRef.current,
-          { 
-            scale: [0.8, 1],
-            opacity: [0, 1]
-          },
-          { 
-            duration: 0.4, 
-            easing: [0.4, 0, 0.2, 1],
-            delay: 0.1
-          }
-        );
+        // Desktop: Modal animation
+        desktopModalRef.current.style.transform = 'scale(1)';
+        desktopModalRef.current.style.opacity = '1';
       } else if (!isDesktop && mobileSheetRef.current) {
-        // Mobile: Bottom sheet animation (slide up)
-        animate(
-          mobileSheetRef.current,
-          { 
-            y: ["100%", "0%"],
-            scale: [0.95, 1],
-            opacity: [0, 1]
-          },
-          { 
-            duration: 0.4, 
-            easing: [0.4, 0, 0.2, 1],
-            delay: 0.1
-          }
-        );
+        // Mobile: Bottom sheet animation
+        mobileSheetRef.current.style.transform = 'translateY(0%)';
+        mobileSheetRef.current.style.opacity = '1';
       }
     }
   }, [isOpen]);

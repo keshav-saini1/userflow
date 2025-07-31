@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { animate, stagger } from 'motion';
 import type { OnboardingStepComponent } from '../types';
 import { useButtonAnimation } from '../hooks/useOnboarding';
 import { useNavigate } from 'react-router';
@@ -64,66 +63,23 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   // Animate in on mount
   useEffect(() => {
     if (overlayRef.current && sheetRef.current) {
-      // Animate overlay fade in
-      animate(overlayRef.current, 
-        { opacity: [0, 1] },
-        { duration: 0.3, easing: "ease-out" }
-      );
-
-      // Animate bottom sheet slide up
-      animate(sheetRef.current, 
-        { 
-          y: ["100%", "0%"],
-          opacity: [0, 1]
-        },
-        { 
-          duration: 0.4, 
-          easing: "ease-out",
-          delay: 0.1
-        }
-      );
-
-      // Stagger animate form elements
-      const formElements = sheetRef.current.querySelectorAll('.animate-form-element');
-      animate(formElements, 
-        { 
-          opacity: [0, 1],
-          y: [20, 0]
-        },
-        { 
-          duration: 0.3, 
-          easing: "ease-out",
-          delay: stagger(0.1, { startDelay: 0.3 })
-        }
-      );
+      // Use CSS transitions instead of Motion API
+      overlayRef.current.style.opacity = '1';
+      sheetRef.current.style.transform = 'translateY(0%)';
+      sheetRef.current.style.opacity = '1';
     }
   }, []);
 
   const handleClose = () => {
     if (overlayRef.current && sheetRef.current) {
-      // Animate bottom sheet slide down
-      animate(sheetRef.current, 
-        { 
-          y: ["0%", "100%"],
-          opacity: [1, 0]
-        },
-        { 
-          duration: 0.3, 
-          easing: "ease-in"
-        }
-      );
-
-      // Animate overlay fade out
-      animate(overlayRef.current, 
-        { opacity: [1, 0] },
-        { 
-          duration: 0.2, 
-          easing: "ease-in",
-          delay: 0.1
-        }
-      ).finished.then(() => {
+      // Use CSS transitions instead of Motion API
+      sheetRef.current.style.transform = 'translateY(100%)';
+      sheetRef.current.style.opacity = '0';
+      overlayRef.current.style.opacity = '0';
+      
+      setTimeout(() => {
         onPrev();
-      });
+      }, 300);
     } else {
       onPrev();
     }

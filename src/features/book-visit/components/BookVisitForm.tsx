@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { BookVisitForm as BookVisitFormType, VisitType } from '../types';
+import type { BookVisitFormData as BookVisitFormType, VisitType } from '../types';
 import VisitTypeSelector from './VisitTypeSelector';
 import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
@@ -21,7 +21,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
   });
 
   const handleVisitTypeSelect = (type: VisitType) => {
-    setFormData(prev => ({
+    setFormData((prev: BookVisitFormType) => ({
       ...prev,
       visitType: type,
       // Reset date and time when visit type changes
@@ -31,7 +31,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
   };
 
   const handleDateSelect = (date: Date) => {
-    setFormData(prev => ({
+    setFormData((prev: BookVisitFormType) => ({
       ...prev,
       selectedDate: date,
       // Reset time when date changes
@@ -40,7 +40,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
   };
 
   const handleTimeSelect = (time: string) => {
-    setFormData(prev => ({
+    setFormData((prev: BookVisitFormType) => ({
       ...prev,
       selectedTime: time
     }));
