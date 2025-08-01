@@ -17,6 +17,7 @@ interface PersonaOption {
 const PersonaSelectionPage: React.FC = () => {
    const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
    const navigate = useNavigate();
+   const username = localStorage.getItem("username");
 
    const personaOptions: PersonaOption[] = [
       {
@@ -75,7 +76,7 @@ const PersonaSelectionPage: React.FC = () => {
                {/* User Greeting Overlay */}
                <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 lg:left-12 lg:right-12 flex flex-col gap-1.5">
                   <span className="font-bold text-white text-2xl md:text-3xl lg:text-3xl leading-tight tracking-tight">
-                     Hey Ishika!
+                     Hey {username}!
                   </span>
                   <p className="text-white/90 text-sm md:text-base lg:text-base">
                      Gurugram, India
