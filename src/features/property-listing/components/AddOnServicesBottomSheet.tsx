@@ -1,5 +1,5 @@
 import React from "react";
-import default_close from "@/assets/default_close.svg";
+import { BaseBottomSheet } from "@/components";
 
 interface AddOnService {
    id: string;
@@ -20,32 +20,15 @@ const AddOnServicesBottomSheet: React.FC<AddOnServicesBottomSheetProps> = ({
    onClose,
    services,
 }) => {
-   if (!isOpen) return null;
-
    return (
-      <>
-         {/* Backdrop */}
-         <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
-
-         {/* Bottom Sheet */}
-         <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] z-50 min-h-[85vh] overflow-hidden">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-100 sticky top-0 px-3.5 py-3.5">
-               <div className="flex items-center justify-between">
-                  <div className="flex items-center justify-between w-full gap-3">
-                     <span className="text-md font-semibold text-[#101828]">
-                        Add-on Service
-                     </span>
-
-                     <button
-                        onClick={onClose}
-                     >
-                        <img src={default_close} alt="default_close" className="w-10 h-10" />
-                     </button>
-                  </div>
-               </div>
-            </div>
-
+      <BaseBottomSheet
+         isOpen={isOpen}
+         onClose={onClose}
+         title="Add-on Service"
+         className="bg-gray-50"
+         bodyClassName="bg-gray-50"
+      >
+         <div className="flex flex-col h-full bg-gray-50">
             {/* Content */}
             <div className="p-5">
                {/* Header */}
@@ -64,7 +47,7 @@ const AddOnServicesBottomSheet: React.FC<AddOnServicesBottomSheetProps> = ({
                   {services.map((service) => (
                      <div
                         key={service.id}
-                        className="bg-white border border-[#ebebeb] rounded-[10px] h-[75px] relative shadow-[0px_4px_30px_0px_rgba(0,0,0,0.05)]"
+                        className="bg-white border p-2 border-[#ebebeb] rounded-[10px] h-[75px] relative shadow-[0px_4px_30px_0px_rgba(0,0,0,0.05)]"
                      >
                         {/* Service Image/Icon */}
                         <div className="absolute left-[13px] top-1/2 transform -translate-y-1/2 w-[50px] h-[50px] rounded bg-center bg-cover bg-no-repeat">
@@ -96,7 +79,7 @@ const AddOnServicesBottomSheet: React.FC<AddOnServicesBottomSheetProps> = ({
                         </div>
 
                         {/* Service Info */}
-                        <div className="absolute left-[75px] top-1/2 transform -translate-y-1/2 w-28">
+                        <div className="absolute left-[75px] top-1/2 transform -translate-y-1/2 ">
                            <div className="flex flex-col gap-1">
                               <span className="text-[16px] font-semibold text-[#2c3032] leading-[1.5] opacity-90">
                                  {service.name}
@@ -111,7 +94,7 @@ const AddOnServicesBottomSheet: React.FC<AddOnServicesBottomSheetProps> = ({
                </div>
             </div>
          </div>
-      </>
+      </BaseBottomSheet>
    );
 };
 

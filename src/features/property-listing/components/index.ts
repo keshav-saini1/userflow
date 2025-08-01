@@ -8,4 +8,7 @@ export { default as ImageGallery } from './ImageGallery';
 export { default as FloatingMenu } from './FloatingMenu';
 export { default as HighlightsBottomSheet } from './HighlightsBottomSheet';
 export { default as IncludedServicesBottomSheet } from './IncludedServicesBottomSheet';
-export { default as AddOnServicesBottomSheet } from './AddOnServicesBottomSheet'; 
+export { default as AddOnServicesBottomSheet } from './AddOnServicesBottomSheet';
+export { default as LocationCommuteBottomSheet } from './LocationCommuteBottomSheet';
+export { default as PoliciesAndRulesBottomSheet } from './PoliciesAndRulesBottomSheet';
+export { default as MarketingDescriptionBottomSheet } from './MarketingDescriptionBottomSheet'; 

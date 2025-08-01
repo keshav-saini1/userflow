@@ -1,7 +1,6 @@
 import React from "react";
-import { FaTimes } from "react-icons/fa";
+import { BaseBottomSheet } from "@/components";
 import double_tick from "@/assets/double_tick.svg";
-import default_close from "@/assets/default_close.svg";
 
 interface Service {
    id: string;
@@ -18,38 +17,25 @@ interface IncludedServicesBottomSheetProps {
 const IncludedServicesBottomSheet: React.FC<
    IncludedServicesBottomSheetProps
 > = ({ isOpen, onClose, services }) => {
-   if (!isOpen) return null;
-
    return (
-      <>
-         {/* Backdrop */}
-         <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
-
-         {/* Bottom Sheet */}
-         <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] z-50 max-h-[85vh] overflow-hidden">
-            {/* Close Button */}
-
+      <BaseBottomSheet
+         isOpen={isOpen}
+         onClose={onClose}
+         title="Included Services"
+         className="bg-gray-50"
+         bodyClassName="bg-gray-50"
+      >
+         <div className="flex flex-col h-full bg-gray-50">
             {/* Content */}
             <div className="p-[22px] pt-0">
                {/* Header */}
-               <div className="mb-8 flex justify-between pt-6 items-center">
-                  <div>
-                     <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
-                        Included Services
-                     </h1>
-                     <p className="text-[16px] text-[#616161] leading-[1.5]">
-                        Here's what this room offers.
-                     </p>
-                  </div>
-
-                  <div className="flex justify-end">
-                     <img
-                        src={default_close}
-                        alt="default_close"
-                        className="w-10 h-10"
-                        onClick={onClose}
-                     />
-                  </div>
+               <div className="mb-8">
+                  <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
+                     Included Services
+                  </h1>
+                  <p className="text-[16px] text-[#616161] leading-[1.5]">
+                     Here's what this room offers.
+                  </p>
                </div>
 
                {/* Services List */}
@@ -72,7 +58,7 @@ const IncludedServicesBottomSheet: React.FC<
                </div>
             </div>
          </div>
-      </>
+      </BaseBottomSheet>
    );
 };
 

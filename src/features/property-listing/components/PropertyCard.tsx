@@ -1,7 +1,5 @@
 import React from "react";
 import type { PropertyDetails } from "../types";
-import { FiArrowRight } from "react-icons/fi";
-import { CiCalendar } from "react-icons/ci";
 import { BiHeart } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import location_home from "@/assets/property/location_home.svg";

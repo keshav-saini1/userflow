@@ -1,5 +1,4 @@
 import React from "react";
-import { FaTimes } from "react-icons/fa";
 import default_close from "@/assets/default_close.svg";
 
 interface Highlight {

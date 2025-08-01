@@ -56,7 +56,11 @@ export interface PropertyUnit {
   floor: number;
   pricePerBed: number;
   occupancy: string;
-  amenities: string[];
+  amenities: {
+    id: string;
+    name: string;
+    icon: string;
+  }[];
   availableFrom: string;
   image: string;
 }

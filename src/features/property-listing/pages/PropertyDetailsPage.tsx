@@ -4,7 +4,7 @@ import type { PropertyDetailPageData } from "../types";
 import ImageGallery, {
    type GalleryCategory,
 } from "../../../components/ImageGallery";
-import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottomSheet } from "../components";
+import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottomSheet, LocationCommuteBottomSheet, PoliciesAndRulesBottomSheet, MarketingDescriptionBottomSheet } from "../components";
 import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
@@ -13,6 +13,7 @@ import double_tick from "@/assets/double_tick.svg";
 import single_tick from "@/assets/single_tick.svg";
 import { FiChevronRight } from "react-icons/fi";
 import { useNavigate } from "react-router";
+import calendar from '@/assets/property/calendar_bw.svg';
 
 interface PropertyDetailsPageProps {
    propertyData: PropertyDetailPageData;
@@ -29,6 +30,9 @@ export default function PropertyDetailsPage({
    const [isHighlightsSheetOpen, setIsHighlightsSheetOpen] = useState(false);
    const [isIncludedServicesSheetOpen, setIsIncludedServicesSheetOpen] = useState(false);
    const [isAddOnServicesSheetOpen, setIsAddOnServicesSheetOpen] = useState(false);
+   const [isLocationCommuteSheetOpen, setIsLocationCommuteSheetOpen] = useState(false);
+   const [isPoliciesRulesSheetOpen, setIsPoliciesRulesSheetOpen] = useState(false);
+   const [isMarketingDescriptionSheetOpen, setIsMarketingDescriptionSheetOpen] = useState(false);
    const navigate = useNavigate();
    // Convert property data to gallery categories format
    const galleryCategories: GalleryCategory[] = [
@@ -101,6 +105,30 @@ export default function PropertyDetailsPage({
 
    const handleCloseAddOnServicesSheet = () => {
       setIsAddOnServicesSheetOpen(false);
+   };
+
+   const handleOpenLocationCommuteSheet = () => {
+      setIsLocationCommuteSheetOpen(true);
+   };
+
+   const handleCloseLocationCommuteSheet = () => {
+      setIsLocationCommuteSheetOpen(false);
+   };
+
+   const handleOpenPoliciesRulesSheet = () => {
+      setIsPoliciesRulesSheetOpen(true);
+   };
+
+   const handleClosePoliciesRulesSheet = () => {
+      setIsPoliciesRulesSheetOpen(false);
+   };
+
+   const handleOpenMarketingDescriptionSheet = () => {
+      setIsMarketingDescriptionSheetOpen(true);
+   };
+
+   const handleCloseMarketingDescriptionSheet = () => {
+      setIsMarketingDescriptionSheetOpen(false);
    };
 
    return (
@@ -247,17 +275,20 @@ export default function PropertyDetailsPage({
 
                                           <div className="flex flex-wrap gap-3">
                                              {unit.amenities.map((amenity) => (
-                                                <span
-                                                   key={amenity}
-                                                   className="text-xs text-gray-600"
-                                                >
-                                                   {amenity}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                   <img
+                                                      src={amenity.icon}
+                                                      alt={amenity.name}
+                                                      className="w-4 h-4 object-contain"
+                                                   />
+                                                   <span className="text-xs text-gray-600">{amenity.name}</span>
+                                                </div>
                                              ))}
                                           </div>
 
                                           <div className="bg-blue-50 rounded-lg p-2">
-                                             <p className="text-xs text-gray-600">
+                                             <p className="text-xs text-gray-600 flex items-center gap-2">
+                                                <img src={calendar} alt="calendar" className="w-4 h-4 object-contain" />
                                                 {unit.availableFrom}
                                              </p>
                                           </div>
@@ -476,7 +507,10 @@ export default function PropertyDetailsPage({
                               {propertyData.location.city}
                            </p>
                         </div>
-                        <button className="text-xs font-medium text-blue-600 underline hover:text-blue-700">
+                        <button 
+                           onClick={handleOpenLocationCommuteSheet}
+                           className="text-xs font-medium text-blue-600 underline hover:text-blue-700"
+                        >
                            Explore area
                         </button>
                      </div>
@@ -569,7 +603,10 @@ export default function PropertyDetailsPage({
                            </div>
                         ))}
                      </div>
-                     <button className="text-xs font-semibold text-blue-600 mt-4 hover:text-blue-700">
+                     <button 
+                        onClick={handleOpenPoliciesRulesSheet}
+                        className="text-xs font-semibold text-blue-600 mt-4 hover:text-blue-700"
+                     >
                         See more
                      </button>
                   </div>
@@ -585,7 +622,10 @@ export default function PropertyDetailsPage({
                         </p>
                         <p className="text-xs text-gray-600 leading-relaxed">
                            {propertyData.marketingDescription}
-                           <button className="text-blue-600 font-bold underline ml-2 hover:text-blue-700">
+                           <button 
+                              onClick={handleOpenMarketingDescriptionSheet}
+                              className="text-blue-600 font-bold underline ml-2 hover:text-blue-700"
+                           >
                               See more
                            </button>
                         </p>
@@ -594,7 +634,7 @@ export default function PropertyDetailsPage({
                </div>
 
                {/* Sidebar - Right Column */}
-               <div className="lg:col-span-1">
+               <div className="lg:col-span-1 hidden lg:block">
                   {/* Sticky Action Card */}
                   <div className="sticky top-24 bg-white rounded-xl shadow-sm p-4 lg:p-6 border border-gray-200">
                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -728,6 +768,25 @@ export default function PropertyDetailsPage({
             isOpen={isAddOnServicesSheetOpen}
             onClose={handleCloseAddOnServicesSheet}
             services={propertyData.addOnServices}
+         />
+
+         {/* Location & Commute Bottom Sheet */}
+         <LocationCommuteBottomSheet
+            isOpen={isLocationCommuteSheetOpen}
+            onClose={handleCloseLocationCommuteSheet}
+            propertyName={propertyData.title}
+         />
+
+         {/* Policies and Rules Bottom Sheet */}
+         <PoliciesAndRulesBottomSheet
+            isOpen={isPoliciesRulesSheetOpen}
+            onClose={handleClosePoliciesRulesSheet}
+         />
+
+         {/* Marketing Description Bottom Sheet */}
+         <MarketingDescriptionBottomSheet
+            isOpen={isMarketingDescriptionSheetOpen}
+            onClose={handleCloseMarketingDescriptionSheet}
          />
       </div>
    );
