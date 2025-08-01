@@ -1,5 +1,4 @@
 import React from "react";
-import { FiHome } from "react-icons/fi";
 import type { RoomOption } from "../types";
 import { BsEye } from "react-icons/bs";
 

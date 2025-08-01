@@ -21,7 +21,7 @@ interface ProfileFormProps {
   onCancel?: () => void;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ onSave, onCancel }) => {
+const ProfileForm: React.FC<ProfileFormProps> = () => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState('');
 

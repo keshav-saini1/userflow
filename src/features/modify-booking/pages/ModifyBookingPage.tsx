@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiArrowLeft, FiSend } from 'react-icons/fi';
+import { FiSend } from 'react-icons/fi';
 import { BookingCard, ModifyOption, CancelBookingModal } from '../components';
 import { sampleBookingDetails, modifyBookingOptions } from '../data/sampleData';
 import type { ModifyBookingOption } from '../types';

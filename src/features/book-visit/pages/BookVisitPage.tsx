@@ -1,6 +1,5 @@
 import React from "react";
 import BookVisitForm from "../components/BookVisitForm";
-import { IoMdClose } from "react-icons/io";
 import { useNavigate } from "react-router";
 import default_back from "@/assets/default_back.svg";
 
