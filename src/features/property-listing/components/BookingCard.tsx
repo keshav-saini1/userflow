@@ -1,0 +1,289 @@
+import React from "react";
+import { FaMapMarkerAlt, FaCalendar } from "react-icons/fa";
+import { ImMap2 } from "react-icons/im";
+import { VscDeviceCameraVideo } from "react-icons/vsc";
+import { LuCopy } from "react-icons/lu";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import phone_outline from "@/assets/bookvisit/phone_outline.svg";
+import phone_outline_white from "@/assets/bookvisit/phone_outline_white.svg";
+
+export interface Booking {
+  id: string;
+  propertyName: string;
+  location: string;
+  status: 'active' | 'completed' | 'upcoming';
+  bookingType: 'visit' | 'live-tour' | 'call' | 'reservation';
+  scheduledDate: string;
+  scheduledTime: string;
+  bookingId?: string;
+  image: string;
+}
+
+interface BookingCardProps {
+  booking: Booking;
+  onCall: (bookingId: string) => void;
+  onGetDirections: (bookingId: string) => void;
+  onLiveTour: (bookingId: string) => void;
+  onReserve: (bookingId: string) => void;
+  onModifyBooking: (bookingId: string) => void;
+  onClick: () => void;
+}
+
+const BookingCard: React.FC<BookingCardProps> = ({
+  booking,
+  onCall,
+  onGetDirections,
+  onLiveTour,
+  onReserve,
+  onModifyBooking,
+  onClick
+}) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-[#eafff2] text-[#00a63e] border-[#00a63e]";
+      case "completed":
+        return "bg-[#eafff2] text-[#00a63e] border-[#00a63e]";
+      case "upcoming":
+        return "bg-[#dfe7fd] text-[#1447e6] border-[#1447e6]";
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-300";
+    }
+  };
+
+  const getStatusDot = (status: string) => {
+    switch (status) {
+      case "active":
+      case "completed":
+        return "bg-[#00a63e]";
+      case "upcoming":
+        return "bg-[#1447e6]";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  const getBookingTypeText = (type: string) => {
+    switch (type) {
+      case "visit":
+        return "Visit Scheduled on";
+      case "live-tour":
+        return "Live Tour Scheduled on";
+      case "call":
+        return "Call Scheduled on";
+      case "reservation":
+        return "Reservation";
+      default:
+        return "Scheduled on";
+    }
+  };
+
+  return (
+    <div
+      className="bg-white rounded-[14px] md:rounded-[12px] border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+      onClick={onClick}
+    >
+      {/* Header */}
+      <div className="p-[17.5px] md:p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-[10.5px] md:gap-2">
+            <div className="flex items-center gap-[3.5px] md:gap-1">
+              <span className="text-[14px] md:text-sm lg:text-base font-semibold text-[#101828]">
+                {booking.propertyName}
+              </span>
+            </div>
+          </div>
+
+          {/* Status Badge */}
+          <div
+            className={`px-[10.5px] py-[7px] md:px-2 md:py-1.5 rounded-[12.75px] flex items-center gap-[7px] md:gap-1.5 ${getStatusColor(
+              booking.status
+            )}`}
+          >
+            <div
+              className={`w-[7px] h-[7px] md:w-1.5 md:h-1.5 rounded-full ${getStatusDot(
+                booking.status
+              )}`}
+            />
+            <span className="text-[10px] md:text-xs font-medium capitalize">
+              {booking.status}
+            </span>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-[3.5px] md:gap-1.5 mt-[10.5px] md:mt-2">
+          <FaMapMarkerAlt className="w-[10.5px] h-[10.5px] md:w-3 md:h-3 text-[#6a7282]" />
+          <span className="text-[12.3px] md:text-xs lg:text-sm text-[#6a7282]">
+            {booking.location}
+          </span>
+        </div>
+
+        {/* Booking ID for completed bookings */}
+        {booking.bookingId && (
+          <div className="mt-[10.5px] md:mt-2">
+            <span className="text-[12.3px] md:text-xs text-[#6a7282]">
+              Booking ID: {booking.bookingId}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-[17.5px] md:p-4">
+        <div className="flex gap-3.5 md:gap-3 items-start">
+          {/* Property Image */}
+          <div className="w-[86px] h-[85px] md:w-20 md:h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-[12.75px] overflow-hidden flex-shrink-0">
+            <img
+              src={booking.image}
+              alt={booking.propertyName}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Booking Details */}
+          <div className="flex-1">
+            <div className="mb-1.5 md:mb-1">
+              <p className="text-[12.3px] md:text-xs lg:text-sm text-[#4a5565] font-medium">
+                {getBookingTypeText(booking.bookingType)}
+              </p>
+            </div>
+
+            <div className="space-y-1 md:space-y-1">
+              <div className="flex items-center gap-1 md:gap-1.5">
+                <FaCalendar className="w-3.5 h-3.5 md:w-3 md:h-3 text-[#4a5565]" />
+                <span className="text-[12.3px] md:text-xs lg:text-sm text-[#4a5565]">
+                  {booking.scheduledDate}
+                </span>
+              </div>
+              <div>
+                <span className="text-[12.3px] md:text-xs lg:text-sm text-[#4a5565]">
+                  {booking.scheduledTime}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-3.5 md:mt-3 flex gap-[18px] md:gap-3">
+          {booking.bookingType === "visit" && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCall(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+              >
+                <img
+                  src={phone_outline}
+                  alt="phone"
+                  className="w-4 h-4 md:w-4 md:h-4"
+                />
+                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                  Call
+                </span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGetDirections(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+              >
+                <ImMap2 className="w-4 h-4 md:w-4 md:h-4" />
+                <span className="text-[14px] md:text-sm font-medium">
+                  Get Directions
+                </span>
+              </button>
+            </>
+          )}
+
+          {booking.bookingType === "live-tour" && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCall(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+              >
+                <img
+                  src={phone_outline}
+                  alt="phone"
+                  className="w-4 h-4 md:w-4 md:h-4"
+                />
+                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                  Call
+                </span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLiveTour(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+              >
+                <VscDeviceCameraVideo className="w-4 h-4 md:w-4 md:h-4" />
+                <span className="text-[14px] md:text-sm font-medium">
+                  Live Tour
+                </span>
+              </button>
+            </>
+          )}
+
+          {booking.bookingType === "reservation" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReserve(booking.id);
+              }}
+              className="w-full h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+            >
+              <LuCopy className="w-3.5 h-3.5 md:w-3.5 md:h-3.5" />
+              <span className="text-[14px] md:text-sm font-medium">
+                Reserve
+              </span>
+            </button>
+          )}
+
+          {booking.bookingType === "call" && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onModifyBooking(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+              >
+                <IoDocumentTextOutline className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 text-[#4a5565]" />
+                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                  Modify Booking
+                </span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCall(booking.id);
+                }}
+                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+              >
+                <img
+                  src={phone_outline_white}
+                  alt="phone"
+                  className="w-4 h-4 md:w-4 md:h-4"
+                />
+                <span className="text-[14px] md:text-sm font-medium">
+                  Call
+                </span>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BookingCard; 
