@@ -20,7 +20,7 @@ import ChangeRoomPage from './features/modify-booking/pages/ChangeRoomPage';
 import CancelBookingExample from './features/modify-booking/examples/CancelBookingExample';
 import ChangeRoomExample from './features/modify-booking/examples/ChangeRoomExample';
 import ReservationIntegrationExample from './features/modify-booking/examples/ReservationIntegrationExample';
-import { WishlistPage, MyBookingsPage } from "./features/property-listing/pages";
+import { WishlistPage, MyBookingsPage, ReviewBookingPage } from "./features/property-listing/pages";
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -219,6 +219,10 @@ const router = createBrowserRouter([
   {
     path: "/my-bookings",
     element: <MyBookingsPage />,
+  },
+  {
+    path: "/review-booking/:bookingId",
+    element: <ReviewBookingPage />,
   },
   {
     path: "/modify-booking",
