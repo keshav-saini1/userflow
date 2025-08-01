@@ -1,5 +1,10 @@
 import React from 'react';
 import type { VisitType, VisitTypeOption } from '../types';
+import { BiCheck } from 'react-icons/bi';
+import livetour from '@/assets/property/livetour.svg';
+import visit from '@/assets/property/visit.svg';
+import phonecall from '@/assets/property/phonecall.svg';
+
 
 interface VisitTypeSelectorProps {
   selectedType: VisitType | null;
@@ -11,19 +16,19 @@ const visitTypeOptions: VisitTypeOption[] = [
     id: 'live-video-tour',
     title: 'Live Video',
     subtitle: 'Tour',
-    icon: '🎥'
+    icon: livetour
   },
   {
     id: 'visit-property',
     title: 'Visit',
     subtitle: 'Property',
-    icon: '🏠'
+    icon: visit
   },
   {
     id: 'phone-call',
     title: 'Phone Call',
     subtitle: '',
-    icon: '📞'
+    icon: phonecall
   }
 ];
 
@@ -42,7 +47,7 @@ const VisitTypeSelector: React.FC<VisitTypeSelectorProps> = ({
         </p>
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-5 w-full">
+      <div className="flex flex-row gap-3 sm:gap-4 lg:gap-5 w-full">
         {visitTypeOptions.map((option) => (
           <button
             key={option.id}
@@ -53,9 +58,7 @@ const VisitTypeSelector: React.FC<VisitTypeSelectorProps> = ({
                 : 'bg-white border-gray-200 hover:border-gray-300'
             }`}
           >
-            <div className="w-8 h-8 sm:w-[42px] sm:h-[42px] flex items-center justify-center text-xl sm:text-2xl">
-              {option.icon}
-            </div>
+            <img src={option.icon} alt={option.title} className="w-12 h-12 sm:w-[42px] sm:h-[42px]" />
             <div className="text-center">
               <div className="text-xs sm:text-[12.3px] font-medium text-[#101828] leading-tight sm:leading-[15.31px]">
                 {option.title}
@@ -68,7 +71,7 @@ const VisitTypeSelector: React.FC<VisitTypeSelectorProps> = ({
             </div>
             {selectedType === option.id && (
               <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-5 h-5 sm:w-[21px] sm:h-[21px] bg-[#101828] rounded-full flex items-center justify-center">
-                <div className="w-3 h-3 sm:w-[12.25px] sm:h-[12.25px] text-white text-xs">✓</div>
+                <BiCheck />
               </div>
             )}
           </button>

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { FaArrowLeft, FaSearch, FaFilter, FaSort } from "react-icons/fa";
 import { PropertyCard } from "../components";
 import { useNavigate } from "react-router";
 import { wishlistProperties } from "../data/wishlistData";
+import default_back from "@/assets/default_back.svg";
+import filter from "@/assets/property/filter.svg";
+import menu from "@/assets/property/menu.svg";
 
 const WishlistPage: React.FC = () => {
    const navigate = useNavigate();
@@ -28,16 +30,14 @@ const WishlistPage: React.FC = () => {
          <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-black/10">
             <div className="flex items-center justify-between p-4">
                <div className="flex items-center gap-3">
-                  <button
-                     onClick={() => navigate(-1)}
-                     className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
-                  >
-                     <FaArrowLeft className="w-4 h-4 text-gray-600" />
+                  <button onClick={() => navigate(-1)}>
+                     <img
+                        src={default_back}
+                        alt="default_back"
+                        className="w-10 h-10"
+                     />
                   </button>
                   <div>
-                     <h1 className="text-lg font-semibold text-gray-900">
-                        My Wishlist
-                     </h1>
                      <p className="text-sm text-gray-600">
                         {filteredProperties.length} properties saved
                      </p>
@@ -46,10 +46,10 @@ const WishlistPage: React.FC = () => {
 
                <div className="flex items-center gap-2">
                   <button className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors">
-                     <FaSort className="w-4 h-4 text-gray-600" />
+                     <img src={filter} alt="filter" />
                   </button>
                   <button className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors">
-                     <FaFilter className="w-4 h-4 text-gray-600" />
+                     <img src={menu} alt="menu" />
                   </button>
                </div>
             </div>
@@ -57,15 +57,12 @@ const WishlistPage: React.FC = () => {
             {/* Search Bar */}
             <div className="px-4 pb-4">
                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <FaSearch className="h-4 w-4 text-gray-400" />
-                  </div>
                   <input
                      type="text"
                      placeholder="Search properties..."
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
-                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     className="block w-full pl-3 pr-3 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                </div>
             </div>
