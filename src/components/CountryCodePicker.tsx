@@ -90,7 +90,7 @@ const CountryCodePicker: React.FC<CountryCodePickerProps> = ({
       {/* Trigger Button */}
       <span
         onClick={handleToggle}
-        className={`bg-neutral-400 flex items-center gap-[7px] lg:gap-2 px-[10.5px] lg:px-3 py-[10px] lg:py-2 rounded-[12.75px] lg:rounded-xl transition-colors hover:bg-neutral-500 ${
+        className={`bg-gray-100 flex items-center gap-[7px] lg:gap-2 px-[10.5px] lg:px-3 py-[10px] lg:py-2 rounded-[12.75px] lg:rounded-xl transition-colors hover:bg-neutral-500 ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
         }`}
       >

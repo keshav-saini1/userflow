@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { FaAngleLeft } from "react-icons/fa";
+
 import newPlace from "../../assets/persona/newplace.svg";
 import existingTenant from "../../assets/persona/existingtenant.svg";
 import app from "../../assets/persona/app.svg";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
 
 interface PersonaOption {
@@ -52,9 +52,9 @@ const PersonaSelectionPage: React.FC = () => {
       );
    };
 
-   const handleBack = () => {
+   const handleLogout = () => {
       // Handle back navigation
-      window.history.back();
+      navigate("/");
    };
 
    return (
@@ -72,16 +72,6 @@ const PersonaSelectionPage: React.FC = () => {
             ), url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')`,
                }}
             >
-               {/* Back Button */}
-               <div className="absolute top-6 left-6 md:top-8 md:left-8">
-                  <div
-                     onClick={handleBack}
-                     className="backdrop-blur-[6px] bg-black/20 flex items-center justify-center h-14  cursor-pointer w-14 aspect-square rounded-full hover:bg-black/30 transition-colors"
-                  >
-                     <FaAngleLeft className="text-white" size={20} />
-                  </div>
-               </div>
-
                {/* User Greeting Overlay */}
                <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 lg:left-12 lg:right-12 flex flex-col gap-1.5">
                   <span className="font-bold text-white text-2xl md:text-3xl lg:text-3xl leading-tight tracking-tight">
@@ -90,6 +80,16 @@ const PersonaSelectionPage: React.FC = () => {
                   <p className="text-white/90 text-sm md:text-base lg:text-base">
                      Gurugram, India
                   </p>
+               </div>
+            </div>
+
+            {/* Logout Button */}
+            <div className="absolute top-6 right-6 md:top-8 md:right-8">
+               <div
+                  onClick={handleLogout}
+                  className="backdrop-blur-[6px] bg-black/20 flex items-center justify-center h-14  cursor-pointer w-14 aspect-square rounded-full hover:bg-black/30 transition-colors"
+               >
+                  <FiLogOut className="text-white" size={20} />
                </div>
             </div>
          </div>
@@ -160,7 +160,7 @@ const PersonaSelectionPage: React.FC = () => {
                <div className="flex justify-center pt-6 md:pt-6 lg:pt-8 w-full">
                   <div className="bg-green-50 flex items-center gap-3 px-4 md:px-6 py-3 md:py-3 lg:py-4 rounded-full">
                      <div className="w-2 h-2 md:w-3 md:h-3 bg-[#00c950] rounded-full" />
-                     <p className="text-[#45556c] text-sm md:text-base lg:text-base">
+                     <p className="text-[#45556c] text-xs md:text-base lg:text-base">
                         Your information is secure and will never be shared
                      </p>
                   </div>

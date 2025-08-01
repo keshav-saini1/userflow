@@ -91,10 +91,8 @@ export const useButtonAnimation = () => {
   const animateSuccess = (element: HTMLElement) => {
     // Use CSS transitions instead of Motion API
     element.style.transform = 'scale(1.05)';
-    element.style.backgroundColor = '#00A63E';
     setTimeout(() => {
       element.style.transform = 'scale(1)';
-      element.style.backgroundColor = '#030213';
     }, 400);
   };
 

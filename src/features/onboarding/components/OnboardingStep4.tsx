@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import type { OnboardingStepComponent } from '../types';
 import { useButtonAnimation } from '../hooks/useOnboarding';
 import { useNavigate } from 'react-router';
+import verified from "@/assets/onboarding/verified.svg";
 
 interface OtpFormData {
   otp0: string;
@@ -35,7 +36,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     clearErrors,
     reset
   } = useForm<OtpFormData>({
-    mode: 'onChange',
+    mode: 'onTouched',
     defaultValues: {
       otp0: '',
       otp1: '',
@@ -183,7 +184,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       {/* Bottom sheet (mobile) / Centered modal (desktop) */}
       <div 
         ref={sheetRef}
-        className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[75vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
+        className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[55vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
       >
         {/* Handle - mobile only */}
         <div className="flex justify-center pt-[10.5px] pb-[7px] lg:hidden">
@@ -201,26 +202,12 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
             </div>
 
             <div className="flex flex-col">
-              <h3 className="text-[#030213] text-[12.3px] lg:text-sm font-medium leading-[17.5px]">
+              <h3 className="text-[#030213] text-[12.6px] lg:text-sm font-medium leading-[17.5px]">
                 Nirvana Rooms
               </h3>
               <div className="flex items-center gap-[3.5px]">
                 {/* Verified icon */}
-                <div className="w-[10.5px] h-[10.5px] lg:w-4 lg:h-4">
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 11 11"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="lg:w-4 lg:h-4"
-                  >
-                    <path
-                      d="M5.5 0.916664L6.875 3.66666L10.0833 4.125L7.79167 6.35416L8.25 9.54166L5.5 8.125L2.75 9.54166L3.20833 6.35416L0.916667 4.125L4.125 3.66666L5.5 0.916664Z"
-                      fill="#00A63E"
-                    />
-                  </svg>
-                </div>
+                <img src={verified} alt="verified" className="w-3 h-3" />
                 <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
                   Verify code
                 </span>

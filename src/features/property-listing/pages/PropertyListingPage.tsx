@@ -32,7 +32,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
   onPropertyClick,
 }) => {
   return (
-    <div className="bg-white min-h-screen w-screen flex flex-col">
+    <div className="bg-white min-h-screen w-screen flex flex-col pb-20">
       {/* Header */}
       <PropertyHeader 
         location={propertyListing.location}
@@ -70,7 +70,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
             {/* Property Listings Section */}
             <div className="space-y-6 lg:space-y-8 xl:space-y-12">
               {/* Section Header */}
-              <div className="text-center lg:text-left">
+              <div className="text-left lg:text-left">
                 <h2 className="text-[#101828] text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight mb-2 lg:mb-4">
                   Available Rental Options
                 </h2>

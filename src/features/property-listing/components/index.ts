@@ -6,4 +6,6 @@ export { SetupCard } from './SetupCard';
 export { AvailabilityAlert } from './AvailabilityAlert';
 export { default as ImageGallery } from './ImageGallery';
 export { default as FloatingMenu } from './FloatingMenu';
-export { default as HighlightsBottomSheet } from './HighlightsBottomSheet'; 
+export { default as HighlightsBottomSheet } from './HighlightsBottomSheet';
+export { default as IncludedServicesBottomSheet } from './IncludedServicesBottomSheet';
+export { default as AddOnServicesBottomSheet } from './AddOnServicesBottomSheet'; 

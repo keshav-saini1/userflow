@@ -52,8 +52,6 @@ const PropertyDetailsWrapper = () => {
   return (
     <PropertyDetailsPage 
       propertyData={samplePropertyDetailData}
-      onBackClick={() => navigate(-1)}
-      onShareClick={() => console.log('Share clicked')}
       onBookVisit={() => navigate('/book-visit')}
       onAskQuestion={() => console.log('Ask question clicked')}
     />

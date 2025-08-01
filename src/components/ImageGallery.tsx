@@ -100,9 +100,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         <div className="absolute top-0 left-0 right-0 p-[14px] flex items-center justify-between">
           {/* Back Button */}
           <div className="backdrop-blur-sm bg-black/20 rounded-full w-[35px] h-[35px] flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5">
+            {/* <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5">
               <path d="M10.5 3.5L3.5 7L10.5 10.5" stroke="white" strokeWidth="1.17" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            </svg> */}
           </div>
 
           {/* Image Counter */}

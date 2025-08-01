@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import type { OnboardingStepComponent } from "../types";
 import { CountryCodePicker } from "@/components";
 import { useButtonAnimation } from "../hooks/useOnboarding";
+import verified from "@/assets/onboarding/verified.svg";
+import whiteArrow from "@/assets/white_arrow 1.svg";
 
 interface FormData {
    phone: string;
@@ -16,36 +18,39 @@ const OnboardingStep3: OnboardingStepComponent = ({
 }) => {
    const { animateSuccess } = useButtonAnimation();
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
+   const username = localStorage.getItem("username");
 
    // Initialize country code from existing data or default to +91
    const initializeCountryCode = () => {
       const existingPhone = currentData.personalInfo?.phone;
       if (existingPhone) {
          // Extract country code from existing phone number
-         if (existingPhone.startsWith('+91')) return '+91';
-         if (existingPhone.startsWith('+1')) return '+1';
-         if (existingPhone.startsWith('+44')) return '+44';
-         if (existingPhone.startsWith('+61')) return '+61';
-         if (existingPhone.startsWith('+49')) return '+49';
-         if (existingPhone.startsWith('+33')) return '+33';
-         if (existingPhone.startsWith('+39')) return '+39';
-         if (existingPhone.startsWith('+34')) return '+34';
-         if (existingPhone.startsWith('+31')) return '+31';
-         if (existingPhone.startsWith('+65')) return '+65';
-         if (existingPhone.startsWith('+971')) return '+971';
-         if (existingPhone.startsWith('+81')) return '+81';
-         if (existingPhone.startsWith('+82')) return '+82';
-         if (existingPhone.startsWith('+86')) return '+86';
-         if (existingPhone.startsWith('+55')) return '+55';
-         if (existingPhone.startsWith('+52')) return '+52';
-         if (existingPhone.startsWith('+27')) return '+27';
-         if (existingPhone.startsWith('+234')) return '+234';
-         if (existingPhone.startsWith('+20')) return '+20';
+         if (existingPhone.startsWith("+91")) return "+91";
+         if (existingPhone.startsWith("+1")) return "+1";
+         if (existingPhone.startsWith("+44")) return "+44";
+         if (existingPhone.startsWith("+61")) return "+61";
+         if (existingPhone.startsWith("+49")) return "+49";
+         if (existingPhone.startsWith("+33")) return "+33";
+         if (existingPhone.startsWith("+39")) return "+39";
+         if (existingPhone.startsWith("+34")) return "+34";
+         if (existingPhone.startsWith("+31")) return "+31";
+         if (existingPhone.startsWith("+65")) return "+65";
+         if (existingPhone.startsWith("+971")) return "+971";
+         if (existingPhone.startsWith("+81")) return "+81";
+         if (existingPhone.startsWith("+82")) return "+82";
+         if (existingPhone.startsWith("+86")) return "+86";
+         if (existingPhone.startsWith("+55")) return "+55";
+         if (existingPhone.startsWith("+52")) return "+52";
+         if (existingPhone.startsWith("+27")) return "+27";
+         if (existingPhone.startsWith("+234")) return "+234";
+         if (existingPhone.startsWith("+20")) return "+20";
       }
-      return '+91';
+      return "+91";
    };
 
-   const [selectedCountryCode, setSelectedCountryCode] = useState(initializeCountryCode());
+   const [selectedCountryCode, setSelectedCountryCode] = useState(
+      initializeCountryCode()
+   );
 
    // Extract local phone number (without country code) for the input field
    const getLocalPhoneNumber = () => {
@@ -67,16 +72,19 @@ const OnboardingStep3: OnboardingStepComponent = ({
       watch,
       trigger,
    } = useForm<FormData>({
-      mode: "onChange",
+      mode: "onTouched",
       defaultValues: {
          phone: getLocalPhoneNumber(),
       },
    });
 
-   // Revalidate phone field when country code changes
+   // Revalidate phone field when country code changes (only if user has interacted)
    useEffect(() => {
-      trigger("phone");
-   }, [selectedCountryCode, trigger]);
+      const phoneValue = watch("phone");
+      if (phoneValue && phoneValue.trim()) {
+         trigger("phone");
+      }
+   }, [selectedCountryCode, trigger, watch]);
 
    // Watch form values to enable/disable button
    const formValues = watch();
@@ -85,41 +93,41 @@ const OnboardingStep3: OnboardingStepComponent = ({
    // Get validation pattern and placeholder based on selected country
    const getPhoneValidation = (countryCode: string) => {
       switch (countryCode) {
-         case '+1': // US/Canada
+         case "+1": // US/Canada
             return {
                pattern: /^[2-9]\d{9}$/,
                message: "Please enter a valid 10-digit phone number",
-               placeholder: "123 456 7890"
+               placeholder: "123 456 7890",
             };
-         case '+44': // UK
+         case "+44": // UK
             return {
                pattern: /^[1-9]\d{9,10}$/,
                message: "Please enter a valid UK phone number",
-               placeholder: "1234 567890"
+               placeholder: "1234 567890",
             };
-         case '+91': // India
+         case "+91": // India
             return {
                pattern: /^[6-9]\d{9}$/,
                message: "Please enter a valid 10-digit Indian phone number",
-               placeholder: "98765 43210"
+               placeholder: "98765 43210",
             };
-         case '+61': // Australia
+         case "+61": // Australia
             return {
                pattern: /^[2-9]\d{8}$/,
                message: "Please enter a valid 9-digit Australian phone number",
-               placeholder: "123 456 789"
+               placeholder: "123 456 789",
             };
-         case '+49': // Germany
+         case "+49": // Germany
             return {
                pattern: /^[1-9]\d{9,11}$/,
                message: "Please enter a valid German phone number",
-               placeholder: "123 456 7890"
+               placeholder: "123 456 7890",
             };
          default:
             return {
                pattern: /^\d{7,15}$/,
                message: "Please enter a valid phone number",
-               placeholder: "Enter phone number"
+               placeholder: "Enter phone number",
             };
       }
    };
@@ -130,14 +138,14 @@ const OnboardingStep3: OnboardingStepComponent = ({
       if (submitButtonRef.current) {
          animateSuccess(submitButtonRef.current);
       }
-      
+
       onUpdateData({
          personalInfo: {
             ...currentData.personalInfo,
             phone: `${selectedCountryCode}${data.phone.trim()}`,
          },
       });
-      
+
       // Delay the next step to show the success animation
       setTimeout(() => {
          onNext();
@@ -152,19 +160,19 @@ const OnboardingStep3: OnboardingStepComponent = ({
    useEffect(() => {
       if (overlayRef.current && sheetRef.current) {
          // Use CSS transitions instead of Motion API
-         overlayRef.current.style.opacity = '1';
-         sheetRef.current.style.transform = 'translateY(0%)';
-         sheetRef.current.style.opacity = '1';
+         overlayRef.current.style.opacity = "1";
+         sheetRef.current.style.transform = "translateY(0%)";
+         sheetRef.current.style.opacity = "1";
       }
    }, []);
 
    const handleClose = () => {
       if (overlayRef.current && sheetRef.current) {
          // Use CSS transitions instead of Motion API
-         sheetRef.current.style.transform = 'translateY(100%)';
-         sheetRef.current.style.opacity = '0';
-         overlayRef.current.style.opacity = '0';
-         
+         sheetRef.current.style.transform = "translateY(100%)";
+         sheetRef.current.style.opacity = "0";
+         overlayRef.current.style.opacity = "0";
+
          setTimeout(() => {
             onPrev();
          }, 300);
@@ -183,7 +191,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
          />
 
          {/* Bottom sheet (mobile) / Centered modal (desktop) */}
-         <div 
+         <div
             ref={sheetRef}
             className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[60vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
          >
@@ -203,26 +211,12 @@ const OnboardingStep3: OnboardingStepComponent = ({
                   </div>
 
                   <div className="flex flex-col">
-                     <h3 className="text-[#030213] text-[12.3px] lg:text-sm font-medium leading-[17.5px]">
+                     <h3 className="text-[#030213] text-[12.6px] lg:text-sm font-medium leading-[17.5px]">
                         Nirvana Rooms
                      </h3>
                      <div className="flex items-center gap-[3.5px]">
                         {/* Verified icon */}
-                        <div className="w-[10.5px] h-[10.5px] lg:w-4 lg:h-4">
-                           <svg
-                              width="11"
-                              height="11"
-                              viewBox="0 0 11 11"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="lg:w-4 lg:h-4"
-                           >
-                              <path
-                                 d="M5.5 0.916664L6.875 3.66666L10.0833 4.125L7.79167 6.35416L8.25 9.54166L5.5 8.125L2.75 9.54166L3.20833 6.35416L0.916667 4.125L4.125 3.66666L5.5 0.916664Z"
-                                 fill="#00A63E"
-                              />
-                           </svg>
-                        </div>
+                        <img src={verified} alt="verified" className="w-3 h-3" />
                         <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
                            Verified property
                         </span>
@@ -256,18 +250,21 @@ const OnboardingStep3: OnboardingStepComponent = ({
 
             <form onSubmit={handleSubmit(onSubmit)}>
                {/* Main content */}
-               <div className="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-6 lg:pb-8 h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
+               <div className="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-6 lg:pb-8  lg:h-auto lg:max-h-[60vh] overflow-auto">
                   {/* Welcome heading */}
-                  <div className="text-center mb-4 lg:mb-10 animate-form-element">
+                  <div className="text-center mb-4 lg:mb-10 animate-form-element w-[80%] mx-auto flex flex-col gap-4">
                      <span className="text-[#030213] text-2xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
-                        What's your phone number? 📱
+                        Great to meet you, {username}! 👋
+                     </span>
+                     <span className="text-neutral-500 text-md lg:text-sm font-medium  leading-[25.5px]">
+                        Let's verify your number to show you available rooms
                      </span>
                   </div>
 
                   {/* Form fields */}
                   <div className="space-y-3 lg:space-y-4">
                      {/* Phone input */}
-                     <div className="bg-[#F5F5F5] p-[0.5px] rounded-[14px] lg:rounded-2xl h-auto animate-form-element">
+                     <div className="bg-gray-50 p-[0.5px] rounded-[14px] lg:rounded-2xl h-auto animate-form-element">
                         <div className="flex items-center gap-[14px] lg:gap-4 p-[10px] lg:p-4 min-h-[59px] lg:h-auto">
                            {/* Country code selector */}
                            <CountryCodePicker
@@ -289,16 +286,26 @@ const OnboardingStep3: OnboardingStepComponent = ({
                                  required: "Phone number is required",
                                  pattern: {
                                     value: phoneValidation.pattern,
-                                    message: phoneValidation.message
-                                 }
+                                    message: phoneValidation.message,
+                                 },
                               })}
                            />
                         </div>
                         {errors.phone && (
                            <div className="px-[17.5px] lg:px-4 pb-2">
                               <p className="text-red-500 text-xs flex items-center gap-1">
-                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                 <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                 >
+                                    <path
+                                       strokeLinecap="round"
+                                       strokeLinejoin="round"
+                                       strokeWidth={2}
+                                       d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
                                  </svg>
                                  {errors.phone.message}
                               </p>
@@ -310,7 +317,15 @@ const OnboardingStep3: OnboardingStepComponent = ({
                   {/* Description */}
                   <div className="text-center mb-[21px] lg:mb-8 mt-4 lg:mt-6 animate-form-element">
                      <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[19.91px] lg:leading-relaxed">
-                        We'll send you a verification code to confirm your number.
+                        We'll send you a verification code to confirm your
+                        number.
+                     </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded-full mx-auto w-max">
+                     <img src={verified} alt="verified" className="w-3 h-3" />
+                     <p className="text-green-500 text-[12.3px] lg:text-sm leading-[19.91px] lg:leading-relaxed">
+                        We never share your number
                      </p>
                   </div>
                </div>
@@ -331,22 +346,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
                      <span className="text-white text-[14px] lg:text-base font-medium leading-[21px]">
                         Send verification code
                      </span>
-                     <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="lg:w-5 lg:h-5"
-                     >
-                        <path
-                           d="M6.75 13.5L11.25 9L6.75 4.5"
-                           stroke="white"
-                           strokeWidth="1.5"
-                           strokeLinecap="round"
-                           strokeLinejoin="round"
-                        />
-                     </svg>
+                     <img src={whiteArrow} alt="arrow" className="w-5 h-5" />
                   </button>
 
                   {/* Trust indicators */}
@@ -366,4 +366,4 @@ const OnboardingStep3: OnboardingStepComponent = ({
    );
 };
 
-export default OnboardingStep3; 
+export default OnboardingStep3;
