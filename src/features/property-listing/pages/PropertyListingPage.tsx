@@ -24,7 +24,6 @@ interface PropertyListingPageProps {
 export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
   propertyListing,
   onBackClick,
-  onShareClick,
   onSetupClick,
   onReserve,
   onBookVisit,
@@ -37,7 +36,6 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
       <PropertyHeader 
         location={propertyListing.location}
         onBackClick={onBackClick}
-        onShareClick={onShareClick}
       />
 
       {/* Hero Section - Full width on desktop */}

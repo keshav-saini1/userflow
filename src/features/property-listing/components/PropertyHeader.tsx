@@ -1,5 +1,6 @@
 import React from "react";
 import type { PropertyLocation } from "../types";
+import { useNavigate } from "react-router";
 
 import default_back from "@/assets/default_back.svg";
 import user from "@/assets/user.svg";
@@ -12,8 +13,8 @@ interface PropertyHeaderProps {
 
 export const PropertyHeader: React.FC<PropertyHeaderProps> = ({
    location,
-   onShareClick,
 }) => {
+   const navigate = useNavigate();
    const renderStars = (rating: number) => {
       const stars = [];
       const fullStars = Math.floor(rating);
@@ -62,7 +63,12 @@ export const PropertyHeader: React.FC<PropertyHeaderProps> = ({
          <div className="flex items-center justify-between">
             {/* Back Button */}
 
-            <img src={default_back} alt="back" className="w-10 h-10" />
+            <img
+               src={default_back}
+               alt="back"
+               className="w-10 h-10"
+               onClick={() => navigate("/persona-selection")}
+            />
 
             {/* Property Info */}
             <div className="flex-1 flex flex-col items-center gap-[3.5px]">
@@ -84,7 +90,7 @@ export const PropertyHeader: React.FC<PropertyHeaderProps> = ({
 
             {/* Share Button */}
             <button
-               onClick={onShareClick}
+               onClick={() => navigate("/profile")}
             >
                <img src={user} alt="user" className="w-10 h-10" />
             </button>

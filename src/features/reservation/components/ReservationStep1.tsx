@@ -3,8 +3,11 @@ import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import Calendar from '../../../components/Calendar';
 import room_reserve from '@/assets/room_reserve.svg';
+import default_back from '@/assets/default_back.svg';
+import { useNavigate } from 'react-router';
 
 const ReservationStep1: React.FC = () => {
+  const navigate = useNavigate();
   const { updateForm, nextStep } = useReservation();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -86,21 +89,19 @@ const ReservationStep1: React.FC = () => {
       <div className="lg:hidden sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-100">
         <div className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3.5">
-            <button className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+            <button className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center" onClick={() => navigate(-1)}>
+              <img src={default_back} alt="back" className="w-10 h-10" />
             </button>
             <div>
               <h2 className="text-sm font-medium text-gray-900">Reserve Room</h2>
               <p className="text-xs text-gray-500">Step 1 of 4</p>
             </div>
           </div>
-          <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
+          {/* <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 

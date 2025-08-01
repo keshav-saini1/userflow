@@ -1,4 +1,4 @@
-import { FaChevronLeft, FaShareAlt, FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
 import type { ConfirmedBookingData } from '../types';
 import timer from "@/assets/onboarding/timer.svg";
 import train from "@/assets/onboarding/train.svg";
@@ -8,6 +8,8 @@ import red_clock from '@/assets/red_clock.svg';
 import edit_btn from '@/assets/edit_btn.svg';
 import { IoEyeOutline } from 'react-icons/io5';
 import { FiCreditCard } from 'react-icons/fi';
+import default_back from '@/assets/default_back_black.svg';
+import default_profile from '@/assets/default_profile_black.svg';
 
 interface ConfirmedBookingPageProps {
   data: ConfirmedBookingData;
@@ -78,15 +80,13 @@ export default function ConfirmedBookingPage({
         <div className="absolute top-8 lg:top-12 left-4 lg:left-8 right-4 lg:right-8 flex justify-between items-center">
           <button
             onClick={onBackClick}
-            className="backdrop-blur-md bg-black/20 rounded-full w-[35px] h-[35px] lg:w-12 lg:h-12 flex items-center justify-center text-white hover:bg-black/30 transition-colors"
           >
-            <FaChevronLeft className="w-4 h-4 lg:w-5 lg:h-5" />
+            <img src={default_back} alt="back" className="w-10 h-10" />
           </button>
           <button
             onClick={onShareClick}
-            className="backdrop-blur-md bg-black/20 rounded-full w-[35px] h-[35px] lg:w-12 lg:h-12 flex items-center justify-center text-white hover:bg-black/30 transition-colors"
           >
-            <FaShareAlt className="w-4 h-4 lg:w-5 lg:h-5" />
+            <img src={default_profile} alt="profile" className="w-10 h-10" />
           </button>
         </div>
 
@@ -235,7 +235,7 @@ export default function ConfirmedBookingPage({
                 {bookingDetails.status === 'approved' && (
                   <button
                     onClick={onModifyBooking}
-                    className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="flex-1 bg-gray-900 text-white rounded-xl py-3 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
                     Modify Booking
                     <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />

@@ -1,17 +1,26 @@
 import React from 'react';
-import type { WebCheckinStepProps } from '../types';
-import { ProfileForm } from '../../user-profile';
+import ProfileForm from '../components/ProfileForm';
 
-const WebCheckinStep2: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
+const UserProfilePage: React.FC = () => {
+  const handleSave = () => {
+    // Handle save functionality
+    console.log('Profile saved');
+  };
+
+  const handleCancel = () => {
+    // Handle cancel functionality
+    console.log('Profile changes cancelled');
+  };
+
   return (
-    <div className="bg-[#121212] relative min-h-screen w-full pb-16">
+    <div className="bg-[#121212] relative min-h-screen w-screen pb-16">
       <div className="bg-gray-50 relative min-h-screen w-full">
         {/* Header */}
         <div className="bg-white sticky top-0 z-10 border-b border-gray-200">
           <div className="p-[14px]">
             <div className="flex items-center gap-3.5">
               <button 
-                onClick={onPrev}
+                onClick={() => window.history.back()}
                 className="bg-gray-100 rounded-[14px] size-[35px] flex items-center justify-center hover:bg-gray-200 transition-colors"
               >
                 <svg className="size-[17.5px] text-[#4a5565]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,19 +29,11 @@ const WebCheckinStep2: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
               </button>
               <div className="flex-1">
                 <h1 className="text-[#101828] text-[17.5px] font-semibold leading-[24.5px]">
-                  Web Check-in
+                  User Profile
                 </h1>
                 <p className="text-[#4a5565] text-[12.3px] leading-[17.5px]">
-                  Step 2 of 4 • Tenant Verification
+                  Manage your profile information
                 </p>
-              </div>
-              <div className="flex items-center gap-[5px]">
-                <span className="text-[#030213] text-[12.3px] font-medium leading-[17.5px]">
-                  90%
-                </span>
-                <div className="bg-[#e0eaff] h-[7px] w-[42px] rounded-full overflow-hidden">
-                  <div className="bg-[#155dfc] h-full w-[70%] rounded-full" />
-                </div>
               </div>
             </div>
           </div>
@@ -40,21 +41,29 @@ const WebCheckinStep2: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
 
         {/* Main Content */}
         <div className="px-[14px] py-[21px]">
-          <ProfileForm />
+          <ProfileForm onSave={handleSave} onCancel={handleCancel} />
         </div>
 
         {/* Bottom Navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-[14px]">
-          <button 
-            onClick={onNext}
-            className="w-full bg-[#155dfc] text-white text-[14px] font-semibold leading-[21px] py-3.5 px-[21px] rounded-[14px] hover:bg-[#0f4cd1] transition-colors"
-          >
-            Continue
-          </button>
+          <div className="flex gap-[14px]">
+            <button 
+              onClick={handleCancel}
+              className="flex-1 bg-gray-100 text-[#101828] text-[14px] font-semibold leading-[21px] py-3.5 px-[21px] rounded-[14px] hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSave}
+              className="flex-1 bg-[#155dfc] text-white text-[14px] font-semibold leading-[21px] py-3.5 px-[21px] rounded-[14px] hover:bg-[#0f4cd1] transition-colors"
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default WebCheckinStep2; 
+export default UserProfilePage; 

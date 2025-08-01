@@ -1,13 +1,15 @@
 import React from 'react';
-import { FiArrowLeft } from 'react-icons/fi';
 import { BookingCard, RoomOptionCard } from '../components';
 import { sampleBookingDetails } from '../data/sampleData';
 import { availableRoomOptions } from '../data/roomOptions';
+import default_back from '@/assets/default_back.svg';
+import { useNavigate } from 'react-router';
 
 const ChangeRoomPage: React.FC = () => {
+  const navigate = useNavigate();
   const handleBackClick = () => {
     // Handle back navigation
-    console.log('Back clicked');
+    navigate("/modify-booking");
   };
 
   const handleRoomSelect = (roomId: string) => {
@@ -22,7 +24,7 @@ const ChangeRoomPage: React.FC = () => {
       // Store room data in sessionStorage for reservation flow
       sessionStorage.setItem('selectedRoomForReservation', JSON.stringify(selectedRoom));
       // Navigate to reservation page
-      window.location.href = '/reservation';
+      navigate("/reservation");
     }
   };
 
@@ -33,9 +35,8 @@ const ChangeRoomPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
           <button
             onClick={handleBackClick}
-            className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
-            <FiArrowLeft className="w-4 h-4 text-gray-600" />
+            <img src={default_back} alt="back" className="w-10 h-10" />
           </button>
           <h1 className="font-semibold text-gray-900 text-base">
             Change Room
