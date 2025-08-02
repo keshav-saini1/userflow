@@ -5,6 +5,7 @@ export * from './modify-booking';
 export * from './onboarding';
 export * from './persona-selection';
 export * from './property-listing';
+export * from './property-filter';
 export * from './reservation';
 export * from './webcheckin';
 export * from './user-profile'; 

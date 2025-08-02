@@ -30,7 +30,8 @@ import {
    MyBookingsPage,
    ReviewBookingPage,
 } from "./features/property-listing/pages";
-import { UpdateMoveInPage, UserProfilePage } from "./features";
+import { FilterPropertiesPage, UpdateMoveInPage, UserProfilePage } from "./features";
+
 
 // Placeholder components - you'll need to create these
 const Login = () => <div>Login Page</div>;
@@ -46,7 +47,6 @@ const PropertyListingWrapper = () => {
          propertyListing={samplePropertyListing}
          onBackClick={() => window.history.back()}
          onShareClick={() => console.log("Share clicked")}
-         onSetupClick={() => console.log("Setup clicked")}
          onReserve={() => navigate("/reservation")}
          onBookVisit={() => navigate("/book-visit")}
          onMapClick={() => console.log("Map clicked")}
@@ -283,6 +283,10 @@ const router = createBrowserRouter([
    {
       path: "/modify-booking/cancel-success",
       element: <CancelBookingSuccessWrapper />,
+   },
+   {
+      path: "/property-filter",
+      element: <FilterPropertiesPage />,
    },
    {
       path: "/profile",

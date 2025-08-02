@@ -24,7 +24,6 @@ interface PropertyListingPageProps {
 export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
    propertyListing,
    onBackClick,
-   onSetupClick,
    onReserve,
    onBookVisit,
    onMapClick,
@@ -56,7 +55,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                   {/* Setup Card and Availability Alert - Mobile: stacked, Desktop: side by side */}
                   <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8 mb-8 lg:mb-12">
                      <div className="flex-1">
-                        <SetupCard onSetupClick={onSetupClick} />
+                        <SetupCard setShowBottomSheet={setShowBottomSheet} />
                      </div>
                      <div className="flex-1 lg:max-w-md">
                         <AvailabilityAlert
