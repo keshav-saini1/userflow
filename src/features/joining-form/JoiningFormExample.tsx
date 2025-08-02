@@ -47,17 +47,7 @@ const JoiningFormExample: React.FC = () => {
     navigate('/joining-status?status=failure');
   };
 
-  const handleProfileComplete = () => {
-    setCurrentStep('status');
-  };
-
-  const handleBack = () => {
-    if (currentStep === 'profile') {
-      setCurrentStep('persona');
-    } else if (currentStep === 'status') {
-      setCurrentStep('profile');
-    }
-  };
+  
 
   if (currentStep === 'profile') {
     return <JoiningProfilePage />;

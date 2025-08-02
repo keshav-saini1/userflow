@@ -30,8 +30,9 @@ import {
    MyBookingsPage,
    ReviewBookingPage,
 } from "./features/property-listing/pages";
-import { FilterPropertiesPage, JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
+import { JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
 import JoiningStatusPage from "./features/joining-form/pages/JoiningStatusPage";
+import { FilterPropertiesPage } from "./features/property-filter";
 
 
 // Placeholder components - you'll need to create these
