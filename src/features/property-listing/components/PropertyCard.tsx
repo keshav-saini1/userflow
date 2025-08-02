@@ -48,6 +48,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       navigate("/book-visit");
    };
 
+
    return (
       <div
          className="bg-white rounded-[21px] shadow-[0px_4px_20px_0px_rgba(0,0,0,0.06),0px_1px_4px_0px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
@@ -56,14 +57,21 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
          <div className="flex flex-col-reverse pb-6">
             {/* Property Image */}
             <div
-               className={`relative h-[${
-                  isWishlistView ? "296px" : "196px"
-               }] lg:h-[220px] overflow-hidden order-3`}
+               className={`relative ${
+                  isWishlistView ? "h-[296px]" : "h-[196px]"
+               } lg:h-[220px] overflow-hidden order-3`}
             >
-               <div
-                  className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 hover:scale-105"
-                  style={{ backgroundImage: `url('${property.image}')` }}
+               <img
+                  src={property.image}
+                  alt={property.name}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  onError={(e) => {
+                     const target = e.target as HTMLImageElement;
+                     target.style.display = 'none';
+                     target.nextElementSibling?.classList.remove('hidden');
+                  }}
                />
+               <div className="w-full h-full bg-gray-200 hidden" />
 
                {/* Gradient Overlay */}
                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

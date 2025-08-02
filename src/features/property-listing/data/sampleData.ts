@@ -65,7 +65,8 @@ export const samplePropertyListing: PropertyListing = {
                icon: "parking",
             },
          ],
-         image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+         image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+         status: "available",
          isRecommended: true,
       },
       {
@@ -96,7 +97,8 @@ export const samplePropertyListing: PropertyListing = {
                icon: "parking",
             },
          ],
-         image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+         image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+         status: "available",
       },
       {
          id: "executive-suite",
@@ -126,7 +128,8 @@ export const samplePropertyListing: PropertyListing = {
                icon: "parking",
             },
          ],
-         image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+         image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+         status: "available",
       },
       {
          id: "budget-friendly-room",
@@ -156,7 +159,8 @@ export const samplePropertyListing: PropertyListing = {
                icon: "parking",
             },
          ],
-         image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+         image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1680&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+         status: "available",
       },
    ],
 };
