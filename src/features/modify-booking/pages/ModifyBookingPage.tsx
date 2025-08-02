@@ -5,10 +5,12 @@ import { sampleBookingDetails, modifyBookingOptions } from '../data/sampleData';
 import type { ModifyBookingOption } from '../types';
 import { useNavigate } from 'react-router';
 import default_back from '@/assets/default_back.svg';
+import AddOnServicesBottomSheet from '@/features/property-listing/components/AddOnServicesBottomSheet';
 
 const ModifyBookingPage: React.FC = () => {
   const navigate = useNavigate();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isAddOnServicesOpen, setIsAddOnServicesOpen] = useState(false);
 
   const handleOptionClick = (option: ModifyBookingOption) => {
     // Handle navigation to specific modification flow
@@ -16,7 +18,13 @@ const ModifyBookingPage: React.FC = () => {
       setIsCancelModalOpen(true);
     } else if (option.action === 'change-room') {
       // Navigate to change room page
-      window.location.href = '/modify-booking/change-room';
+      navigate("/modify-booking/change-room");
+    } else if (option.action === 'change-date') {
+      // Navigate to update move-in date page
+      navigate("/modify-booking/update-movein");
+    } else if (option.action === 'add-services') {
+      // Open add-on services bottom sheet
+      setIsAddOnServicesOpen(true);
     } else {
       console.log('Selected option:', option.action);
     }
@@ -115,6 +123,38 @@ const ModifyBookingPage: React.FC = () => {
         onClose={() => setIsCancelModalOpen(false)}
         onKeepBooking={handleKeepBooking}
         onConfirmCancellation={handleConfirmCancellation}
+      />
+
+      {/* Add-on Services Bottom Sheet */}
+      <AddOnServicesBottomSheet
+        isOpen={isAddOnServicesOpen}
+        onClose={() => setIsAddOnServicesOpen(false)}
+        services={[
+          {
+            id: '1',
+            name: 'Housekeeping',
+            price: '₹500/month',
+            icon: '🧹'
+          },
+          {
+            id: '2',
+            name: 'Wi-Fi',
+            price: '₹300/month',
+            icon: '📶'
+          },
+          {
+            id: '3',
+            name: 'Laundry Service',
+            price: '₹200/month',
+            icon: '👕'
+          },
+          {
+            id: '4',
+            name: 'Gym Access',
+            price: '₹800/month',
+            icon: '💪'
+          }
+        ]}
       />
     </div>
   );
