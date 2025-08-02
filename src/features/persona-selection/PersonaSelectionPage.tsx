@@ -5,6 +5,7 @@ import existingTenant from "../../assets/persona/existingtenant.svg";
 import app from "../../assets/persona/app.svg";
 import { FiArrowRight, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
+import ConfirmSheet from "../joining-form/components/ConfirmSheet";
 
 interface PersonaOption {
    id: string;
@@ -16,6 +17,7 @@ interface PersonaOption {
 
 const PersonaSelectionPage: React.FC = () => {
    const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+   const [showConfirmSheet, setShowConfirmSheet] = useState(false);
    const navigate = useNavigate();
    const username = localStorage.getItem("username");
 
@@ -45,12 +47,27 @@ const PersonaSelectionPage: React.FC = () => {
 
    const handlePersonaSelect = (personaId: string) => {
       setSelectedPersona(personaId);
-      // Handle navigation or API call here
-      console.log("Selected persona:", personaId);
-      // TODO: Add navigation or API integration
-      navigate(
-         personaOptions.find((option) => option.id === personaId)?.href || "/"
-      );
+      
+      if (personaId === "not-added") {
+         setShowConfirmSheet(true);
+      } else {
+         // Handle navigation or API call here
+         console.log("Selected persona:", personaId);
+         // TODO: Add navigation or API integration
+         navigate(
+            personaOptions.find((option) => option.id === personaId)?.href || "/"
+         );
+      }
+   };
+
+   const handleConfirmSheetClose = () => {
+      setShowConfirmSheet(false);
+      setSelectedPersona(null);
+   };
+
+   const handleConfirmSheetConfirm = () => {
+      setShowConfirmSheet(false);
+      navigate("/joining-profile");
    };
 
    const handleLogout = () => {
@@ -168,6 +185,14 @@ const PersonaSelectionPage: React.FC = () => {
                </div>
             </div>
          </div>
+
+         {/* Confirm Sheet */}
+         <ConfirmSheet
+            isOpen={showConfirmSheet}
+            onClose={handleConfirmSheetClose}
+            onConfirm={handleConfirmSheetConfirm}
+            phoneNumber={username || undefined}
+         />
       </div>
    );
 };

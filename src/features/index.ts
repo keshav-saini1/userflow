@@ -3,6 +3,7 @@ export * from './book-visit';
 export * from './confirmed-booking';
 export * from './modify-booking';
 export * from './onboarding';
+export * from './joining-form';
 export * from './persona-selection';
 export * from './property-listing';
 export * from './property-filter';

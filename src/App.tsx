@@ -30,7 +30,8 @@ import {
    MyBookingsPage,
    ReviewBookingPage,
 } from "./features/property-listing/pages";
-import { FilterPropertiesPage, UpdateMoveInPage, UserProfilePage } from "./features";
+import { FilterPropertiesPage, JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
+import JoiningStatusPage from "./features/joining-form/pages/JoiningStatusPage";
 
 
 // Placeholder components - you'll need to create these
@@ -291,6 +292,14 @@ const router = createBrowserRouter([
    {
       path: "/profile",
       element: <UserProfilePage />,
+   },
+   {
+      path: "/joining-profile",
+      element: <JoiningProfilePage />,
+   },
+   {
+      path: "/joining-status",
+      element: <JoiningStatusPage />,
    },
    {
       path: "/login",
