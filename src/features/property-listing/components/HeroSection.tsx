@@ -1,20 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import type { PropertyLocation } from "../types";
 import time from "@/assets/onboarding/timer.svg";
 import building from "@/assets/onboarding/building.svg";
 import train from "@/assets/onboarding/train.svg";
 import food from "@/assets/onboarding/food.svg";
 import rightArrow from "@/assets/white_arrow 1.svg";
+import LocationCommuteBottomSheet from "./LocationCommuteBottomSheet";
 
 interface HeroSectionProps {
    heroImage: string;
    location: PropertyLocation;
+   setShowBottomSheet: (show: boolean) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
    heroImage,
    location,
+   setShowBottomSheet
 }) => {
+   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
+
+   const openLocationsSheet = () => {
+      setIsLocationSheetOpen(true);
+      setShowBottomSheet(true);
+   };
+
+   const closeLocationSheet = () => {
+      setIsLocationSheetOpen(false);
+      setShowBottomSheet(false);
+   };
+
    return (
       <div className="relative h-[272px] md:h-[400px] lg:h-[500px] w-full overflow-hidden">
          {/* Background Image Container */}
@@ -55,7 +70,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                      </div>
 
                      {/* Find Nearby Spots Card - Responsive sizing */}
-                     <div className="bg-white/10 backdrop-blur-[6px] w-[100%] rounded-[14px] lg:rounded-2xl p-[10.5px] py-3 lg:p-4 flex items-center gap-[10.5px] lg:gap-4 max-w-lg lg:mx-auto">
+                     <div className="bg-white/10 backdrop-blur-[6px] w-[100%] rounded-[14px] lg:rounded-2xl p-[10.5px] py-3 lg:p-4 flex items-center gap-[10.5px] lg:gap-4 max-w-lg lg:mx-auto" onClick={openLocationsSheet}>
                         {/* Icon */}
                         <img
                            src={time}
@@ -120,6 +135,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                </div>
             </div>
          </div>
+         <LocationCommuteBottomSheet
+            isOpen={isLocationSheetOpen}
+            onClose={closeLocationSheet}
+            propertyName={`${location.area}, ${location.city}`}
+         />
       </div>
    );
 };
