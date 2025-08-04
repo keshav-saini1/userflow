@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import verified_badge from "@/assets/verified_badge.svg";
 import pending_badge from "@/assets/pending_badge.svg";
+import { UnsavedChangesAlert } from "@/components";
 
 interface EditableField {
    id: string;
@@ -18,15 +19,35 @@ interface DocumentCard {
    image?: string;
 }
 
-interface ProfileFormProps {
-   onSave?: () => void;
-   onCancel?: () => void;
-   editable?: boolean;
+interface ProfileFormRef {
+   save: () => void;
+   hasUnsavedChanges: boolean;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ editable = true }) => {
+interface ProfileFormProps {
+   onSave?: () => void;
+   editable?: boolean;
+   onContinue?: (hasChanges: boolean) => void;
+   ref?: React.Ref<ProfileFormRef>;
+}
+
+const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(({ 
+   editable = true, 
+   onSave, 
+   onContinue
+}, ref) => {
    const [editingField, setEditingField] = useState<string | null>(null);
    const [tempValue, setTempValue] = useState("");
+   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+   const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+   const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
+   
+   // Store initial values for comparison
+   const initialValues = useRef<{
+      basic: EditableField[];
+      other: EditableField[];
+      parent: EditableField[];
+   } | null>(null);
 
    // Dummy data for editable fields
    const [basicDetails, setBasicDetails] = useState<EditableField[]>([
@@ -177,6 +198,60 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ editable = true }) => {
       },
    ]);
 
+   // Store initial values on component mount
+   useEffect(() => {
+      if (!initialValues.current) {
+         initialValues.current = {
+            basic: JSON.parse(JSON.stringify(basicDetails)),
+            other: JSON.parse(JSON.stringify(otherDetails)),
+            parent: JSON.parse(JSON.stringify(parentDetails)),
+         };
+      }
+   }, []);
+
+   // Check for changes
+   const checkForChanges = () => {
+      if (!initialValues.current) return false;
+      
+      const hasBasicChanges = basicDetails.some((field, index) => 
+         field.value !== initialValues.current!.basic[index].value
+      );
+      
+      const hasOtherChanges = otherDetails.some((field, index) => 
+         field.value !== initialValues.current!.other[index].value
+      );
+      
+      const hasParentChanges = parentDetails.some((field, index) => 
+         field.value !== initialValues.current!.parent[index].value
+      );
+      
+      return hasBasicChanges || hasOtherChanges || hasParentChanges;
+   };
+
+   // Update hasUnsavedChanges whenever form data changes
+   useEffect(() => {
+      const hasChanges = checkForChanges();
+      setHasUnsavedChanges(hasChanges);
+      
+      // Notify parent component about changes
+      if (onContinue) {
+         onContinue(hasChanges);
+      }
+   }, [basicDetails, otherDetails, parentDetails, onContinue]);
+
+   // Handle beforeunload event
+   useEffect(() => {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+         if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+         }
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+   }, [hasUnsavedChanges]);
+
    const handleEditField = (fieldId: string, currentValue: string) => {
       setEditingField(fieldId);
       setTempValue(currentValue);
@@ -228,6 +303,48 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ editable = true }) => {
       setEditingField(null);
       setTempValue("");
    };
+
+   // Expose save function to parent component
+   const handleSave = () => {
+      // Save the current state as the new initial state
+      initialValues.current = {
+         basic: JSON.parse(JSON.stringify(basicDetails)),
+         other: JSON.parse(JSON.stringify(otherDetails)),
+         parent: JSON.parse(JSON.stringify(parentDetails)),
+      };
+      setHasUnsavedChanges(false);
+      
+      if (onSave) {
+         onSave();
+      }
+   };
+
+   const handleProceedAnyway = () => {
+      setShowUnsavedAlert(false);
+      setHasUnsavedChanges(false);
+      if (pendingNavigation) {
+         pendingNavigation();
+         setPendingNavigation(null);
+      }
+   };
+
+   const handleCancelNavigation = () => {
+      setShowUnsavedAlert(false);
+      setPendingNavigation(null);
+   };
+
+   // Expose save function to parent via ref
+   React.useImperativeHandle(ref, () => ({
+      save: handleSave,
+      hasUnsavedChanges
+   }));
+
+   // Expose save function to parent via callback
+   useEffect(() => {
+      if (onContinue) {
+         onContinue(hasUnsavedChanges);
+      }
+   }, [hasUnsavedChanges, onContinue]);
 
    const renderEditableField = (
       field: EditableField,
@@ -636,7 +753,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ editable = true }) => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                      />
                   </svg>
                </div>
@@ -647,8 +764,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ editable = true }) => {
                </div>
             </div>
          </div>
+
+
+
+         {/* Unsaved Changes Alert */}
+         <UnsavedChangesAlert
+            isOpen={showUnsavedAlert}
+            onProceed={handleProceedAnyway}
+            onCancel={handleCancelNavigation}
+         />
       </div>
    );
-};
+});
 
 export default ProfileForm;
