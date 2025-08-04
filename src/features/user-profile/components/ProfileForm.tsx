@@ -529,7 +529,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(({
          return (
             <div
                key={doc.id}
-               className="bg-white h-[150px] relative rounded-[8.75px] w-[150px] border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-[12.5px]"
+               className="bg-white h-[150px] relative rounded-[8.75px] w-[180px] border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-[12.5px] flex-shrink-0 min-w-[180px]"
             >
                <div className="bg-[rgba(3,2,19,0.1)] rounded-full size-7 flex items-center justify-center mb-[3.5px]">
                   <svg
@@ -559,7 +559,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(({
       return (
          <div
             key={doc.id}
-            className="bg-white h-[150px] relative rounded-[8.75px] w-[150px] shadow-sm flex-shrink-0"
+            className="bg-white h-[150px] relative rounded-[8.75px] w-[150px] shadow-sm flex-shrink-0 min-w-[150px]"
          >
             <div className="h-full flex flex-col">
                <div className="bg-blue-100 h-[95px] rounded-t-[8.75px] relative overflow-hidden">
