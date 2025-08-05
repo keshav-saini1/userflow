@@ -1,6 +1,7 @@
 export { default as BaseBottomSheet } from './BaseBottomSheet';
 export { default as Calendar } from './Calendar';
 export { default as CountryCodePicker } from './CountryCodePicker';
+export { default as DocumentVerification } from './DocumentVerification';
 export { default as ImageCarousel } from './ImageCarousel';
 export { default as ImageGallery } from './ImageGallery';
 export { default as MultiSelectDropdown } from './MultiSelectDropdown';

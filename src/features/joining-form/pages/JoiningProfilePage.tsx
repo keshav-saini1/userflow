@@ -34,6 +34,11 @@ const JoiningProfilePage: React.FC = () => {
     navigate('/joining-status?status=failure');
   };
 
+  const handleDocumentAdd = () => {
+    console.log('handleDocumentAdd');
+    navigate('/joining-documents');
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen w-screen">
       {/* Header */}
@@ -63,7 +68,7 @@ const JoiningProfilePage: React.FC = () => {
       {/* Main Content */}
       <div className="p-4 pb-20">
         <div className="max-w-md mx-auto">
-          <ProfileForm onSave={handleComplete} />
+          <ProfileForm onSave={handleComplete} onDocumentAdd={handleDocumentAdd} />
         </div>
       </div>
 

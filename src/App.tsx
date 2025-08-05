@@ -30,7 +30,7 @@ import {
    MyBookingsPage,
    ReviewBookingPage,
 } from "./features/property-listing/pages";
-import { JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
+import { AddDocumentsPage, JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
 import JoiningStatusPage from "./features/joining-form/pages/JoiningStatusPage";
 import { FilterPropertiesPage } from "./features/property-filter";
 
@@ -301,6 +301,10 @@ const router = createBrowserRouter([
    {
       path: "/joining-status",
       element: <JoiningStatusPage />,
+   },
+   {
+      path: "/joining-documents",
+      element: <AddDocumentsPage />,
    },
    {
       path: "/login",
