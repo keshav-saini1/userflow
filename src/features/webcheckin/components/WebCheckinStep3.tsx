@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { WebCheckinStepProps } from '../types';
-import { PaidFlowUploadSheet } from '../document-uploads';
 import { DocumentVerification } from '@/components';
 
 interface DocumentItem {
@@ -14,9 +13,6 @@ interface DocumentItem {
 }
 
 const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
-  
   const [documents, setDocuments] = useState<DocumentItem[]>([
     {
       id: 'aadhaar',
@@ -66,13 +62,7 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
   ]);
 
   const handleDocumentClick = (document: DocumentItem) => {
-    setSelectedDocument(document);
-    setIsBottomSheetOpen(true);
-  };
-
-  const handleDocumentUpload = () => {
-    // This will be handled by the PaidFlowUploadSheet
-    // The actual upload logic is in the bottom sheet
+    console.log('Document clicked:', document.name);
   };
 
   const handleUploadComplete = (documentId: string) => {
@@ -83,9 +73,8 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
     ));
   };
 
-  const handleChooseDifferentDocument = () => {
-    setIsBottomSheetOpen(false);
-    setSelectedDocument(null);
+  const handleChooseDifferentDocument = (documentId?: string) => {
+    console.log('Choose different document for:', documentId);
   };
 
   const requiredDocumentsCount = documents.filter(doc => doc.isRequired).length;
@@ -130,7 +119,6 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
         <div className="px-[14px] py-[21px]">
           <DocumentVerification
             documents={documents}
-            onDocumentUpload={handleDocumentUpload}
             onDocumentClick={handleDocumentClick}
             onUploadComplete={handleUploadComplete}
             onChooseDifferentDocument={handleChooseDifferentDocument}
@@ -155,18 +143,6 @@ const WebCheckinStep3: React.FC<WebCheckinStepProps> = ({ onNext, onPrev }) => {
           </button>
         </div>
       </div>
-
-      {/* Document Upload Bottom Sheet */}
-      <PaidFlowUploadSheet
-        isOpen={isBottomSheetOpen}
-        onClose={() => {
-          setIsBottomSheetOpen(false);
-          setSelectedDocument(null);
-        }}
-        documentName={selectedDocument?.name || ''}
-        onUploadComplete={() => handleUploadComplete(selectedDocument?.id || '')}
-        onChooseDifferentDocument={handleChooseDifferentDocument}
-      />
     </div>
   );
 };
