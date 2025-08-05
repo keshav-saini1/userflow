@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import ProfileForm from '../components/ProfileForm';
 
 const UserProfilePage: React.FC = () => {
-  const [isNavigating, setIsNavigating] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const profileFormRef = useRef<any>(null);
 
@@ -13,15 +12,9 @@ const UserProfilePage: React.FC = () => {
     // window.location.href = '/dashboard';
   };
 
-  const handleCancel = () => {
-    // Handle cancel functionality
-    console.log('Profile changes cancelled');
-    // Navigate back
-    window.history.back();
-  };
 
   const handleBackNavigation = () => {
-    setIsNavigating(true);
+    // setIsNavigating(true);
     // The ProfileForm will handle the unsaved changes check
     // If there are no changes, it will call this function
     window.history.back();
