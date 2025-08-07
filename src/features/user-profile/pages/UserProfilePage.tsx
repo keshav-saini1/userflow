@@ -38,7 +38,7 @@ const UserProfilePage: React.FC = () => {
   // };
 
   return (
-    <div className="bg-[#121212] relative min-h-screen w-screen pb-16">
+    <div className="bg-[#121212] relative min-h-screen w-screen">
       <div className="bg-gray-50 relative min-h-screen w-full">
         {/* Header */}
         <div className="bg-white sticky top-0 z-10 border-b border-gray-200">
