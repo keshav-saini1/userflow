@@ -73,14 +73,14 @@ const UserProfilePage: React.FC = () => {
         </div>
 
         {/* Continue Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-[14px]">
+        {/* <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-[14px]">
           <button 
             onClick={handleContinueClick}
             className="w-full bg-[#155dfc] text-white text-[14px] font-semibold leading-[21px] py-3.5 px-[21px] rounded-[14px] hover:bg-[#0f4cd1] transition-colors"
           >
             {hasUnsavedChanges ? "Save & Continue" : "Continue"}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ import {
 import { AddDocumentsPage, JoiningProfilePage, UpdateMoveInPage, UserProfilePage } from "./features";
 import JoiningStatusPage from "./features/joining-form/pages/JoiningStatusPage";
 import { FilterPropertiesPage } from "./features/property-filter";
+import DateInputTest from "./components/DynamicForm/fields/DateInputTest";
 
 
 // Placeholder components - you'll need to create these
@@ -305,6 +306,10 @@ const router = createBrowserRouter([
    {
       path: "/joining-documents",
       element: <AddDocumentsPage />,
+   },
+   {
+      path: "/date-test",
+      element: <DateInputTest />,
    },
    {
       path: "/login",

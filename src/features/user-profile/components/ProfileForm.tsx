@@ -1,16 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import verified_badge from "@/assets/verified_badge.svg";
 import pending_badge from "@/assets/pending_badge.svg";
 import { UnsavedChangesAlert } from "@/components";
-
-interface EditableField {
-   id: string;
-   label: string;
-   value: string;
-   icon: string;
-   isEditing: boolean;
-   tempValue: string;
-}
+import DynamicForm from "@/components/DynamicForm";
+import userProfileFormSchema from "../form/config";
 
 interface DocumentCard {
    id: string;
@@ -26,150 +19,20 @@ interface ProfileFormRef {
 
 interface ProfileFormProps {
    onSave?: () => void;
-   editable?: boolean;
    onContinue?: (hasChanges: boolean) => void;
    ref?: React.Ref<ProfileFormRef>;
    onDocumentAdd?: () => void;
 }
 
 const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
-   ({ editable = true, onSave, onContinue, onDocumentAdd }, ref) => {
-      const [editingField, setEditingField] = useState<string | null>(null);
-      const [tempValue, setTempValue] = useState("");
+   ({ onSave, onContinue, onDocumentAdd }, ref) => {
       const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
       const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
       const [pendingNavigation, setPendingNavigation] = useState<
          (() => void) | null
       >(null);
-
-      // Store initial values for comparison
-      const initialValues = useRef<{
-         basic: EditableField[];
-         other: EditableField[];
-         parent: EditableField[];
-      } | null>(null);
-
-      // Dummy data for editable fields
-      const [basicDetails, setBasicDetails] = useState<EditableField[]>([
-         {
-            id: "fullName",
-            label: "Full Name",
-            value: "Nimit Jain",
-            icon: "user",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "contactNumber",
-            label: "Contact Number",
-            value: "9756237892",
-            icon: "phone",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "alternateNumber",
-            label: "Alternate Number",
-            value: "9756237892",
-            icon: "phone",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "gender",
-            label: "Gender",
-            value: "Male",
-            icon: "user",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "dateOfBirth",
-            label: "Date of Birth",
-            value: "2 March 1997",
-            icon: "calendar",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "email",
-            label: "Email address",
-            value: "nimitjain@gmail.com",
-            icon: "mail",
-            isEditing: false,
-            tempValue: "",
-         },
-      ]);
-
-      const [otherDetails, setOtherDetails] = useState<EditableField[]>([
-         {
-            id: "companyName",
-            label: "College/Company Name",
-            value: "Rentok",
-            icon: "building",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "medicalCondition",
-            label: "Medical Condition (if any)",
-            value: "No",
-            icon: "medical",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "tenantType",
-            label: "Tenant Type",
-            value: "Add details",
-            icon: "user",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "foodPreference",
-            label: "Food Preference",
-            value: "Veg",
-            icon: "food",
-            isEditing: false,
-            tempValue: "",
-         },
-      ]);
-
-      const [parentDetails, setParentDetails] = useState<EditableField[]>([
-         {
-            id: "fatherName",
-            label: "Father/Guardian Name",
-            value: "Add details",
-            icon: "user",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "parentNumber",
-            label: "Parent Number",
-            value: "9756237892",
-            icon: "phone",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "localGuardianName",
-            label: "Local Guardian Name",
-            value: "Add details",
-            icon: "user",
-            isEditing: false,
-            tempValue: "",
-         },
-         {
-            id: "localGuardianNumber",
-            label: "Local Guardian Number",
-            value: "9756237892",
-            icon: "phone",
-            isEditing: false,
-            tempValue: "",
-         },
-      ]);
+      const [formData, setFormData] = useState<Record<string, string | number | boolean>>({});
+      const [initialFormData, setInitialFormData] = useState<Record<string, string | number | boolean>>({});
 
       // Dummy data for documents
       const [documents] = useState<DocumentCard[]>([
@@ -198,37 +61,44 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
          },
       ]);
 
+      // Default values for the form
+      const defaultValues = {
+         email: "nimitjain@gmail.com",
+         name: "Nimit Jain",
+         alternatePhone: "9756237892",
+         dateOfBirth: "1997-03-02",
+         gender: "male",
+         collegeCompanyName: "Rentok",
+         tenantType: "working-professional",
+         currentAddress: "",
+         phone: "9756237892",
+         fatherName: "Add details",
+         parentPhone: "9756237892",
+         localGuardianName: "Add details",
+         localGuardianPhone: "9756237892",
+         pinCode: "",
+         remark: "",
+         bankAccountNumber: "",
+         ifscCode: "",
+         bankName: "",
+         upiId: "",
+         companyParent: "",
+         companyAddress: ""
+      };
+
       // Store initial values on component mount
       useEffect(() => {
-         if (!initialValues.current) {
-            initialValues.current = {
-               basic: JSON.parse(JSON.stringify(basicDetails)),
-               other: JSON.parse(JSON.stringify(otherDetails)),
-               parent: JSON.parse(JSON.stringify(parentDetails)),
-            };
-         }
+         setInitialFormData(defaultValues);
+         setFormData(defaultValues);
       }, []);
 
       // Check for changes
       const checkForChanges = () => {
-         if (!initialValues.current) return false;
-
-         const hasBasicChanges = basicDetails.some(
-            (field, index) =>
-               field.value !== initialValues.current!.basic[index].value
+         if (!initialFormData || Object.keys(initialFormData).length === 0) return false;
+         
+         return Object.keys(formData).some(key => 
+            formData[key] !== initialFormData[key]
          );
-
-         const hasOtherChanges = otherDetails.some(
-            (field, index) =>
-               field.value !== initialValues.current!.other[index].value
-         );
-
-         const hasParentChanges = parentDetails.some(
-            (field, index) =>
-               field.value !== initialValues.current!.parent[index].value
-         );
-
-         return hasBasicChanges || hasOtherChanges || hasParentChanges;
       };
 
       // Update hasUnsavedChanges whenever form data changes
@@ -240,7 +110,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
          if (onContinue) {
             onContinue(hasChanges);
          }
-      }, [basicDetails, otherDetails, parentDetails, onContinue]);
+      }, [formData, onContinue]);
 
       // Handle beforeunload event
       useEffect(() => {
@@ -256,68 +126,12 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
             window.removeEventListener("beforeunload", handleBeforeUnload);
       }, [hasUnsavedChanges]);
 
-      const handleEditField = (fieldId: string, currentValue: string) => {
-         setEditingField(fieldId);
-         setTempValue(currentValue);
-      };
-
-      const handleSaveField = (
-         fieldId: string,
-         section: "basic" | "other" | "parent"
-      ) => {
-         const updateSection = (sectionData: EditableField[]) => {
-            return sectionData.map((field) =>
-               field.id === fieldId
-                  ? { ...field, value: tempValue, isEditing: false }
-                  : { ...field, isEditing: false }
-            );
-         };
-
-         switch (section) {
-            case "basic":
-               setBasicDetails(updateSection(basicDetails));
-               break;
-            case "other":
-               setOtherDetails(updateSection(otherDetails));
-               break;
-            case "parent":
-               setParentDetails(updateSection(parentDetails));
-               break;
-         }
-         setEditingField(null);
-         setTempValue("");
-      };
-
-      const handleCancelEdit = (section: "basic" | "other" | "parent") => {
-         const resetSection = (sectionData: EditableField[]) => {
-            return sectionData.map((field) => ({ ...field, isEditing: false }));
-         };
-
-         switch (section) {
-            case "basic":
-               setBasicDetails(resetSection(basicDetails));
-               break;
-            case "other":
-               setOtherDetails(resetSection(otherDetails));
-               break;
-            case "parent":
-               setParentDetails(resetSection(parentDetails));
-               break;
-         }
-         setEditingField(null);
-         setTempValue("");
-      };
-
-      // Expose save function to parent component
-      const handleSave = () => {
-         // Save the current state as the new initial state
-         initialValues.current = {
-            basic: JSON.parse(JSON.stringify(basicDetails)),
-            other: JSON.parse(JSON.stringify(otherDetails)),
-            parent: JSON.parse(JSON.stringify(parentDetails)),
-         };
+      // Handle form submission
+      const handleFormSubmit = (data: Record<string, string | number | boolean>) => {
+         setFormData(data);
+         setInitialFormData(data);
          setHasUnsavedChanges(false);
-
+         
          if (onSave) {
             onSave();
          }
@@ -339,200 +153,9 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
 
       // Expose save function to parent via ref
       React.useImperativeHandle(ref, () => ({
-         save: handleSave,
+         save: () => handleFormSubmit(formData),
          hasUnsavedChanges,
       }));
-
-      // Expose save function to parent via callback
-      useEffect(() => {
-         if (onContinue) {
-            onContinue(hasUnsavedChanges);
-         }
-      }, [hasUnsavedChanges, onContinue]);
-
-      const renderEditableField = (
-         field: EditableField,
-         section: "basic" | "other" | "parent"
-      ) => {
-         const isEditing = editingField === field.id;
-
-         return (
-            <div
-               key={field.id}
-               className="flex items-center justify-between py-3.5 px-3.5 border-b border-slate-100"
-            >
-               <div className="flex items-center gap-[10.5px] flex-1">
-                  <div className="relative shrink-0 size-[18px]">
-                     <svg
-                        className="size-[18px] text-[#455067]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                     >
-                        {field.icon === "user" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                           />
-                        )}
-                        {field.icon === "phone" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                           />
-                        )}
-                        {field.icon === "calendar" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                           />
-                        )}
-                        {field.icon === "mail" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                           />
-                        )}
-                        {field.icon === "building" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                           />
-                        )}
-                        {field.icon === "medical" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                           />
-                        )}
-                        {field.icon === "food" && (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                           />
-                        )}
-                     </svg>
-                  </div>
-                  <div className="flex-1">
-                     <p className="text-[#455067] text-[12.3px] leading-[17.5px] font-normal">
-                        {field.label}
-                     </p>
-                     {editable ? (
-                        <input
-                           type="text"
-                           value={field.value}
-                           onChange={(e) => {
-                              const updateSection = (
-                                 sectionData: EditableField[]
-                              ) => {
-                                 return sectionData.map((f) =>
-                                    f.id === field.id
-                                       ? { ...f, value: e.target.value }
-                                       : f
-                                 );
-                              };
-
-                              switch (section) {
-                                 case "basic":
-                                    setBasicDetails(
-                                       updateSection(basicDetails)
-                                    );
-                                    break;
-                                 case "other":
-                                    setOtherDetails(
-                                       updateSection(otherDetails)
-                                    );
-                                    break;
-                                 case "parent":
-                                    setParentDetails(
-                                       updateSection(parentDetails)
-                                    );
-                                    break;
-                              }
-                           }}
-                           className="text-[#101828] text-[15px] leading-[17.5px] font-semibold w-full bg-transparent border-none outline-none"
-                           placeholder={
-                              field.value === "Add details" ? "Add details" : ""
-                           }
-                        />
-                     ) : (
-                        <p
-                           className={`text-[#101828] text-[15px] leading-[17.5px] font-semibold ${
-                              field.value === "Add details" ? "opacity-50" : ""
-                           }`}
-                        >
-                           {field.value}
-                        </p>
-                     )}
-                  </div>
-               </div>
-
-               {!editable && isEditing && (
-                  <div className="flex gap-2">
-                     <button
-                        onClick={() => handleSaveField(field.id, section)}
-                        className="size-6 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
-                     >
-                        <svg
-                           className="size-3 text-white"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor"
-                        >
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                           />
-                        </svg>
-                     </button>
-                     <button
-                        onClick={() => handleCancelEdit(section)}
-                        className="size-6 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                     >
-                        <svg
-                           className="size-3 text-white"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor"
-                        >
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                           />
-                        </svg>
-                     </button>
-                  </div>
-               )}
-
-               {!editable && !isEditing && (
-                  <button
-                     onClick={() => handleEditField(field.id, field.value)}
-                     className="text-[#155dfc] text-[12.3px] font-medium hover:text-[#0f4cd1] transition-colors"
-                  >
-                     Edit
-                  </button>
-               )}
-            </div>
-         );
-      };
 
       const renderDocumentCard = (doc: DocumentCard) => {
          if (doc.status === "add") {
@@ -697,90 +320,17 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
                </div>
             </div>
 
-            {/* Basic Details */}
-            <div className="bg-white rounded-[21px] shadow-sm">
-               <div className="p-[21px]">
-                  <div className="flex items-center justify-between mb-3.5">
-                     <h3 className="text-[#101828] text-[14px] font-semibold leading-[21px]">
-                        Basic Details
-                     </h3>
-                     <svg
-                        className="size-[17.5px] text-[#717182]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                     >
-                        <path
-                           strokeLinecap="round"
-                           strokeLinejoin="round"
-                           strokeWidth={2}
-                           d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                        />
-                     </svg>
-                  </div>
-                  <div className="space-y-0">
-                     {basicDetails.map((field) =>
-                        renderEditableField(field, "basic")
-                     )}
-                  </div>
-               </div>
-            </div>
-
-            {/* Other Details */}
-            <div className="bg-white rounded-[21px] shadow-sm">
-               <div className="p-[21px]">
-                  <div className="flex items-center justify-between mb-3.5">
-                     <h3 className="text-[#101828] text-[14px] font-semibold leading-[21px]">
-                        Other Details
-                     </h3>
-                     <svg
-                        className="size-[17.5px] text-[#717182]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                     >
-                        <path
-                           strokeLinecap="round"
-                           strokeLinejoin="round"
-                           strokeWidth={2}
-                           d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                        />
-                     </svg>
-                  </div>
-                  <div className="space-y-0">
-                     {otherDetails.map((field) =>
-                        renderEditableField(field, "other")
-                     )}
-                  </div>
-               </div>
-            </div>
-
-            {/* Parent and Guardian Details */}
-            <div className="bg-white rounded-[21px] shadow-sm">
-               <div className="p-[21px]">
-                  <div className="flex items-center justify-between mb-3.5">
-                     <h3 className="text-[#101828] text-[14px] font-semibold leading-[21px]">
-                        Parent and Guardian Details
-                     </h3>
-                     <svg
-                        className="size-[17.5px] text-[#717182]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                     >
-                        <path
-                           strokeLinecap="round"
-                           strokeLinejoin="round"
-                           strokeWidth={2}
-                           d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                        />
-                     </svg>
-                  </div>
-                  <div className="space-y-0">
-                     {parentDetails.map((field) =>
-                        renderEditableField(field, "parent")
-                     )}
-                  </div>
+            {/* Dynamic Form */}
+            <div className="rounded-[21px]">
+               <div className="">
+                  <DynamicForm
+                     schema={userProfileFormSchema}
+                     onSubmit={handleFormSubmit}
+                     submitButtonText="Continue"
+                     defaultValues={defaultValues}
+                     className="space-y-6"
+                     expandAllByDefault={true}
+                  />
                </div>
             </div>
 
