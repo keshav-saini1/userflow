@@ -135,7 +135,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
          }
       }
 
-      const error = errors[name]?.message as string | undefined;
+      const error = errors[name]?.message as any;
 
       switch (type) {
          case "text":

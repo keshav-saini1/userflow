@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import ProfileForm from '../components/ProfileForm';
 
 const UserProfilePage: React.FC = () => {
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  // const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const profileFormRef = useRef<any>(null);
 
   const handleSave = () => {
@@ -21,20 +21,21 @@ const UserProfilePage: React.FC = () => {
   };
 
   const handleContinue = (hasChanges: boolean) => {
-    setHasUnsavedChanges(hasChanges);
+    console.log('hasChanges', hasChanges);
+    // setHasUnsavedChanges(hasChanges);
   };
 
-  const handleContinueClick = () => {
-    if (hasUnsavedChanges) {
-      // Save first, then continue
-      if (profileFormRef.current) {
-        profileFormRef.current.save();
-      }
-    }
-    // Continue to next step
-    console.log('Continuing to next step');
-    // window.location.href = '/next-page';
-  };
+  // const handleContinueClick = () => {
+  //   if (hasUnsavedChanges) {
+  //     // Save first, then continue
+  //     if (profileFormRef.current) {
+  //       profileFormRef.current.save();
+  //     }
+  //   }
+  //   // Continue to next step
+  //   console.log('Continuing to next step');
+  //   // window.location.href = '/next-page';
+  // };
 
   return (
     <div className="bg-[#121212] relative min-h-screen w-screen pb-16">
