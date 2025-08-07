@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import WebCheckinStep1 from './WebCheckinStep1';
+import type { WebCheckinData } from '../types';
 import WebCheckinStep2 from './WebCheckinStep2';
 import WebCheckinStep3 from './WebCheckinStep3';
-import type { WebCheckinData } from '../types';
+import WebCheckinStep5 from './WebCheckinStep5';
 
 const WebCheckinFlow: React.FC = () => {
   const [flowData, setFlowData] = useState<WebCheckinData>({
@@ -68,10 +69,9 @@ const WebCheckinFlow: React.FC = () => {
         <WebCheckinStep3 {...stepProps} />
       )}
       
-      {/* Future steps will be added here */}
-      {/* {flowData.currentStep === 4 && (
-        <WebCheckinStep4 {...stepProps} />
-      )} */}
+      {flowData.currentStep === 4 && (
+        <WebCheckinStep5 {...stepProps} />
+      )}
     </div>
   );
 };
