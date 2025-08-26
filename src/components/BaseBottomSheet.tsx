@@ -46,7 +46,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
               stiffness: 300,
               duration: 0.3 
             }}
-            className={`relative w-full bg-white rounded-t-3xl max-h-[95vh] flex flex-col ${className}`}
+            className={`relative w-full bg-white rounded-t-3xl max-h-[95vh] min-h-[70vh] flex flex-col ${className}`}
           >
             {/* Header */}
             <motion.div
@@ -61,7 +61,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2, duration: 0.3 }}
-                    className="text-base font-semibold text-gray-900"
+                    className="font-semibold text-xl text-gray-900"
                   >
                     {title}
                   </motion.h2>

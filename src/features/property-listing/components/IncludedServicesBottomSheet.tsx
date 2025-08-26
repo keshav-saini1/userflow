@@ -29,10 +29,10 @@ const IncludedServicesBottomSheet: React.FC<
             {/* Content */}
             <div className="p-[22px] pt-0">
                {/* Header */}
-               <div className="mb-8">
-                  <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
+               <div className="my-3">
+                  {/* <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
                      Included Services
-                  </h1>
+                  </h1> */}
                   <p className="text-[16px] text-[#616161] leading-[1.5]">
                      Here's what this room offers.
                   </p>

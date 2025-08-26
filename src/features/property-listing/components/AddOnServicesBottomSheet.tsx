@@ -30,12 +30,12 @@ const AddOnServicesBottomSheet: React.FC<AddOnServicesBottomSheetProps> = ({
       >
          <div className="flex flex-col h-full bg-gray-50">
             {/* Content */}
-            <div className="p-5">
+            <div className="p-2">
                {/* Header */}
-               <div className="mb-6">
-                  <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
+               <div className="my-3">
+                  {/* <h1 className="text-[24px] font-semibold text-[#2c3032] leading-[1.5] mb-2">
                      Available Add-on Services
-                  </h1>
+                  </h1> */}
                   <p className="text-[16px] text-[#616161] leading-[1.5]">
                      These extra services are offered with the rental — from
                      cleaning to Wi-Fi and more.

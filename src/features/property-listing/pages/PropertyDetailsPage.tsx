@@ -4,16 +4,15 @@ import type { PropertyDetailPageData } from "../types";
 import ImageGallery, {
    type GalleryCategory,
 } from "../../../components/ImageGallery";
-import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottomSheet, LocationCommuteBottomSheet, PoliciesAndRulesBottomSheet, MarketingDescriptionBottomSheet } from "../components";
+import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottomSheet, PoliciesAndRulesBottomSheet, MarketingDescriptionBottomSheet } from "../components";
 import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
-import { ImageCarousel } from "@/components";
+import { ImageCarousel, UnitCard } from "@/components";
 import double_tick from "@/assets/double_tick.svg";
 import single_tick from "@/assets/single_tick.svg";
 import { FiChevronRight } from "react-icons/fi";
 import { useNavigate } from "react-router";
-import calendar from '@/assets/property/calendar_bw.svg';
 
 interface PropertyDetailsPageProps {
    propertyData: PropertyDetailPageData;
@@ -108,11 +107,7 @@ export default function PropertyDetailsPage({
    };
 
    const handleOpenLocationCommuteSheet = () => {
-      setIsLocationCommuteSheetOpen(true);
-   };
-
-   const handleCloseLocationCommuteSheet = () => {
-      setIsLocationCommuteSheetOpen(false);
+     navigate('/location-commute')
    };
 
    const handleOpenPoliciesRulesSheet = () => {
@@ -161,7 +156,7 @@ export default function PropertyDetailsPage({
                   <div onClick={handleViewAllPhotos}>
                      <ImageCarousel
                         images={propertyData.heroImages}
-                        showNavigation={true}
+                        showNavigation={false}
                         autoPlay={true}
                         className="h-56"
                      />
@@ -244,56 +239,22 @@ export default function PropertyDetailsPage({
                            </div>
 
                            {/* Horizontally scrollable units */}
-                           <div className="overflow-x-auto">
+                           <div className="overflow-x-auto scrollbar-hide">
                               <div className="flex gap-4 min-w-[340px]">
                                  {propertyData.availableUnits.map((unit) => (
-                                    <div
+                                    <UnitCard
                                        key={unit.id}
-                                       className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow min-w-[280px] max-w-xs flex-shrink-0"
-                                    >
-                                       <img
-                                          src={unit.image}
-                                          alt={unit.name}
-                                          className="w-full h-28 lg:h-32 object-cover"
-                                       />
-                                       <div className="p-4 space-y-4">
-                                          <div>
-                                             <div className="flex justify-between items-center">
-                                                <h4 className="font-bold text-gray-900">
-                                                   {unit.name}
-                                                </h4>
-                                                <span className="text-xs text-gray-500">
-                                                   Floor {unit.floor}
-                                                </span>
-                                             </div>
-                                             <p className="text-xs font-medium text-gray-600">
-                                                ₹{" "}
-                                                {unit.pricePerBed.toLocaleString()}
-                                                /bed | {unit.occupancy}
-                                             </p>
-                                          </div>
-
-                                          <div className="flex flex-wrap gap-3">
-                                             {unit.amenities.map((amenity) => (
-                                                <div className="flex items-center gap-2">
-                                                   <img
-                                                      src={amenity.icon}
-                                                      alt={amenity.name}
-                                                      className="w-4 h-4 object-contain"
-                                                   />
-                                                   <span className="text-xs text-gray-600">{amenity.name}</span>
-                                                </div>
-                                             ))}
-                                          </div>
-
-                                          <div className="bg-blue-50 rounded-lg p-2">
-                                             <p className="text-xs text-gray-600 flex items-center gap-2">
-                                                <img src={calendar} alt="calendar" className="w-4 h-4 object-contain" />
-                                                {unit.availableFrom}
-                                             </p>
-                                          </div>
-                                       </div>
-                                    </div>
+                                       unit={{
+                                          id: unit.id,
+                                          image: unit.image,
+                                          name: unit.name,
+                                          floor: unit.floor,
+                                          pricePerBed: unit.pricePerBed,
+                                          occupancy: unit.occupancy,
+                                          amenities: unit.amenities,
+                                          availableFrom: unit.availableFrom,
+                                       }}
+                                    />
                                  ))}
                               </div>
                            </div>
@@ -771,11 +732,11 @@ export default function PropertyDetailsPage({
          />
 
          {/* Location & Commute Bottom Sheet */}
-         <LocationCommuteBottomSheet
+         {/* <LocationCommuteBottomSheet
             isOpen={isLocationCommuteSheetOpen}
             onClose={handleCloseLocationCommuteSheet}
             propertyName={propertyData.title}
-         />
+         /> */}
 
          {/* Policies and Rules Bottom Sheet */}
          <PoliciesAndRulesBottomSheet

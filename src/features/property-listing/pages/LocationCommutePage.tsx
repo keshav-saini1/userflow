@@ -64,7 +64,7 @@ const LocationCommutePage: React.FC = () => {
                   src={default_back}
                   alt="back"
                   className="w-10 h-10"
-                  onClick={() => navigate("/property-listing")}
+                  onClick={() => navigate(-1)}
                />
 
                {/* Center Title */}
@@ -183,5 +183,3 @@ const LocationCommutePage: React.FC = () => {
 };
 
 export default LocationCommutePage;
-
-
