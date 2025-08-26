@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 
 export interface GalleryImage {
   id: string;
@@ -29,6 +29,30 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   const [currentCategory, setCurrentCategory] = useState<GalleryCategory>(categories[0]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+
+  // Touch handling refs
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
+
+  // Category tabs centering
+  const categoriesContainerRef = useRef<HTMLDivElement | null>(null);
+  const categoryButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    const container = categoriesContainerRef.current;
+    const activeBtn = categoryButtonRefs.current[currentCategory.id || ''];
+    if (!container || !activeBtn) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = activeBtn.getBoundingClientRect();
+
+    // Calculate the desired scrollLeft so the button is centered
+    const buttonCenterX = activeBtn.offsetLeft + (buttonRect.width / 2);
+    const targetScrollLeft = buttonCenterX - (containerRect.width / 2);
+
+    container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+  }, [currentCategory, categories]);
 
   const currentImage = currentCategory.images[currentImageIndex];
 
@@ -72,10 +96,87 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     document.body.removeChild(link);
   }, [currentImage?.src, currentImage?.alt, currentCategory.name]);
 
+  const goToNext = useCallback(() => {
+    const images = currentCategory.images;
+    if (currentImageIndex < images.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+      return;
+    }
+    // Move to next category and first image
+    const currentCategoryIdx = categories.findIndex(c => c.id === currentCategory.id);
+    const nextCategoryIdx = (currentCategoryIdx + 1) % categories.length;
+    const nextCategory = categories[nextCategoryIdx];
+    handleCategoryChange(nextCategory);
+    setCurrentImageIndex(0);
+  }, [currentCategory, currentImageIndex, categories, handleCategoryChange]);
+
+  const goToPrev = useCallback(() => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+      return;
+    }
+    // Move to previous category and last image
+    const currentCategoryIdx = categories.findIndex(c => c.id === currentCategory.id);
+    const prevCategoryIdx = (currentCategoryIdx - 1 + categories.length) % categories.length;
+    const prevCategory = categories[prevCategoryIdx];
+    handleCategoryChange(prevCategory);
+    const lastIndex = Math.max(prevCategory.images.length - 1, 0);
+    setCurrentImageIndex(lastIndex);
+  }, [currentCategory, currentImageIndex, categories, handleCategoryChange]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    isSwipingRef.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current == null || touchStartYRef.current == null) return;
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStartXRef.current;
+    const deltaY = touch.clientY - touchStartYRef.current;
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal gesture: prevent vertical scroll while swiping
+      e.preventDefault();
+      isSwipingRef.current = true;
+    }
+  }, []);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current == null || touchStartYRef.current == null) return;
+    const changedTouch = e.changedTouches[0];
+    const deltaX = changedTouch.clientX - touchStartXRef.current;
+    const deltaY = changedTouch.clientY - touchStartYRef.current;
+    const threshold = 50; // px
+
+    // Reset start refs
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (!isSwipingRef.current) return;
+    isSwipingRef.current = false;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > threshold) {
+      if (deltaX < 0) {
+        // swipe left -> next
+        goToNext();
+      } else {
+        // swipe right -> prev
+        goToPrev();
+      }
+    }
+  }, [goToNext, goToPrev]);
+
   return (
     <div className={`bg-[#121212] w-full h-full min-h-screen flex flex-col ${className}`}>
       {/* Main Container */}
-      <div className="relative w-full h-full bg-black">
+      <div
+        className="relative w-full h-full bg-black"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         {/* Main Image */}
         <div 
           className="w-full h-full bg-cover bg-center bg-no-repeat"
@@ -119,11 +220,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         </div>
 
         {/* Category Tabs */}
-        <div className="absolute top-[70px] left-3.5 right-3.5 h-[38.5px] overflow-x-auto">
+        <div ref={categoriesContainerRef} className="absolute top-[70px] left-3.5 right-3.5 h-[38.5px] overflow-x-auto">
           <div className="flex gap-2 h-full">
             {categories.map((category) => (
               <button
                 key={category.id}
+                ref={(el) => { categoryButtonRefs.current[category.id] = el; }}
                 onClick={() => handleCategoryChange(category)}
                 className={`h-[31.5px] px-3 rounded-full flex items-center gap-1 transition-all duration-200 flex-shrink-0 ${
                   category.id === currentCategory.id
