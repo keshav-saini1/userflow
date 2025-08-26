@@ -4,6 +4,7 @@ import type { OnboardingStepComponent } from '../types';
 import { useButtonAnimation } from '../hooks/useOnboarding';
 import { useNavigate } from 'react-router';
 import verified from "@/assets/onboarding/verified.svg";
+import { BaseBottomSheet } from "@/components";
 
 interface OtpFormData {
   otp0: string;
@@ -21,10 +22,6 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const { animateSuccess } = useButtonAnimation();
   const navigate = useNavigate();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Animation refs
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
 
   const {
     control,
@@ -61,29 +58,8 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     }
   }, [resendTimer]);
 
-  // Animate in on mount
-  useEffect(() => {
-    if (overlayRef.current && sheetRef.current) {
-      // Use CSS transitions instead of Motion API
-      overlayRef.current.style.opacity = '1';
-      sheetRef.current.style.transform = 'translateY(0%)';
-      sheetRef.current.style.opacity = '1';
-    }
-  }, []);
-
   const handleClose = () => {
-    if (overlayRef.current && sheetRef.current) {
-      // Use CSS transitions instead of Motion API
-      sheetRef.current.style.transform = 'translateY(100%)';
-      sheetRef.current.style.opacity = '0';
-      overlayRef.current.style.opacity = '0';
-      
-      setTimeout(() => {
-        onPrev();
-      }, 300);
-    } else {
-      onPrev();
-    }
+    onPrev();
   };
 
   const handleOtpChange = (index: number, value: string, onChange: (value: string) => void) => {
@@ -173,239 +149,187 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const otpFields: (keyof OtpFormData)[] = ['otp0', 'otp1', 'otp2', 'otp3', 'otp4', 'otp5'];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end lg:items-center lg:justify-center">
-      {/* Background overlay */}
-      <div
-        ref={overlayRef}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={handleClose}
-      />
-
-      {/* Bottom sheet (mobile) / Centered modal (desktop) */}
-      <div 
-        ref={sheetRef}
-        className="relative w-full lg:w-full lg:max-w-md bg-white rounded-t-[21px] lg:rounded-[24px] min-h-[55vh] lg:min-h-fit lg:max-h-[90vh] overflow-hidden lg:shadow-2xl"
-      >
-        {/* Handle - mobile only */}
-        <div className="flex justify-center pt-[10.5px] pb-[7px] lg:hidden">
-          <div className="w-[35px] h-[3.5px] bg-[#DBEAFE] rounded-full" />
+    <BaseBottomSheet
+      isOpen={true}
+      onClose={handleClose}
+      title="Nirvana Rooms"
+      bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-[84px] lg:pb-8"
+    >
+      {/* Header subtext */}
+      <div className="flex items-center gap-[10.5px] mb-4">
+        <div className="w-7 h-7 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
+          <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">N</span>
         </div>
-        
-        {/* Header */}
-        <div className="flex items-center justify-between px-[21px] lg:px-8 py-[11px] lg:py-6 border-b border-transparent">
-          <div className="flex items-center gap-[10.5px]">
-            {/* Property avatar */}
-            <div className="w-7 h-7 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
-              <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">
-                N
-              </span>
+        <div className="flex items-center gap-[3.5px]">
+          <img src={verified} alt="verified" className="w-3 h-3" />
+          <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">Verify code</span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Content */}
+        <div className="h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
+          <div className="flex flex-col gap-[35px] lg:gap-10">
+            {/* Heading section */}
+            <div className="flex flex-col gap-[10.5px] lg:gap-4 animate-form-element">
+              <div className="text-center">
+                <span className="text-[#030213] text-[21px] lg:text-3xl font-medium leading-[26.25px] lg:leading-tight" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                  Enter verification code 📱
+                </span>
+              </div>
+              
+              <div className="flex flex-col gap-[10.5px] lg:gap-3">
+                <div className="text-center">
+                  <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    We sent a 6-digit code to
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    <span className="font-semibold text-[#5a5a69]">{phoneNumber}</span>
+                    <span className="ml-3" onClick={handleClose}>Edit</span>
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col">
-              <h3 className="text-[#030213] text-[12.6px] lg:text-sm font-medium leading-[17.5px]">
-                Nirvana Rooms
-              </h3>
-              <div className="flex items-center gap-[3.5px]">
-                {/* Verified icon */}
-                <img src={verified} alt="verified" className="w-3 h-3" />
-                <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
-                  Verify code
-                </span>
+            {/* OTP and resend section */}
+            <div className="flex flex-col gap-[21px] lg:gap-8">
+              {/* OTP Input */}
+              <div className="flex justify-center gap-[10.5px] lg:gap-3 animate-form-element">
+                {otpFields.map((fieldName, index) => (
+                  <Controller
+                    key={fieldName}
+                    name={fieldName}
+                    control={control}
+                    rules={{
+                      required: 'Required',
+                      pattern: {
+                        value: /^[0-9]$/,
+                        message: 'Must be a single digit'
+                      }
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <input
+                        ref={(el) => { inputRefs.current[index] = el; }}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={value}
+                        onChange={(e) => handleOtpChange(index, e.target.value, onChange)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        onPaste={index === 0 ? handlePaste : undefined}
+                        className={`w-[42px] h-[49px] text-black lg:w-14 lg:h-16 text-center text-lg lg:text-xl font-semibold bg-neutral-100 lg:bg-gray-50 border-2 rounded-[12.75px] lg:rounded-xl transition-colors ${
+                          hasErrors 
+                            ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500' 
+                            : value 
+                            ? ' bg-green-50  focus:neutral-800'
+                            : 'border-transparent lg:border-gray-200 focus:border-blue-500 focus:ring-blue-500'
+                        } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
+                      />
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Error Message */}
+              {errors.root && (
+                <div className="mb-4 p-3 lg:p-4 bg-red-50 border border-red-200 rounded-lg animate-form-element">
+                  <p className="text-sm text-red-600 flex items-center">
+                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {errors.root.message}
+                  </p>
+                </div>
+              )}
+
+              {/* Resend Section */}
+              <div className="flex flex-col gap-[10.5px] lg:gap-3 animate-form-element">
+                <div className="text-center">
+                  <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    Didn't receive the code?
+                  </p>
+                </div>
+                <div className="text-center">
+                  <span
+                    onClick={handleResend}
+                    className={`text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed bg-white transition-colors ${
+                      canResend 
+                        ? 'text-blue-600 hover:text-blue-800 cursor-pointer' 
+                        : 'text-[#717182] cursor-not-allowed'
+                    }`}
+                    style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}
+                  >
+                    {canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Close button */}
+        {/* Bottom Actions */}
+        <div className="absolute lg:relative bottom-0 left-0 right-0 bg-white/95 lg:bg-white backdrop-blur lg:backdrop-blur-none rounded-t-[14px] lg:rounded-none px-[14px] lg:px-8 pt-[15px] lg:pt-0 pb-[21px] lg:pb-8 border-t lg:border-t-0 border-gray-100">
+          {/* Desktop Back button */}
+          <div className="hidden lg:flex space-x-4 mb-4">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+            >
+              Back
+            </button>
+            <button
+              ref={submitButtonRef}
+              type="submit"
+              disabled={!isOtpComplete}
+              className="flex-2 py-3 px-8 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Verify & Continue
+            </button>
+          </div>
+
+          {/* Mobile continue button */}
           <button
-            onClick={handleClose}
-            className="w-7 h-7 lg:w-8 lg:h-8 bg-[#ECECF0]/60 rounded-full flex items-center justify-center hover:bg-[#ECECF0]/80 transition-colors"
+            ref={submitButtonRef}
+            type="submit"
+            disabled={!isOtpComplete}
+            className={`lg:hidden w-full h-[49px] rounded-[14px] flex items-center justify-center gap-[10.5px] mb-[10.5px] transition-all hover:scale-[1.02] active:scale-[0.98] ${
+              isOtpComplete
+                ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
+                : "bg-[#030213]/40"
+            }`}
           >
+            <span className="text-white text-[14px] font-medium leading-[21px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+              Verify & Continue
+            </span>
             <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="lg:w-5 lg:h-5"
             >
               <path
-                d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5"
-                stroke="#0A0A0A"
-                strokeWidth="1.2"
+                d="M6.75 13.5L11.25 9L6.75 4.5"
+                stroke="white"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </button>
+
+          {/* Trust indicators - Mobile only */}
+          <div className="lg:hidden text-center">
+            <p className="text-[#717182] text-[10.5px] leading-[14px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+              Enter the 6-digit code sent to your phone
+            </p>
+          </div>
         </div>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Content */}
-          <div className="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-[84px] lg:pb-8 h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
-            <div className="flex flex-col gap-[35px] lg:gap-10">
-              {/* Heading section */}
-              <div className="flex flex-col gap-[10.5px] lg:gap-4 animate-form-element">
-                <div className="text-center">
-                  <span className="text-[#030213] text-[21px] lg:text-3xl font-medium leading-[26.25px] lg:leading-tight" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                    Enter verification code 📱
-                  </span>
-                </div>
-                
-                <div className="flex flex-col gap-[10.5px] lg:gap-3">
-                  <div className="text-center">
-                    <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                      We sent a 6-digit code to
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                      <span className="font-semibold text-[#5a5a69]">{phoneNumber}</span>
-                      <span className="ml-3" onClick={handleClose}>Edit</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* OTP and resend section */}
-              <div className="flex flex-col gap-[21px] lg:gap-8">
-                {/* OTP Input */}
-                <div className="flex justify-center gap-[10.5px] lg:gap-3 animate-form-element">
-                  {otpFields.map((fieldName, index) => (
-                    <Controller
-                      key={fieldName}
-                      name={fieldName}
-                      control={control}
-                      rules={{
-                        required: 'Required',
-                        pattern: {
-                          value: /^[0-9]$/,
-                          message: 'Must be a single digit'
-                        }
-                      }}
-                      render={({ field: { onChange, value } }) => (
-                        <input
-                          ref={(el) => { inputRefs.current[index] = el; }}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          value={value}
-                          onChange={(e) => handleOtpChange(index, e.target.value, onChange)}
-                          onKeyDown={(e) => handleKeyDown(index, e)}
-                          onPaste={index === 0 ? handlePaste : undefined}
-                          className={`w-[42px] h-[49px] text-black lg:w-14 lg:h-16 text-center text-lg lg:text-xl font-semibold bg-neutral-100 lg:bg-gray-50 border-2 rounded-[12.75px] lg:rounded-xl transition-colors ${
-                            hasErrors 
-                              ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500' 
-                              : value 
-                              ? ' bg-green-50  focus:neutral-800'
-                              : 'border-transparent lg:border-gray-200 focus:border-blue-500 focus:ring-blue-500'
-                          } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
-                        />
-                      )}
-                    />
-                  ))}
-                </div>
-
-                {/* Error Message */}
-                {errors.root && (
-                  <div className="mb-4 p-3 lg:p-4 bg-red-50 border border-red-200 rounded-lg animate-form-element">
-                    <p className="text-sm text-red-600 flex items-center">
-                      <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {errors.root.message}
-                    </p>
-                  </div>
-                )}
-
-                {/* Resend Section */}
-                <div className="flex flex-col gap-[10.5px] lg:gap-3 animate-form-element">
-                  <div className="text-center">
-                    <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                      Didn't receive the code?
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <span
-                      onClick={handleResend}
-                      className={`text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed bg-white transition-colors ${
-                        canResend 
-                          ? 'text-blue-600 hover:text-blue-800 cursor-pointer' 
-                          : 'text-[#717182] cursor-not-allowed'
-                      }`}
-                      style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}
-                    >
-                      {canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
-                    </span>
-                  </div>
-                </div>
-
-                
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Actions */}
-          <div className="absolute lg:relative bottom-0 left-0 right-0 bg-white/95 lg:bg-white backdrop-blur lg:backdrop-blur-none rounded-t-[14px] lg:rounded-none px-[14px] lg:px-8 pt-[15px] lg:pt-0 pb-[21px] lg:pb-8 border-t lg:border-t-0 border-gray-100">
-            {/* Desktop Back button */}
-            <div className="hidden lg:flex space-x-4 mb-4">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-              >
-                Back
-              </button>
-              <button
-                ref={submitButtonRef}
-                type="submit"
-                disabled={!isOtpComplete}
-                className="flex-2 py-3 px-8 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Verify & Continue
-              </button>
-            </div>
-
-            {/* Mobile continue button */}
-            <button
-              ref={submitButtonRef}
-              type="submit"
-              disabled={!isOtpComplete}
-              className={`lg:hidden w-full h-[49px] rounded-[14px] flex items-center justify-center gap-[10.5px] mb-[10.5px] transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                isOtpComplete
-                  ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
-                  : "bg-[#030213]/40"
-              }`}
-            >
-              <span className="text-white text-[14px] font-medium leading-[21px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                Verify & Continue
-              </span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6.75 13.5L11.25 9L6.75 4.5"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            {/* Trust indicators - Mobile only */}
-            <div className="lg:hidden text-center">
-              <p className="text-[#717182] text-[10.5px] leading-[14px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                Enter the 6-digit code sent to your phone
-              </p>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </BaseBottomSheet>
   );
 };
 

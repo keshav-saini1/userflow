@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
-import Calendar from '../../../components/Calendar';
+import Calendar, { type DateRange } from '../../../components/Calendar';
 import room_reserve from '@/assets/room_reserve.svg';
 import default_back from '@/assets/default_back.svg';
 import { useNavigate } from 'react-router';
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router';
 const ReservationStep1: React.FC = () => {
   const navigate = useNavigate();
   const { updateForm, nextStep } = useReservation();
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({ startDate: null, endDate: null });
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   // Sample property data - in real app this would come from props or API
@@ -23,18 +23,19 @@ const ReservationStep1: React.FC = () => {
     type: 'Private Room'
   };
 
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    updateForm({ selectedDate: date });
+  const handleDateRangeSelect = (range: DateRange) => {
+    setSelectedDateRange(range);
+    // Persist at least the start date to the form for compatibility
+    updateForm({ selectedDate: range.startDate });
   };
 
   const handleContinue = () => {
-    if (selectedDate) {
+    if (selectedDateRange.startDate) {
       nextStep();
     }
   };
 
-  const isContinueDisabled = !selectedDate;
+  const isContinueDisabled = !selectedDateRange.startDate;
 
   // Function to calculate date based on move-in option
   const calculateMoveInDate = (option: string): Date => {
@@ -69,19 +70,14 @@ const ReservationStep1: React.FC = () => {
   // Handle move-in option selection
   const handleMoveInOption = (option: string) => {
     const calculatedDate = calculateMoveInDate(option);
-    setSelectedDate(calculatedDate);
     setSelectedOption(option);
-    
+    const range: DateRange = { startDate: calculatedDate, endDate: calculatedDate };
+    setSelectedDateRange(range);
     updateForm({ selectedDate: calculatedDate });
   };
 
   // Calendar configuration - all future and present dates are available
   // Past dates are automatically disabled by the Calendar component
-
-  const hasEvents = (date: Date) => {
-    const day = date.getDate();
-    return [8, 9, 10, 11, 12].includes(day);
-  };
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -172,15 +168,19 @@ const ReservationStep1: React.FC = () => {
             {/* Calendar */}
             <div className="mb-6 lg:mb-8">
               <Calendar
-                displayDate={new Date(new Date().getFullYear(), new Date().getMonth(), 1)}
-                selectedDate={selectedDate}
-                onDateSelect={handleDateSelect}
-                hasEvents={hasEvents}
-                showNavigation={true}
-                showDayHeaders={true}
-                className="lg:max-w-md lg:mx-auto"
+                 selectionMode="range"
+                 selectedDateRange={selectedDateRange}
+                 onDateRangeSelect={handleDateRangeSelect}
+                 displayDate={new Date(2025, 7, 1)} // August 2025
+                 isDateAvailable={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return date >= today;
+                 }}
+                 className="w-full"
               />
             </div>
+            
 
             {/* Move-in Options */}
             <div className="flex gap-2 lg:gap-3 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
