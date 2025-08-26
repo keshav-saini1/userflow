@@ -1,33 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router";
 import type { PropertyLocation } from "../types";
 import time from "@/assets/onboarding/timer.svg";
 import building from "@/assets/onboarding/building.svg";
 import train from "@/assets/onboarding/train.svg";
 import food from "@/assets/onboarding/food.svg";
 import rightArrow from "@/assets/white_arrow 1.svg";
-import LocationCommuteBottomSheet from "./LocationCommuteBottomSheet";
 
 interface HeroSectionProps {
    heroImage: string;
    location: PropertyLocation;
-   setShowBottomSheet: (show: boolean) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
    heroImage,
-   location,
-   setShowBottomSheet
+   location
 }) => {
-   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
+   const navigate = useNavigate();
 
    const openLocationsSheet = () => {
-      setIsLocationSheetOpen(true);
-      setShowBottomSheet(true);
-   };
-
-   const closeLocationSheet = () => {
-      setIsLocationSheetOpen(false);
-      setShowBottomSheet(false);
+      navigate("/location-commute");
    };
 
    return (
@@ -135,11 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                </div>
             </div>
          </div>
-         <LocationCommuteBottomSheet
-            isOpen={isLocationSheetOpen}
-            onClose={closeLocationSheet}
-            propertyName={`${location.area}, ${location.city}`}
-         />
+         {/* Bottom sheet removed; navigating to /location-commute instead */}
       </div>
    );
 };

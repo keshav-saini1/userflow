@@ -31,6 +31,7 @@ import {
 import JoiningStatusPage from "../features/joining-form/pages/JoiningStatusPage";
 import { FilterPropertiesPage } from "../features/property-filter";
 import DateInputTest from "../components/DynamicForm/fields/DateInputTest";
+import LocationCommutePage from "@/features/property-listing/pages/LocationCommutePage";
 
 export const router = createBrowserRouter([
    {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
    {
       path: "/property-details/:propertyId",
       element: <PropertyDetailsWrapper />,
+   },
+   {
+      path: "/location-commute",
+      element: <LocationCommutePage />
    },
    {
       path: "/webcheckin",
