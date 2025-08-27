@@ -122,23 +122,30 @@ const Calendar: React.FC<CalendarProps> = ({
   // Use provided isDateAvailable or default to checking if date is not in the past
   const checkDateAvailability = isDateAvailable || defaultIsDateAvailable;
 
+  // Normalize date to midnight and compare by time value to avoid string/lexicographic issues
+  const normalizeDateToMidnight = (d: Date): number => {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  };
+
   // Helper function to check if a date is in the selected range
   const isDateInRange = (date: Date, range: DateRange): boolean => {
     if (!range.startDate || !range.endDate) return false;
-    const dateStr = date.toDateString();
-    const startStr = range.startDate.toDateString();
-    const endStr = range.endDate.toDateString();
-    return dateStr >= startStr && dateStr <= endStr;
+    const target = normalizeDateToMidnight(date);
+    const start = normalizeDateToMidnight(range.startDate);
+    const end = normalizeDateToMidnight(range.endDate);
+    return target >= start && target <= end;
   };
 
   // Helper function to check if a date is the start of the range
   const isDateRangeStart = (date: Date, range: DateRange): boolean => {
-    return range.startDate?.toDateString() === date.toDateString();
+    if (!range.startDate) return false;
+    return normalizeDateToMidnight(range.startDate) === normalizeDateToMidnight(date);
   };
 
   // Helper function to check if a date is the end of the range
   const isDateRangeEnd = (date: Date, range: DateRange): boolean => {
-    return range.endDate?.toDateString() === date.toDateString();
+    if (!range.endDate) return false;
+    return normalizeDateToMidnight(range.endDate) === normalizeDateToMidnight(date);
   };
 
   const calendarDays = useMemo(() => {
@@ -327,7 +334,9 @@ const Calendar: React.FC<CalendarProps> = ({
                         ? 'bg-blue-100 text-blue-900'
                         : 'text-gray-900 hover:bg-gray-50'
                     : 'text-gray-600 opacity-30'
-                  : 'text-gray-300 opacity-30'
+                  : day.isInRange 
+                    ? 'bg-blue-100 text-blue-900 opacity-80' 
+                    : 'text-gray-300 opacity-30'
                 }
                 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
               `}
