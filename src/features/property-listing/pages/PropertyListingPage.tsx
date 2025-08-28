@@ -9,6 +9,8 @@ import {
    FloatingMenu,
 } from "../components";
 import type { PropertyListing } from "../types";
+import FullPageSpinner from "@/components/FullPageSpinner";
+import usePropertyListing from "../api/usePropertyListing";
 
 interface PropertyListingPageProps {
    propertyListing: PropertyListing;
@@ -29,7 +31,10 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
    onMapClick,
    onPropertyClick,
 }) => {
+   // hook fetching data for the page
+   const { list, isLoadingList } = usePropertyListing();
    const [showBottomSheet, setShowBottomSheet] = useState(false);
+
    return (
       <div className="bg-white h-screen w-screen flex flex-col overflow-hidden">
          {/* Fixed Header */}
@@ -124,6 +129,14 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                <FloatingMenu />
             </div>
          )}
+
+         {
+            isLoadingList && (
+               <div>
+                  <FullPageSpinner />
+               </div>
+            )
+         }
       </div>
    );
 };
