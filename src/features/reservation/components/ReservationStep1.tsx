@@ -30,50 +30,56 @@ const ReservationStep1: React.FC = () => {
   };
 
   const handleContinue = () => {
-    if (selectedDateRange.startDate) {
+    if (selectedDateRange.startDate && selectedDateRange.endDate) {
       nextStep();
     }
   };
 
-  const isContinueDisabled = !selectedDateRange.startDate;
+  const isContinueDisabled = !selectedDateRange.startDate || !selectedDateRange.endDate;
 
-  // Function to calculate date based on move-in option
-  const calculateMoveInDate = (option: string): Date => {
+  // Function to calculate date range based on move-in option
+  const calculateDateRange = (option: string): DateRange => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time to start of day
     
     switch (option) {
       case 'immediate': {
-        return today;
+        // Immediate: today to today (same day)
+        return { startDate: today, endDate: today };
       }
       case '7days': {
+        // 7 days: today to 7 days from now
         const sevenDays = new Date(today);
         sevenDays.setDate(today.getDate() + 7);
-        return sevenDays;
+        return { startDate: today, endDate: sevenDays };
       }
       case '15days': {
+        // 15 days: today to 15 days from now
         const fifteenDays = new Date(today);
         fifteenDays.setDate(today.getDate() + 15);
-        return fifteenDays;
+        return { startDate: today, endDate: fifteenDays };
       }
       case '30days': {
+        // 30 days: today to 30 days from now
         const thirtyDays = new Date(today);
         thirtyDays.setDate(today.getDate() + 30);
-        return thirtyDays;
+        return { startDate: today, endDate: thirtyDays };
       }
       default: {
-        return today;
+        return { startDate: today, endDate: today };
       }
     }
   };
 
   // Handle move-in option selection
   const handleMoveInOption = (option: string) => {
-    const calculatedDate = calculateMoveInDate(option);
+    const calculatedRange = calculateDateRange(option);
     setSelectedOption(option);
-    const range: DateRange = { startDate: calculatedDate, endDate: calculatedDate };
-    setSelectedDateRange(range);
-    updateForm({ selectedDate: calculatedDate });
+    setSelectedDateRange(calculatedRange);
+    // Update form with the start date (end date is maintained in local state)
+    updateForm({ 
+      selectedDate: calculatedRange.startDate
+    });
   };
 
   // Calendar configuration - all future and present dates are available
@@ -179,6 +185,38 @@ const ReservationStep1: React.FC = () => {
                  }}
                  className="w-full"
               />
+            </div>
+
+            {/* Check-in/Check-out Display */}
+            <div className="mb-6 lg:mb-8">
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <div className="text-sm font-medium text-gray-900">Check-in</div>
+                    <div className="text-sm text-gray-600">
+                      {selectedDateRange.startDate 
+                        ? selectedDateRange.startDate.toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'short'
+                          })
+                        : 'Select date'
+                      }
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="text-sm font-medium text-gray-900">Check-out</div>
+                    <div className="text-sm text-gray-600">
+                      {selectedDateRange.endDate 
+                        ? selectedDateRange.endDate.toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'short'
+                          })
+                        : 'Select date'
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
 
