@@ -5,6 +5,8 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
   fallbackPath?: string;
+  redirectAuthenticated?: boolean;
+  authenticatedRedirectPath?: string;
 }
 
 interface AuthState {
@@ -17,35 +19,43 @@ interface AuthState {
   };
 }
 
-// Hook to get authentication state - you'll need to implement this based on your auth system
+// Hook to get authentication state based on localStorage token
 const useAuth = (): AuthState => {
-  // TODO: Replace with your actual authentication logic
-  // This could come from Context, Redux, Zustand, or other state management
-  
-  // Example implementation:
   const [authState, setAuthState] = React.useState<AuthState>({
     isAuthenticated: false,
     isLoading: true,
   });
 
+  console.log({authState});
+
   React.useEffect(() => {
-    // Simulate checking authentication status
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
-        // Replace with your actual auth check logic
-        // const token = localStorage.getItem('authToken');
-        // const response = await validateToken(token);
+        // Check for token in localStorage
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
         
-        // For now, simulate loading
-        setTimeout(() => {
+        if (token && username) {
+          // Token exists, user is authenticated
           setAuthState({
-            isAuthenticated: false, // Set to true when user is authenticated
+            isAuthenticated: true,
             isLoading: false,
-            // user: response.user // Set user data when authenticated
+            user: {
+              id: 'user-id', // You can generate or store this separately
+              email: username, // Using username as email for now
+              role: 'user', // Default role, you can store this separately
+            },
           });
-        }, 1000);
-      } catch {
-        // Handle authentication errors
+        } else {
+          // No token found, user is not authenticated
+          setAuthState({
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
+      } catch (error) {
+        // Handle any localStorage errors
+        console.error('Error checking authentication:', error);
         setAuthState({
           isAuthenticated: false,
           isLoading: false,
@@ -53,16 +63,39 @@ const useAuth = (): AuthState => {
       }
     };
 
+    // Check immediately without delay
     checkAuth();
   }, []);
 
   return authState;
 };
 
+// Component to redirect authenticated users away from certain pages (like onboarding)
+const AuthenticatedRedirect: React.FC<{ redirectPath: string }> = ({ redirectPath }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Checking authentication...</span>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return null; // Don't render anything if not authenticated
+};
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
-  requiredRole,
-  fallbackPath = '/login',
+  requiredRole = false,
+  fallbackPath = '/',
+  redirectAuthenticated = false,
+  authenticatedRedirectPath = '/property-listing',
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
@@ -109,4 +142,5 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   return <>{children}</>;
 };
 
+export { AuthenticatedRedirect };
 export default ProtectedRoute;

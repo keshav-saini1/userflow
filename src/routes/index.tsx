@@ -32,11 +32,17 @@ import JoiningStatusPage from "../features/joining-form/pages/JoiningStatusPage"
 import { FilterPropertiesPage } from "../features/property-filter";
 import DateInputTest from "../components/DynamicForm/fields/DateInputTest";
 import LocationCommutePage from "@/features/property-listing/pages/LocationCommutePage";
+import ProtectedRoute, { AuthenticatedRedirect } from "./ProtectedRoute";
 
 export const router = createBrowserRouter([
    {
       path: "/",
-      element: <OnboardingPage />,
+      element: (
+         <>
+            <AuthenticatedRedirect redirectPath="/property-listing" />
+            <OnboardingPage />
+         </>
+      ),
    },
    {
       path: "/onboarding",
@@ -44,103 +50,203 @@ export const router = createBrowserRouter([
    },
    {
       path: "/persona-selection",
-      element: <PersonaSelectionPage />,
+      element: (
+         <ProtectedRoute>
+            <PersonaSelectionPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/property-listing",
-      element: <PropertyListingWrapper />,
+      element: (
+         <ProtectedRoute>
+            <PropertyListingWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/property-details/:propertyId",
-      element: <PropertyDetailsWrapper />,
+      element: (
+         <ProtectedRoute>
+            <PropertyDetailsWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/location-commute",
-      element: <LocationCommutePage />
+      element: (
+         <ProtectedRoute>
+            <LocationCommutePage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/webcheckin",
-      element: <WebCheckinPage />,
+      element: (
+         <ProtectedRoute>
+            <WebCheckinPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/book-visit",
-      element: <BookVisitWrapper />,
+      element: (
+         <ProtectedRoute>
+            <BookVisitWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/book-visit/success",
-      element: <BookVisitSuccessWrapper />,
+      element: (
+         <ProtectedRoute>
+            <BookVisitSuccessWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/reservation",
-      element: <ReservationPage />,
+      element: (
+         <ProtectedRoute>
+            <ReservationPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/bookings",
-      element: <ConfirmedBookingWrapper />,
+      element: (
+         <ProtectedRoute>
+            <ConfirmedBookingWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/wishlist",
-      element: <WishlistPage />,
+      element: (
+         <ProtectedRoute>
+            <WishlistPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/my-bookings",
-      element: <MyBookingsPage />,
+      element: (
+         <ProtectedRoute>
+            <MyBookingsPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/review-booking/:bookingId",
-      element: <ReviewBookingPage />,
+      element: (
+         <ProtectedRoute>
+            <ReviewBookingPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking",
-      element: <ModifyBookingPage />,
+      element: (
+         <ProtectedRoute>
+            <ModifyBookingPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/change-room",
-      element: <ChangeRoomPage />,
+      element: (
+         <ProtectedRoute>
+            <ChangeRoomPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/update-movein",
-      element: <UpdateMoveInPage />,
+      element: (
+         <ProtectedRoute>
+            <UpdateMoveInPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/cancel-example",
-      element: <CancelBookingExample />,
+      element: (
+         <ProtectedRoute>
+            <CancelBookingExample />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/change-room-example",
-      element: <ChangeRoomExample />,
+      element: (
+         <ProtectedRoute>
+            <ChangeRoomExample />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/reservation-integration-example",
-      element: <ReservationIntegrationExample />,
+      element: (
+         <ProtectedRoute>
+            <ReservationIntegrationExample />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/modify-booking/cancel-success",
-      element: <CancelBookingSuccessWrapper />,
+      element: (
+         <ProtectedRoute>
+            <CancelBookingSuccessWrapper />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/property-filter",
-      element: <FilterPropertiesPage />,
+      element: (
+         <ProtectedRoute>
+            <FilterPropertiesPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/profile",
-      element: <UserProfilePage />,
+      element: (
+         <ProtectedRoute>
+            <UserProfilePage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/joining-profile",
-      element: <JoiningProfilePage />,
+      element: (
+         <ProtectedRoute>
+            <JoiningProfilePage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/joining-status",
-      element: <JoiningStatusPage />,
+      element: (
+         <ProtectedRoute>
+            <JoiningStatusPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/joining-documents",
-      element: <AddDocumentsPage />,
+      element: (
+         <ProtectedRoute>
+            <AddDocumentsPage />
+         </ProtectedRoute>
+      ),
    },
    {
       path: "/date-test",
-      element: <DateInputTest />,
+      element: (
+         <ProtectedRoute>
+            <DateInputTest />
+         </ProtectedRoute>
+      ),
    },
    // {
    //    path: "/admin",

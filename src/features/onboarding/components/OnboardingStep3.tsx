@@ -1,163 +1,180 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, use } from "react";
 import { useForm } from "react-hook-form";
 import type { OnboardingStepComponent } from "../types";
 import { CountryCodePicker } from "@/components";
-import { useButtonAnimation } from "../hooks/useOnboarding";
+import { useButtonAnimation, useOnboarding } from "../hooks/useOnboarding";
 import verified from "@/assets/onboarding/verified.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
 import { BaseBottomSheet } from "@/components";
+import { useOnboardingApi } from "../api/useOnboardingApi";
+import { toast } from "sonner"
 
 interface FormData {
-   phone: string;
+  phone: string;
 }
 
 const OnboardingStep3: OnboardingStepComponent = ({
-   onNext,
-   onPrev,
-   onUpdateData,
-   currentData,
+  onNext,
+  onPrev,
+  onUpdateData,
+  currentData,
 }) => {
-   const { animateSuccess } = useButtonAnimation();
-   const submitButtonRef = React.useRef<HTMLButtonElement>(null);
-   const username = localStorage.getItem("username");
+  const { animateSuccess } = useButtonAnimation();
+  const submitButtonRef = React.useRef<HTMLButtonElement>(null);
+  const username = useMemo(() => currentData.personalInfo?.name, [currentData.personalInfo?.name]);
+  console.log({ username });
 
-   // Initialize country code from existing data or default to +91
-   const initializeCountryCode = () => {
-      const existingPhone = currentData.personalInfo?.phone;
-      if (existingPhone) {
-         // Extract country code from existing phone number
-         if (existingPhone.startsWith("+91")) return "+91";
-         if (existingPhone.startsWith("+1")) return "+1";
-         if (existingPhone.startsWith("+44")) return "+44";
-         if (existingPhone.startsWith("+61")) return "+61";
-         if (existingPhone.startsWith("+49")) return "+49";
-         if (existingPhone.startsWith("+33")) return "+33";
-         if (existingPhone.startsWith("+39")) return "+39";
-         if (existingPhone.startsWith("+34")) return "+34";
-         if (existingPhone.startsWith("+31")) return "+31";
-         if (existingPhone.startsWith("+65")) return "+65";
-         if (existingPhone.startsWith("+971")) return "+971";
-         if (existingPhone.startsWith("+81")) return "+81";
-         if (existingPhone.startsWith("+82")) return "+82";
-         if (existingPhone.startsWith("+86")) return "+86";
-         if (existingPhone.startsWith("+55")) return "+55";
-         if (existingPhone.startsWith("+52")) return "+52";
-         if (existingPhone.startsWith("+27")) return "+27";
-         if (existingPhone.startsWith("+234")) return "+234";
-         if (existingPhone.startsWith("+20")) return "+20";
+  // Initialize country code from existing data or default to +91
+  const initializeCountryCode = () => {
+    const existingPhone = currentData.personalInfo?.phone;
+    if (existingPhone) {
+      // Extract country code from existing phone number
+      if (existingPhone.startsWith("+91")) return "+91";
+      if (existingPhone.startsWith("+1")) return "+1";
+      if (existingPhone.startsWith("+44")) return "+44";
+      if (existingPhone.startsWith("+61")) return "+61";
+      if (existingPhone.startsWith("+49")) return "+49";
+      if (existingPhone.startsWith("+33")) return "+33";
+      if (existingPhone.startsWith("+39")) return "+39";
+      if (existingPhone.startsWith("+34")) return "+34";
+      if (existingPhone.startsWith("+31")) return "+31";
+      if (existingPhone.startsWith("+65")) return "+65";
+      if (existingPhone.startsWith("+971")) return "+971";
+      if (existingPhone.startsWith("+81")) return "+81";
+      if (existingPhone.startsWith("+82")) return "+82";
+      if (existingPhone.startsWith("+86")) return "+86";
+      if (existingPhone.startsWith("+55")) return "+55";
+      if (existingPhone.startsWith("+52")) return "+52";
+      if (existingPhone.startsWith("+27")) return "+27";
+      if (existingPhone.startsWith("+234")) return "+234";
+      if (existingPhone.startsWith("+20")) return "+20";
+    }
+    return "+91";
+  };
+
+  const [selectedCountryCode, setSelectedCountryCode] = useState(
+    initializeCountryCode()
+  );
+
+  // Extract local phone number (without country code) for the input field
+  const getLocalPhoneNumber = () => {
+    const existingPhone = currentData.personalInfo?.phone;
+    if (existingPhone) {
+      // Remove country code prefix to show only local number
+      const countryCode = initializeCountryCode();
+      if (existingPhone.startsWith(countryCode)) {
+        return existingPhone.slice(countryCode.length);
       }
-      return "+91";
-   };
+    }
+    return "";
+  };
 
-   const [selectedCountryCode, setSelectedCountryCode] = useState(
-      initializeCountryCode()
-   );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    watch,
+    trigger,
+  } = useForm<FormData>({
+    mode: "onTouched",
+    defaultValues: {
+      phone: getLocalPhoneNumber(),
+    },
+  });
 
-   // Extract local phone number (without country code) for the input field
-   const getLocalPhoneNumber = () => {
-      const existingPhone = currentData.personalInfo?.phone;
-      if (existingPhone) {
-         // Remove country code prefix to show only local number
-         const countryCode = initializeCountryCode();
-         if (existingPhone.startsWith(countryCode)) {
-            return existingPhone.slice(countryCode.length);
-         }
-      }
-      return "";
-   };
+  const { getOtp, isGettingOtp, getOtpError, getOtpData } = useOnboardingApi();
 
-   const {
-      register,
-      handleSubmit,
-      formState: { errors, isValid },
-      watch,
-      trigger,
-   } = useForm<FormData>({
-      mode: "onTouched",
-      defaultValues: {
-         phone: getLocalPhoneNumber(),
+  // Revalidate phone field when country code changes (only if user has interacted)
+  useEffect(() => {
+    const phoneValue = watch("phone");
+    if (phoneValue && phoneValue.trim()) {
+      trigger("phone");
+    }
+  }, [selectedCountryCode, trigger, watch]);
+
+  // Watch form values to enable/disable button
+  const formValues = watch();
+  const isFormValid = formValues.phone?.trim() && isValid;
+
+  // Get validation pattern and placeholder based on selected country
+  const getPhoneValidation = (countryCode: string) => {
+    switch (countryCode) {
+      case "+1": // US/Canada
+        return {
+          pattern: /^[2-9]\d{9}$/,
+          message: "Please enter a valid 10-digit phone number",
+          placeholder: "123 456 7890",
+        };
+      case "+44": // UK
+        return {
+          pattern: /^[1-9]\d{9,10}$/,
+          message: "Please enter a valid UK phone number",
+          placeholder: "1234 567890",
+        };
+      case "+91": // India
+        return {
+          pattern: /^[6-9]\d{9}$/,
+          message: "Please enter a valid 10-digit Indian phone number",
+          placeholder: "98765 43210",
+        };
+      case "+61": // Australia
+        return {
+          pattern: /^[2-9]\d{8}$/,
+          message: "Please enter a valid 9-digit Australian phone number",
+          placeholder: "123 456 789",
+        };
+      case "+49": // Germany
+        return {
+          pattern: /^[1-9]\d{9,11}$/,
+          message: "Please enter a valid German phone number",
+          placeholder: "123 456 7890",
+        };
+      default:
+        return {
+          pattern: /^\d{7,15}$/,
+          message: "Please enter a valid phone number",
+          placeholder: "Enter phone number",
+        };
+    }
+  };
+
+  const phoneValidation = getPhoneValidation(selectedCountryCode);
+
+  const onSubmit = (data: FormData) => {
+    if (submitButtonRef.current) {
+      animateSuccess(submitButtonRef.current);
+    }
+
+    onUpdateData({
+      personalInfo: {
+        ...currentData.personalInfo,
+        phone: `${selectedCountryCode}${data.phone.trim()}`,
       },
-   });
+    });
 
-   // Revalidate phone field when country code changes (only if user has interacted)
-   useEffect(() => {
-      const phoneValue = watch("phone");
-      if (phoneValue && phoneValue.trim()) {
-         trigger("phone");
-      }
-   }, [selectedCountryCode, trigger, watch]);
+    getOtp({
+      tenant_phone: `${selectedCountryCode}${data.phone.trim()}`,
+      name: username || "",
+    });
+  };
 
-   // Watch form values to enable/disable button
-   const formValues = watch();
-   const isFormValid = formValues.phone?.trim() && isValid;
+  useEffect(() => {
+    if (getOtpError) {
+      toast.error(getOtpError.message);
+    }
 
-   // Get validation pattern and placeholder based on selected country
-   const getPhoneValidation = (countryCode: string) => {
-      switch (countryCode) {
-         case "+1": // US/Canada
-            return {
-               pattern: /^[2-9]\d{9}$/,
-               message: "Please enter a valid 10-digit phone number",
-               placeholder: "123 456 7890",
-            };
-         case "+44": // UK
-            return {
-               pattern: /^[1-9]\d{9,10}$/,
-               message: "Please enter a valid UK phone number",
-               placeholder: "1234 567890",
-            };
-         case "+91": // India
-            return {
-               pattern: /^[6-9]\d{9}$/,
-               message: "Please enter a valid 10-digit Indian phone number",
-               placeholder: "98765 43210",
-            };
-         case "+61": // Australia
-            return {
-               pattern: /^[2-9]\d{8}$/,
-               message: "Please enter a valid 9-digit Australian phone number",
-               placeholder: "123 456 789",
-            };
-         case "+49": // Germany
-            return {
-               pattern: /^[1-9]\d{9,11}$/,
-               message: "Please enter a valid German phone number",
-               placeholder: "123 456 7890",
-            };
-         default:
-            return {
-               pattern: /^\d{7,15}$/,
-               message: "Please enter a valid phone number",
-               placeholder: "Enter phone number",
-            };
-      }
-   };
+    if (getOtpData) {
+      toast.success(getOtpData.message);
+      onNext();
+    }
+  }, [getOtpData, getOtpError])
 
-   const phoneValidation = getPhoneValidation(selectedCountryCode);
 
-   const onSubmit = (data: FormData) => {
-      if (submitButtonRef.current) {
-         animateSuccess(submitButtonRef.current);
-      }
-
-      onUpdateData({
-         personalInfo: {
-            ...currentData.personalInfo,
-            phone: `${selectedCountryCode}${data.phone.trim()}`,
-         },
-      });
-
-      // Delay the next step to show the success animation
-      setTimeout(() => {
-         onNext();
-      }, 400);
-   };
-
-   const handleClose = () => {
+  const handleClose = () => {
     onPrev();
   };
 
-   return (
+  return (
     <BaseBottomSheet
       isOpen={true}
       onClose={handleClose}
@@ -253,14 +270,13 @@ const OnboardingStep3: OnboardingStepComponent = ({
             ref={submitButtonRef}
             type="submit"
             disabled={!isFormValid}
-            className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${
-              isFormValid
+            className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${isFormValid
                 ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
                 : "bg-[#030213]/40"
-            }`}
+              }`}
           >
             <span className="text-white text-[14px] lg:text-base font-medium leading-[21px]">
-Send verification code</span>
+              Send verification code</span>
             <img src={whiteArrow} alt="arrow" className="w-5 h-5" />
           </button>
 

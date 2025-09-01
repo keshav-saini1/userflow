@@ -21,10 +21,7 @@ export interface OnboardingData {
     };
     personalInfo?: {
       name?: string;
-      email?: string;
       phone?: string;
-      occupation?: string;
-      isPhoneVerified?: boolean;
     };
     moveInDetails?: {
       preferredDate?: string;

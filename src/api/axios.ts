@@ -4,8 +4,10 @@ function removeCookie(name: string) {
   document.cookie = `${name}=; Max-Age=0; path=/;`;
 }
 
+const BASE_URL = "http://localhost:3000"
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: BASE_URL,
   timeout: 10000,
 });
 

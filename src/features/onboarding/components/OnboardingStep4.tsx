@@ -5,6 +5,8 @@ import { useButtonAnimation } from '../hooks/useOnboarding';
 import { useNavigate } from 'react-router';
 import verified from "@/assets/onboarding/verified.svg";
 import { BaseBottomSheet } from "@/components";
+import { useOnboardingApi } from '../api/useOnboardingApi';
+import { toast } from 'sonner';
 
 interface OtpFormData {
   otp0: string;
@@ -43,6 +45,8 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       otp5: '',
     },
   });
+
+  const { verifyOtp, isVerifyingOtp, verifyOtpError, verifyOtpData } = useOnboardingApi();
 
   // Watch all OTP values to check completion
   const otpValues = watch();
@@ -105,27 +109,33 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       return;
     }
 
-    // Simulate OTP verification
-    if (otp === '123456') {
-      if (submitButtonRef.current) {
-        animateSuccess(submitButtonRef.current);
-      }
-      
-      onUpdateData({ 
-        personalInfo: {
-          ...currentData.personalInfo,
-          isPhoneVerified: true,
-        }
-      });
-      
-      // Delay to show success animation
-      setTimeout(() => {
-        navigate('/persona-selection')
-      }, 400);
-    } else {
-      setError('root', { message: 'Invalid OTP. Please try again.' });
+    if (submitButtonRef.current) {
+      animateSuccess(submitButtonRef.current);
     }
+    
+    onUpdateData({ 
+      personalInfo: {
+        ...currentData.personalInfo,
+      }
+    });
+
+    verifyOtp({
+      otp,
+      tenant_phone: currentData.personalInfo?.phone || '',
+    });
   };
+
+  useEffect(() => {
+    if (verifyOtpError) {
+      toast.error(verifyOtpError.message);
+    }
+    if (verifyOtpData) {
+      toast.success(verifyOtpData.message);
+      console.log({verifyOtpData});
+      localStorage.setItem('token', verifyOtpData?.data?.token || '');
+      navigate('/persona-selection')
+    }
+  }, [verifyOtpData, verifyOtpError])
 
   const handleResend = () => {
     if (!canResend) return;
