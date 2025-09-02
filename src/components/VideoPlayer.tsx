@@ -10,7 +10,6 @@ interface VideoPlayerProps {
   autoPlay?: boolean;
   muted?: boolean;
   loop?: boolean;
-  onClose?: () => void;
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -20,18 +19,35 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   className = '',
   showControls = true,
   autoPlay = false,
-  muted = false,
+  muted = true, // Default to muted for better UX
   loop = false,
-  onClose,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showThumbnail, setShowThumbnail] = useState(true);
-  const [showControlsOverlay, setShowControlsOverlay] = useState(false);
+  const [showThumbnail, setShowThumbnail] = useState(!autoPlay); // Show thumbnail unless autoPlay is true
+  const [showControlsOverlay, setShowControlsOverlay] = useState(showControls);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Stop video when component unmounts or onClose is called
+  // Handle autoPlay when component mounts
+  useEffect(() => {
+    if (autoPlay && videoRef.current) {
+      const playVideo = async () => {
+        try {
+          await videoRef.current?.play();
+          setShowThumbnail(false);
+          setIsPlaying(true);
+        } catch (error) {
+          console.error('Auto-play failed:', error);
+          setShowThumbnail(true);
+          setIsPlaying(false);
+        }
+      };
+      playVideo();
+    }
+  }, [autoPlay, src]);
+
+  // Stop video when component unmounts
   useEffect(() => {
     return () => {
       if (videoRef.current) {
@@ -41,15 +57,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
   }, []);
 
-  // Handle onClose prop changes
+  // Handle video stopping when modal closes
   useEffect(() => {
-    if (onClose && videoRef.current) {
+    if (!autoPlay && videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
       setIsPlaying(false);
       setShowThumbnail(true);
     }
-  }, [onClose]);
+  }, [autoPlay]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -93,20 +109,20 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleVideoClick = () => {
     if (showThumbnail) {
       togglePlay();
-    } else {
+    } else if (showControls) {
       // Toggle controls visibility when video is playing
       setShowControlsOverlay(!showControlsOverlay);
     }
   };
 
   const handleMouseEnter = () => {
-    if (!showThumbnail) {
+    if (!showThumbnail && showControls) {
       setShowControlsOverlay(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!showThumbnail) {
+    if (!showThumbnail && showControls) {
       setShowControlsOverlay(false);
     }
   };
@@ -125,9 +141,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onEnded={handleVideoEnd}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        autoPlay={autoPlay}
         muted={isMuted}
         loop={loop}
+        playsInline
+        preload="metadata"
         onClick={handleVideoClick}
       />
 
@@ -217,21 +234,40 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   src,
   title,
 }) => {
+  const videoPlayerRef = useRef<HTMLVideoElement>(null);
+
+  // Stop video when modal closes
+  useEffect(() => {
+    if (!isOpen && videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    // Stop video before closing
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
       {/* Backdrop */}
       <div
         className="absolute inset-0"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Modal Content */}
       <div className="relative w-full h-full max-w-4xl max-h-[90vh] mx-4">
         {/* Close Button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
         >
           <FaTimes className="w-5 h-5" />
@@ -243,8 +279,8 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           title={title}
           className="w-full h-full"
           showControls={true}
-          autoPlay={true}
-          onClose={onClose}
+          autoPlay={isOpen} // Only autoplay when modal is open
+          muted={false} // Allow sound in modal
         />
       </div>
     </div>

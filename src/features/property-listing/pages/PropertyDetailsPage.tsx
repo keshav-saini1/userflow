@@ -538,6 +538,8 @@ export default function PropertyDetailsPage({
                                     title={video?.title || 'Video'}
                                     className="w-full h-full"
                                     showControls={false}
+                                    autoPlay={false}
+                                    muted={true}
                                  />
                               </div>
                            ))}
