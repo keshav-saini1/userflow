@@ -28,7 +28,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({
                 Where you'll be
               </h3>
               <p className="text-[#4a5565] text-[12.3px] lg:text-sm font-normal leading-[17.5px] lg:leading-5">
-                {location.area}, {location.city}
+                {location?.area}, {location?.city}
               </p>
             </div>
           </div>

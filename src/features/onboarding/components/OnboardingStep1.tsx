@@ -5,8 +5,39 @@ import room from "@/assets/onboarding/room.svg";
 import crew from "@/assets/onboarding/crew.svg";
 import adulting from "@/assets/onboarding/adulting.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
+import { useOnboardingApi, type PropertyPageData } from "../api/useOnboardingApi";
+import { useSearchParams } from "react-router";
+import { useEffect, useState } from "react";
+
+const feature_images: Record<number, string> = {
+   1: room,
+   2: crew,
+   3: adulting
+};
 
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
+   // eazypg_id from url query params
+   const [searchParams] = useSearchParams();
+   const [pageData, setPageData] = useState<PropertyPageData | null>(null);
+   const { getPublicProperty, getPublicPropertyData } = useOnboardingApi();
+   const [propertyData, setPropertyData] = useState();
+
+   const eazypgId = searchParams.get('eazypg_id');
+
+   useEffect(() => {
+      if (eazypgId) {
+         getPublicProperty(eazypgId);
+      }
+   }, [eazypgId, getPublicProperty]);
+
+   useEffect(() => {
+      if (getPublicPropertyData) {
+         setPageData(JSON.parse(getPublicPropertyData?.data?.pageData))
+         setPropertyData(getPublicPropertyData?.data);
+         localStorage.setItem('selectedPropertyId', getPublicPropertyData?.data?.id);
+      }
+   }, [getPublicPropertyData])
+
    const handleContinue = () => {
       // Trigger Step 2 overlay
       onNext();
@@ -33,14 +64,14 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                <div className="max-w-4xl mx-auto">
                   <div className="mb-4 lg:mb-6 text-left lg:text-center">
                      <p className="text-white text-2xl lg:text-6xl font-bold mb-3 lg:mb-4 tracking-tight">
-                        Find Your Perfect Coliving Space
+                        {pageData?.tagline}
                      </p>
 
                      {/* Location indicator */}
                      <div className="flex items-center mb-3 lg:mb-4 lg:justify-center">
                         <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full mr-2"></div>
                         <span className="text-white/90 text-sm lg:text-base font-medium">
-                           Iffco Chowk, Gurgaon
+                           {propertyData?.propertyAddress?.city}, {propertyData?.propertyAddress?.state}
                         </span>
                      </div>
 
@@ -53,10 +84,10 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
                               className="w-4 h-4 lg:w-6 lg:h-6"
                            />
                            <span className="text-white text-[13px] lg:text-sm font-medium">
-                              Verified
+                              {propertyData?.verifiedStatus ? 'Verified' : "Not Verified"}
                            </span>
                            <span className="text-white/70 text-[11px] lg:text-sm self-end">
-                              Properties
+                              {propertyData?.verifiedStatus ? 'Properties' : "Property"}
                            </span>
                         </div>
                         <div className="backdrop-blur-md bg-white/15 px-3 py-2 lg:px-4 lg:py-2 rounded-full flex items-end justify-between space-x-[6px]">
@@ -83,78 +114,36 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
             <div className="max-w-6xl mx-auto">
                <div className="text-center mb-6 lg:mb-12">
                   <h2 className="text-lg lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-2 lg:mb-4 leading-tight">
-                     Life's better when the boring stuff is handled
+                     {pageData?.propQuote}
                   </h2>
                   <p className="text-gray-600 text-sm lg:text-lg leading-relaxed max-w-2xl mx-auto">
-                     Move in, make friends, start living. We'll take care of
-                     everything else.
+                     {pageData?.propDescription}
                   </p>
                </div>
 
                {/* Feature cards */}
                <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6 xl:gap-8">
-                  {/* Feature 1 */}
-                  <div className="bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100 lg:shadow-md hover:shadow-lg transition-shadow">
-                     <div className="flex space-x-3 lg:space-x-4">
-                        <img
-                           src={room}
-                           alt=""
-                           className="w-16 h-16 lg:w-32 lg:h-32"
-                        />
-                        <div className="flex-1">
-                           <h3 className="font-bold text-gray-900 text-sm lg:text-lg mb-1 lg:mb-2">
-                              Your room, your sanctuary
-                           </h3>
-                           <p className="text-gray-600 text-xs lg:text-sm leading-relaxed">
-                              Walk into a fully furnished room that's ready for
-                              your first Instagram story. No shopping lists, no
-                              setup stress.
-                           </p>
+                  {
+                     pageData?.features?.map((data, idx) => (
+                        <div key={idx} className="bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100 lg:shadow-md hover:shadow-lg transition-shadow">
+                           <div className="flex space-x-3 lg:space-x-4">
+                              <img
+                                 src={feature_images[idx + 1]}
+                                 alt=""
+                                 className="w-16 h-16 lg:w-32 lg:h-32"
+                              />
+                              <div className="flex-1">
+                                 <h3 className="font-bold text-gray-900 text-sm lg:text-lg mb-1 lg:mb-2">
+                                    {data?.title}
+                                 </h3>
+                                 <p className="text-gray-600 text-xs lg:text-sm leading-relaxed">
+                                    {data?.description}
+                                 </p>
+                              </div>
+                           </div>
                         </div>
-                     </div>
-                  </div>
-
-                  {/* Feature 2 */}
-                  <div className="bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100 lg:shadow-md hover:shadow-lg transition-shadow">
-                     <div className="flex space-x-3 lg:space-x-4">
-                        <img
-                           src={crew}
-                           alt=""
-                           className="w-16 h-16 lg:w-32 lg:h-32"
-                        />
-                        <div className="flex-1">
-                           <h3 className="font-bold text-gray-900 text-sm lg:text-lg mb-1 lg:mb-2">
-                              Meet your new crew
-                           </h3>
-                           <p className="text-gray-600 text-xs lg:text-sm leading-relaxed">
-                              From morning coffee chats to weekend adventures,
-                              you're moving into friendships that might just
-                              change your life.
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-
-                  {/* Feature 3 */}
-                  <div className="bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-gray-100 lg:shadow-md hover:shadow-lg transition-shadow">
-                     <div className="flex space-x-3 lg:space-x-4">
-                        <img
-                           src={adulting}
-                           alt=""
-                           className="w-16 h-16 lg:w-32 lg:h-32"
-                        />
-                        <div className="flex-1">
-                           <h3 className="font-bold text-gray-900 text-sm lg:text-lg mb-1 lg:mb-2">
-                              Zero adulting required
-                           </h3>
-                           <p className="text-gray-600 text-xs lg:text-sm leading-relaxed">
-                              WiFi that actually works, cleaning that happens
-                              like magic, and bills that pay themselves. You
-                              focus on living.
-                           </p>
-                        </div>
-                     </div>
-                  </div>
+                     ))
+                  }
                </div>
             </div>
          </div>

@@ -46,6 +46,40 @@ export interface VerifyOtpResponse {
   }
 }
 
+export interface PropertyAddress {
+  address_line_1: string;
+  address_line_2: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+export interface PropertyFeature {
+  title: string;
+  description: string;
+}
+
+export interface PropertyPageData {
+  tagline: string;
+  propQuote: string;
+  propDescription: string;
+  features: PropertyFeature[];
+}
+
+export interface PublicPropertyResponse {
+  status: number;
+  message: string;
+  data: {
+    id: string;
+    propertyName: string;
+    propertyAddress: PropertyAddress;
+    moveInStatus: string;
+    verifiedStatus: boolean;
+    propertyTag: string[];
+    pageData: string; // JSON string that can be parsed to PropertyPageData
+  }
+}
+
 async function postGetOtp(payload: GetOtpRequest): Promise<ApiResponse<GetOtpResponse>> {
   const { data } = await api.post<ApiResponse<GetOtpResponse>>('/tenant/unified/otp/send', payload);
   return data;
@@ -53,6 +87,11 @@ async function postGetOtp(payload: GetOtpRequest): Promise<ApiResponse<GetOtpRes
 
 async function postVerifyOtp(payload: VerifyOtpRequest): Promise<ApiResponse<VerifyOtpResponse>> {
   const { data } = await api.post<ApiResponse<VerifyOtpResponse>>('/tenant/unified/otp/verify', payload);
+  return data;
+}
+
+async function getPublicProperty(eazypgId: string): Promise<ApiResponse<PublicPropertyResponse>> {
+  const { data } = await api.get<ApiResponse<PublicPropertyResponse>>(`/property/public/${eazypgId}`);
   return data;
 }
 
@@ -65,6 +104,11 @@ export function useOnboardingApi() {
   const verifyOtpMutation = useMutation({
     mutationKey: ['onboarding', 'verify-otp'],
     mutationFn: postVerifyOtp,
+  });
+
+  const getPublicPropertyMutation = useMutation({
+    mutationKey: ['onboarding', 'public-property'],
+    mutationFn: getPublicProperty,
   });
 
   return {
@@ -81,10 +125,18 @@ export function useOnboardingApi() {
     isVerifyingOtp: verifyOtpMutation.isPending,
     verifyOtpError: verifyOtpMutation.error as unknown as Error | null,
     verifyOtpData: verifyOtpMutation.data,
+
+    // Get Public Property
+    getPublicProperty: getPublicPropertyMutation.mutateAsync,
+    getPublicPropertyStatus: getPublicPropertyMutation.status,
+    isGettingPublicProperty: getPublicPropertyMutation.isPending,
+    getPublicPropertyError: getPublicPropertyMutation.error as unknown as Error | null,
+    getPublicPropertyData: getPublicPropertyMutation.data,
   };
 }
 
 export const OnboardingApi = {
   getOtp: postGetOtp,
   verifyOtp: postVerifyOtp,
+  getPublicProperty,
 };

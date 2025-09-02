@@ -73,19 +73,19 @@ export const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             {/* Property Info */}
             <div className="flex-1 flex flex-col items-center gap-[3.5px]">
                <span className="text-[#101828] text-[15.8px] font-semibold leading-[24.5px] text-center">
-                  {location.name}
+                  {location?.name}
                </span>
-               <div className="flex items-center gap-[3.5px]">
+               {/* <div className="flex items-center gap-[3.5px]">
                   <div className="flex items-center gap-[3.5px]">
-                     {renderStars(location.rating)}
+                     {renderStars(location?.rating)}
                   </div>
                   <span className="text-[#101828] text-[12.3px] font-medium leading-[17.5px]">
-                     {location.rating}
+                     {location?.rating}
                   </span>
                   <span className="text-[#6a7282] text-[12.3px] font-normal leading-[17.5px]">
-                     ({location.reviewCount} reviews)
+                     ({location?.reviewCount} reviews)
                   </span>
-               </div>
+               </div> */}
             </div>
 
             {/* Share Button */}

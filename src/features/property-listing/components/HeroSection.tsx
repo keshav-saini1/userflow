@@ -29,7 +29,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="relative h-full w-full">
                <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url('${heroImage}')` }}
+                  style={{ backgroundImage: heroImage ? `url('${heroImage}')` : undefined }}
                />
             </div>
 
@@ -56,7 +56,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         <div className="flex items-center gap-[7px] lg:gap-2">
                            <div className="w-[7px] h-[7px] lg:w-2 lg:h-2 bg-green-500 rounded-full" />
                            <span className="text-white/90 text-[14px] lg:text-lg font-medium leading-[21px]">
-                              {location.area}, {location.city}
+                              {(location?.area ?? "").toString()}{location?.area && location?.city ? ", " : ""}{(location?.city ?? "").toString()}
                            </span>
                         </div>
                      </div>
@@ -80,7 +80,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
                            {/* Nearby Spots Info - Responsive layout */}
                            <div className="flex items-center justify-center gap-3.5 lg:gap-6 flex-wrap">
-                              {location.nearbySpots.map((spot, index) => (
+                              {(location?.nearbySpots ?? []).map((spot, index) => (
                                  <div
                                     key={index}
                                     className="flex items-center gap-[3.5px] lg:gap-1.5"

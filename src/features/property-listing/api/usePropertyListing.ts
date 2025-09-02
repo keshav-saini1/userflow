@@ -1,74 +1,55 @@
-import { useQuery } from "@tanstack/react-query";
-import type { UseQueryOptions, QueryKey } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/api/axios";
-import type {
-  PropertyListing,
-  PropertyDetailPageData,
-} from "@/features/property-listing/types";
+// Keep types open/relaxed – adapt as backend types become available
+export type PropertiesResponse = unknown;
+export type RentalOptionsResponse = unknown;
 
-// API paths
-const PROPERTY_LIST_PATH = "/properties";
-const PROPERTY_DETAIL_PATH = (id: string) => `/properties/${id}`;
-
-// Fetchers
-async function fetchPropertyList(): Promise<PropertyListing[]> {
-  const { data } = await api.get<PropertyListing[]>(PROPERTY_LIST_PATH);
+// Small helpers to fetch data via the shared axios instance (`@/api/axios`)
+async function fetchRentalOptions(propertyId: string): Promise<PropertiesResponse> {
+  const { data } = await api.get(`/property/${propertyId}/list`);
   return data;
 }
 
-async function fetchPropertyDetail(id: string): Promise<PropertyDetailPageData> {
-  const { data } = await api.get<PropertyDetailPageData>(PROPERTY_DETAIL_PATH(id));
+async function fetchRentalOptionDetails(propertyId: string, optionType: string): Promise<RentalOptionsResponse> {
+  const { data } = await api.get(`/property/rental_option/${propertyId}/${optionType}`);
   return data;
 }
 
-// Standalone hooks (useful when caller only needs one)
-export function usePropertiesList(options?: Partial<UseQueryOptions<PropertyListing[], Error, PropertyListing[], QueryKey>>) {
-  const query = useQuery<PropertyListing[], Error>({
-    queryKey: ["properties", "list"],
-    queryFn: fetchPropertyList,
-    // Allow caller overrides without forcing them to supply generics each time
-    ...(options as any),
+// API-style hook similar to useOnboardingApi.ts
+// Provides imperative functions with statuses using useMutation
+export function usePropertyListingApi() {
+  const getPropertyListMutation = useMutation({
+    mutationKey: ["property", "list"],
+    mutationFn: (propertyId: string) => fetchRentalOptions(propertyId),
   });
-  return query;
-}
 
-export function usePropertyDetails(
-  id: string | undefined,
-  options?: Partial<UseQueryOptions<PropertyDetailPageData, Error, PropertyDetailPageData, QueryKey>>
-) {
-  const query = useQuery<PropertyDetailPageData, Error>({
-    queryKey: ["properties", "detail", id],
-    queryFn: () => fetchPropertyDetail(id as string),
-    enabled: Boolean(id),
-    ...(options as any),
+  const getRentalOptionDetailsMutation = useMutation({
+    mutationKey: ["property", "rental-option", "details"],
+    mutationFn: ({ propertyId, optionType }: { propertyId: string; optionType: string }) =>
+      fetchRentalOptionDetails(propertyId, optionType),
   });
-  return query;
-}
-
-// Combined hook that exposes both list and optional detail in one place
-export default function usePropertyListing(propertyId?: string) {
-  const list = usePropertiesList();
-  const detail = usePropertyDetails(propertyId);
-
-  const isLoadingList = list.isLoading || list.isFetching;
-  const isLoadingDetail = detail.isLoading || detail.isFetching;
-  const isAnyLoading = isLoadingList || isLoadingDetail;
 
   return {
-    // queries
-    list,
-    detail,
-    // smart loading flags
-    isLoadingList,
-    isLoadingDetail,
-    isAnyLoading,
-    // convenience data refs
-    properties: list.data,
-    property: detail.data,
-    // refetch helpers
-    refetchList: list.refetch,
-    refetchDetail: detail.refetch,
-  } as const;
+    // Get Property List (rental options list for a property)
+    getPropertyList: getPropertyListMutation.mutateAsync,
+    getPropertyListStatus: getPropertyListMutation.status,
+    isGettingPropertyList: getPropertyListMutation.isPending,
+    getPropertyListError: getPropertyListMutation.error as unknown as Error | null,
+    getPropertyListData: getPropertyListMutation.data,
+
+    // Get Rental Option Details (for a given type)
+    getRentalOptionDetails: getRentalOptionDetailsMutation.mutateAsync,
+    getRentalOptionDetailsStatus: getRentalOptionDetailsMutation.status,
+    isGettingRentalOptionDetails: getRentalOptionDetailsMutation.isPending,
+    getRentalOptionDetailsError: getRentalOptionDetailsMutation.error as unknown as Error | null,
+    getRentalOptionDetailsData: getRentalOptionDetailsMutation.data,
+  };
 }
+
+// Direct API accessors (useful outside React or for simple calls)
+export const PropertyListingApi = {
+  getPropertyList: fetchRentalOptions,
+  getRentalOptionDetails: fetchRentalOptionDetails,
+};
 
 

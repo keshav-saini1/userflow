@@ -9,8 +9,6 @@ import {
    FloatingMenu,
 } from "../components";
 import type { PropertyListing } from "../types";
-import FullPageSpinner from "@/components/FullPageSpinner";
-import usePropertyListing from "../api/usePropertyListing";
 
 interface PropertyListingPageProps {
    propertyListing: PropertyListing;
@@ -20,7 +18,7 @@ interface PropertyListingPageProps {
    onReserve?: (propertyId: string) => void;
    onBookVisit?: (propertyId: string) => void;
    onMapClick?: () => void;
-   onPropertyClick?: (propertyId: string) => void;
+   onPropertyClick?: (sharing_type: number) => void;
 }
 
 export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
@@ -31,16 +29,15 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
    onMapClick,
    onPropertyClick,
 }) => {
-   // hook fetching data for the page
-   const { list, isLoadingList } = usePropertyListing();
    const [showBottomSheet, setShowBottomSheet] = useState(false);
+   console.log({propertyListing})
 
    return (
       <div className="bg-white h-screen w-screen flex flex-col overflow-hidden">
          {/* Fixed Header */}
          <div className="flex-shrink-0">
             <PropertyHeader
-               location={propertyListing.location}
+               location={propertyListing?.location}
                onBackClick={onBackClick}
             />
          </div>
@@ -50,8 +47,8 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
             {/* Hero Section - Full width on desktop */}
             <div className="w-full">
                <HeroSection
-                  heroImage={propertyListing.heroImage}
-                  location={propertyListing.location}
+                  heroImage={propertyListing?.heroImage}
+                  location={propertyListing?.location}
                />
             </div>
 
@@ -84,10 +81,8 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                               Find your perfect space
                            </p>
                         </div>
-
-                        {/* Property Cards Grid - Mobile: 1 column, Tablet: 2 columns, Desktop: 2-3 columns */}
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 lg:gap-8 xl:gap-10">
-                           {propertyListing.properties.map((property) => (
+                           {propertyListing && propertyListing?.properties?.map((property: any) => (
                               <div
                                  key={property.id}
                                  className="flex justify-center"
@@ -97,7 +92,15 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                                        property={property}
                                        onReserve={onReserve}
                                        onBookVisit={onBookVisit}
-                                       onPropertyClick={onPropertyClick}
+                                       onPropertyClick={
+                                          onPropertyClick
+                                             ? () => {
+                                                if (property?.sharing_type != null) {
+                                                   onPropertyClick(property.sharing_type);
+                                                }
+                                             }
+                                             : undefined
+                                       }
                                     />
                                  </div>
                               </div>
@@ -130,13 +133,13 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
             </div>
          )}
 
-         {
+         {/* {
             isLoadingList && (
                <div>
                   <FullPageSpinner />
                </div>
             )
-         }
+         } */}
       </div>
    );
 };

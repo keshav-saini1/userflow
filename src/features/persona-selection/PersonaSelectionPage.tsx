@@ -72,6 +72,8 @@ const PersonaSelectionPage: React.FC = () => {
 
    const handleLogout = () => {
       // Handle back navigation
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
       navigate("/");
    };
 

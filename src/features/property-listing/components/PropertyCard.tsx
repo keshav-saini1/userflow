@@ -160,7 +160,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                      )}
                   </div>
 
-                  {property.pricing.originalPrice && !isWishlistView && (
+                  {/* {property.pricing.originalPrice && !isWishlistView && (
                      <div className="flex items-center gap-[7px]">
                         <span className="text-[#99a1af] text-[17.3px] font-normal leading-[17.5px] line-through">
                            {formatPrice(property.pricing.originalPrice)}
@@ -174,7 +174,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            </div>
                         )}
                      </div>
-                  )}
+                  )} */}
                </div>
 
                {!isWishlistView && (
@@ -185,7 +185,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            Included amenities:
                         </h4>
                         <div className="flex flex-col gap-[7px]">
-                           {property.amenities.map((amenity) => (
+                           {property.amenities.slice(0,4).map((amenity) => (
                               <div
                                  key={amenity.id}
                                  className="flex items-center gap-[10.5px]"
@@ -196,6 +196,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                                  </span>
                               </div>
                            ))}
+                           <span className="text-[#364153] text-[12.3px] font-normal leading-[17.5px]">+{(property.amenities.length) - 4} more</span>
                         </div>
                      </div>
                   </>
