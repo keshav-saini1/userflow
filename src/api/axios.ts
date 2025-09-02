@@ -16,10 +16,10 @@ api.interceptors.request.use(
   (config) => {
     // You can add headers or modify config here
     // Example: Add auth token if available
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

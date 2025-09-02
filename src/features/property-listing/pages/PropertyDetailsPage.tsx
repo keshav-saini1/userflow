@@ -9,7 +9,6 @@ import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
 import { ImageCarousel, UnitCard, VideoPlayer, VideoModal } from "@/components";
-import single_tick from "@/assets/single_tick.svg";
 import { useNavigate } from "react-router";
 
 interface PropertyDetailsPageProps {
@@ -247,9 +246,9 @@ export default function PropertyDetailsPage({
                            </div>
 
                            {/* Horizontally scrollable units */}
-                           <div className="overflow-x-auto scrollbar-hide">
-                              <div className="flex gap-4 min-w-[340px]">
-                                 {(propertyData?.availableUnits || []).map((unit) => (
+                           <div className="overflow-x-auto ">
+                              <div className="flex gap-4 min-w-[340px] scrollbar-hide">
+                                 {(propertyData?.availableUnits?.slice(0, 5) || []).map((unit) => (
                                     <UnitCard
                                        key={unit?.id || 'unknown'}
                                        unit={{

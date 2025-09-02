@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type {
    BookVisitFormData as BookVisitFormType,
    VisitType,
@@ -6,6 +6,9 @@ import type {
 import VisitTypeSelector from "./VisitTypeSelector";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
+import { useParams } from "react-router";
+import { useBookVisitApi } from "../api/useBookVisitApi";
+import { toast } from "sonner";
 
 interface BookVisitFormProps {
    onSuccess: (bookingDetails: {
@@ -22,6 +25,11 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
       selectedDate: null,
       selectedTime: null,
    });
+   const params = useParams();
+
+   const propertyId = localStorage.getItem('selectedPropertyId');
+   const { createVisit, createVisitData, createVisitError } = useBookVisitApi();
+
 
    const handleVisitTypeSelect = (type: VisitType) => {
       setFormData((prev: BookVisitFormType) => ({
@@ -55,31 +63,53 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
    const handleSubmit = () => {
       if (isFormComplete) {
          console.log("Form submitted:", formData);
+         const body = {
+            visit_type: formData.visitType || "",
+            visit_date: formData.selectedDate?.toISOString() || "",
+            visit_time: formData.selectedTime || "",
+            property_id: propertyId || "",
+         }
 
-         // Prepare booking details for success page
-         const bookingDetails = {
+         createVisit(body);
+      }
+   };
+
+   useEffect(() => {
+      if (createVisitData) {
+          // Prepare booking details for success page
+          const visitDate = createVisitData?.data?.visit_date;
+          const bookingDate = visitDate ? new Date(visitDate) : null;
+          const bookingDetails = {
             property: "Nirvana Rooms",
             visitType:
-               formData.visitType === "live-video-tour"
+               createVisitData?.data?.visit_type === "live-video-tour"
                   ? "Live Video Tour"
-                  : formData.visitType === "visit-property"
+                  : createVisitData?.data?.visit_type === "visit-property"
                   ? "Visit Property"
                   : "Phone Call",
-            date: formData.selectedDate
-               ? formData.selectedDate.toLocaleDateString("en-US", {
+            date: bookingDate ? bookingDate.toLocaleDateString("en-US", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                  })
                : "",
-            time: formData.selectedTime || "",
+            time: createVisitData?.data?.visit_time || "",
          };
 
          // Navigate to success page
          onSuccess(bookingDetails);
+         console.log("Create Visit Data:", createVisitData);
+         // onSuccess(createVisitData);
       }
-   };
+   }, [createVisitData]);
+
+   useEffect(() => {
+      if (createVisitError) {
+         console.log({createVisitError})
+         toast.error(createVisitError?.response?.data?.message || "Error creating visit please try again");
+      }
+   }, [createVisitError]);
 
    return (
       <div className="flex flex-col gap-6 sm:gap-8 lg:gap-10 w-full overflow-hidden pb-16">
