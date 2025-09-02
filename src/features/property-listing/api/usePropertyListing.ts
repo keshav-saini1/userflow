@@ -11,7 +11,7 @@ async function fetchRentalOptions(propertyId: string): Promise<PropertiesRespons
 }
 
 async function fetchRentalOptionDetails(propertyId: string, optionType: string): Promise<RentalOptionsResponse> {
-  const { data } = await api.get(`/property/rental_option/${propertyId}/${optionType}`);
+  const { data } = await api.get(`/property/${propertyId}/${optionType}/rental-option`);
   return data;
 }
 

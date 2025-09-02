@@ -8,6 +8,7 @@ export { default as UnitCard } from './UnitCard';
 export { default as MultiSelectDropdown } from './MultiSelectDropdown';
 export { default as UnsavedChangesAlert } from './UnsavedChangesAlert';
 export { default as DynamicForm } from './DynamicForm';
+export { default as VideoPlayer, VideoModal } from './VideoPlayer';
 export type { MultiSelectOption } from './MultiSelectDropdown';
 export type { Country } from './CountryCodePicker';
 export type { GalleryImage, GalleryCategory, ImageGalleryProps } from './ImageGallery';

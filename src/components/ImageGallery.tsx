@@ -1,10 +1,13 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { VideoModal } from './VideoPlayer';
 
 export interface GalleryImage {
   id: string;
   src: string;
   alt: string;
   category: string;
+  isVideo?: boolean;
+  thumbnail?: string;
 }
 
 export interface GalleryCategory {
@@ -29,11 +32,16 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   const [currentCategory, setCurrentCategory] = useState<GalleryCategory>(categories[0]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<{ src: string; title?: string } | null>(null);
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
+  const thumbnailVideoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const currentPlayPromise = useRef<Promise<void> | null>(null);
 
   // Touch handling refs
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const isSwipingRef = useRef(false);
+  const touchContainerRef = useRef<HTMLDivElement>(null);
 
   // Category tabs centering
   const categoriesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -90,11 +98,122 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   const handleDownload = useCallback(() => {
     const link = document.createElement('a');
     link.href = currentImage?.src || '';
-    link.download = `${currentCategory.name}-${currentImage?.alt || 'image'}.jpg`;
+    const extension = currentImage?.isVideo ? 'mp4' : 'jpg';
+    link.download = `${currentCategory.name}-${currentImage?.alt || 'image'}.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, [currentImage?.src, currentImage?.alt, currentCategory.name]);
+  }, [currentImage?.src, currentImage?.alt, currentCategory.name, currentImage?.isVideo]);
+
+  const handleCloseVideoModal = useCallback(() => {
+    setSelectedVideo(null);
+  }, []);
+
+  // Handle video autoplay when current image changes
+  useEffect(() => {
+    // Pause all thumbnail videos
+    Object.values(thumbnailVideoRefs.current).forEach(video => {
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+
+    // Handle main video with proper error handling
+    if (currentImage?.isVideo && mainVideoRef.current) {
+      const video = mainVideoRef.current;
+      
+      // Cancel any existing play promise
+      if (currentPlayPromise.current) {
+        currentPlayPromise.current = null;
+      }
+      
+      // Reset video and load new source
+      video.currentTime = 0;
+      video.load(); // Force reload of video source
+      
+      // Wait for video to be ready then play
+      const handleCanPlay = () => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          currentPlayPromise.current = playPromise;
+          playPromise
+            .then(() => {
+              currentPlayPromise.current = null;
+            })
+            .catch(error => {
+              currentPlayPromise.current = null;
+              // Ignore AbortError as it's expected when videos are interrupted
+              if (error.name !== 'AbortError') {
+                console.error('Video play error:', error);
+              }
+            });
+        }
+        video.removeEventListener('canplay', handleCanPlay);
+      };
+      
+      video.addEventListener('canplay', handleCanPlay);
+      
+      // Fallback: try to play immediately if already loaded
+      if (video.readyState >= 3) { // HAVE_FUTURE_DATA
+        handleCanPlay();
+      }
+    } else if (mainVideoRef.current) {
+      // Cancel any existing play promise
+      if (currentPlayPromise.current) {
+        currentPlayPromise.current = null;
+      }
+      mainVideoRef.current.pause();
+      mainVideoRef.current.currentTime = 0;
+    }
+  }, [currentImage, currentImageIndex]);
+
+  // Handle category change
+  useEffect(() => {
+    // Cancel any existing play promise
+    if (currentPlayPromise.current) {
+      currentPlayPromise.current = null;
+    }
+    
+    // Pause main video when category changes
+    if (mainVideoRef.current) {
+      mainVideoRef.current.pause();
+      mainVideoRef.current.currentTime = 0;
+    }
+    
+    // Pause all thumbnail videos when category changes
+    Object.values(thumbnailVideoRefs.current).forEach(video => {
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, [currentCategory]);
+
+
+  // Cleanup effect to pause all videos when component unmounts
+  useEffect(() => {
+    return () => {
+      // Cancel any existing play promise
+      if (currentPlayPromise.current) {
+        currentPlayPromise.current = null;
+      }
+      
+      // Pause main video
+      if (mainVideoRef.current) {
+        mainVideoRef.current.pause();
+        mainVideoRef.current.currentTime = 0;
+      }
+      
+      // Pause all thumbnail videos
+      Object.values(thumbnailVideoRefs.current).forEach(video => {
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
+    };
+  }, []);
 
   const goToNext = useCallback(() => {
     const images = currentCategory.images;
@@ -124,68 +243,110 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     setCurrentImageIndex(lastIndex);
   }, [currentCategory, currentImageIndex, categories, handleCategoryChange]);
 
-  const onTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    const touch = e.touches[0];
-    touchStartXRef.current = touch.clientX;
-    touchStartYRef.current = touch.clientY;
-    isSwipingRef.current = false;
-  }, []);
+  // Touch event handlers with proper preventDefault support
+  useEffect(() => {
+    const container = touchContainerRef.current;
+    if (!container) return;
 
-  const onTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (touchStartXRef.current == null || touchStartYRef.current == null) return;
-    const touch = e.touches[0];
-    const deltaX = touch.clientX - touchStartXRef.current;
-    const deltaY = touch.clientY - touchStartYRef.current;
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Horizontal gesture: prevent vertical scroll while swiping
-      e.preventDefault();
-      isSwipingRef.current = true;
-    }
-  }, []);
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      touchStartXRef.current = touch.clientX;
+      touchStartYRef.current = touch.clientY;
+      isSwipingRef.current = false;
+    };
 
-  const onTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (touchStartXRef.current == null || touchStartYRef.current == null) return;
-    const changedTouch = e.changedTouches[0];
-    const deltaX = changedTouch.clientX - touchStartXRef.current;
-    const deltaY = changedTouch.clientY - touchStartYRef.current;
-    const threshold = 50; // px
-
-    // Reset start refs
-    touchStartXRef.current = null;
-    touchStartYRef.current = null;
-
-    if (!isSwipingRef.current) return;
-    isSwipingRef.current = false;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > threshold) {
-      if (deltaX < 0) {
-        // swipe left -> next
-        goToNext();
-      } else {
-        // swipe right -> prev
-        goToPrev();
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartXRef.current == null || touchStartYRef.current == null) return;
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStartXRef.current;
+      const deltaY = touch.clientY - touchStartYRef.current;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal gesture: prevent vertical scroll while swiping
+        e.preventDefault();
+        isSwipingRef.current = true;
       }
-    }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (touchStartXRef.current == null || touchStartYRef.current == null) return;
+      const changedTouch = e.changedTouches[0];
+      const deltaX = changedTouch.clientX - touchStartXRef.current;
+      const deltaY = changedTouch.clientY - touchStartYRef.current;
+      const threshold = 50; // px
+
+      // Reset start refs
+      touchStartXRef.current = null;
+      touchStartYRef.current = null;
+
+      if (!isSwipingRef.current) return;
+      isSwipingRef.current = false;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > threshold) {
+        if (deltaX < 0) {
+          // swipe left -> next
+          goToNext();
+        } else {
+          // swipe right -> prev
+          goToPrev();
+        }
+      }
+    };
+
+    // Add event listeners with passive: false to allow preventDefault
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
   }, [goToNext, goToPrev]);
 
   return (
     <div className={`bg-[#121212] w-full h-full min-h-screen flex flex-col ${className}`}>
       {/* Main Container */}
       <div
+        ref={touchContainerRef}
         className="relative w-full h-full bg-black"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
-        {/* Main Image */}
-        <div 
-          className="w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('${currentImage?.src}')`,
-            backgroundSize: '100% 37.5%',
-            backgroundPosition: 'left center'
-          }}
-        />
+        {/* Main Image/Video */}
+        {currentImage?.isVideo ? (
+          <video
+            ref={mainVideoRef}
+            src={currentImage.src}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onLoadedData={() => {
+              // Ensure video plays when loaded
+              if (mainVideoRef.current) {
+                const playPromise = mainVideoRef.current.play();
+                if (playPromise !== undefined) {
+                  playPromise.catch(error => {
+                    if (error.name !== 'AbortError') {
+                      console.error('Video autoplay failed:', error);
+                    }
+                  });
+                }
+              }
+            }}
+            onError={(e) => console.error('Video error:', e)}
+          />
+        ) : (
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('${currentImage?.src}')`,
+              backgroundSize: '100% 37.5%',
+              backgroundPosition: 'left center'
+            }}
+          />
+        )}
         
         {/* Navigation Overlay */}
         <div className="absolute inset-0 flex items-center justify-between px-7 py-[403.25px]">
@@ -268,17 +429,41 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             {currentCategory.images.map((image, index) => (
               <div key={image.id} className="flex-shrink-0 relative">
                 <button
-                  onClick={() => handleThumbnailClick(index)}
+                  onClick={() => {
+                    handleThumbnailClick(index);
+                  }}
                   className={`w-14 h-[42px] rounded-[8.75px] overflow-hidden transition-all duration-200 ${
                     index === currentImageIndex
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-black'
                       : ''
                   }`}
                 >
-                  <div 
-                    className="w-full h-full bg-cover bg-center bg-no-repeat bg-[#1e2939]"
-                    style={{ backgroundImage: `url('${image.src}')` }}
-                  />
+                  {image.isVideo ? (
+                    <video
+                      ref={(el) => { thumbnailVideoRefs.current[image.id] = el; }}
+                      src={image.src}
+                      className="w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      onMouseEnter={(e) => {
+                        const video = e.currentTarget;
+                        video.play().catch(() => {});
+                      }}
+                      onMouseLeave={(e) => {
+                        const video = e.currentTarget;
+                        video.pause();
+                        video.currentTime = 0;
+                      }}
+                      onError={(e) => console.error('Thumbnail video error:', e)}
+                    />
+                  ) : (
+                    <div 
+                      className="w-full h-full bg-cover bg-center bg-no-repeat bg-[#1e2939]"
+                      style={{ backgroundImage: `url('${image.src}')` }}
+                    />
+                  )}
                 </button>
                 
                 {/* Thumbnail Label */}
@@ -340,6 +525,16 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <VideoModal
+          isOpen={!!selectedVideo}
+          onClose={handleCloseVideoModal}
+          src={selectedVideo.src}
+          title={selectedVideo.title}
+        />
+      )}
     </div>
   );
 };

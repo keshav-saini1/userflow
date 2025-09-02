@@ -65,7 +65,7 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/property-details/:propertyId",
+      path: "/property-details/:sharing_type",
       element: (
          <ProtectedRoute>
             <PropertyDetailsWrapper />

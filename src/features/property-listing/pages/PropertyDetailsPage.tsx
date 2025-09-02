@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaChevronLeft, FaPlay } from "react-icons/fa";
+import { FaChevronLeft } from "react-icons/fa";
 import type { PropertyDetailPageData } from "../types";
 import ImageGallery, {
    type GalleryCategory,
@@ -8,10 +8,8 @@ import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottom
 import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
-import { ImageCarousel, UnitCard } from "@/components";
-import double_tick from "@/assets/double_tick.svg";
+import { ImageCarousel, UnitCard, VideoPlayer, VideoModal } from "@/components";
 import single_tick from "@/assets/single_tick.svg";
-import { FiChevronRight } from "react-icons/fi";
 import { useNavigate } from "react-router";
 
 interface PropertyDetailsPageProps {
@@ -25,27 +23,31 @@ export default function PropertyDetailsPage({
    onBookVisit,
    onAskQuestion,
 }: PropertyDetailsPageProps) {
+   
    const [isGalleryOpen, setIsGalleryOpen] = useState(false);
    const [isHighlightsSheetOpen, setIsHighlightsSheetOpen] = useState(false);
    const [isIncludedServicesSheetOpen, setIsIncludedServicesSheetOpen] = useState(false);
    const [isAddOnServicesSheetOpen, setIsAddOnServicesSheetOpen] = useState(false);
-   const [isLocationCommuteSheetOpen, setIsLocationCommuteSheetOpen] = useState(false);
    const [isPoliciesRulesSheetOpen, setIsPoliciesRulesSheetOpen] = useState(false);
    const [isMarketingDescriptionSheetOpen, setIsMarketingDescriptionSheetOpen] = useState(false);
+   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title?: string } | null>(null);
    const navigate = useNavigate();
+
+   console.log({propertyData})
+
    // Convert property data to gallery categories format
    const galleryCategories: GalleryCategory[] = [
       // Group photos by category if they have categories, otherwise show all photos
       ...(() => {
-         const photoCategories = propertyData.photos.reduce((acc, photo) => {
-            const category = photo.category || "General";
+         const photoCategories = (propertyData?.photos || []).reduce((acc, photo) => {
+            const category = photo?.category || "General";
             if (!acc[category]) {
                acc[category] = [];
             }
             acc[category].push({
-               id: `photo-${photo.id}`,
-               src: photo.url,
-               alt: photo.category,
+               id: `photo-${photo?.id || 'unknown'}`,
+               src: photo?.url || '',
+               alt: photo?.category || 'photo',
                category: category.toLowerCase().replace(" ", "-"),
             });
             return acc;
@@ -55,8 +57,8 @@ export default function PropertyDetailsPage({
             ([categoryName, images]) => ({
                id: categoryName.toLowerCase().replace(" ", "-"),
                name: categoryName,
-               count: images.length,
-               images,
+               count: images?.length || 0,
+               images: images || [],
             })
          );
       })(),
@@ -64,12 +66,14 @@ export default function PropertyDetailsPage({
       {
          id: "videos",
          name: "Videos",
-         count: propertyData.videos.length,
-         images: propertyData.videos.map((video, index) => ({
+         count: propertyData?.videos?.length || 0,
+         images: (propertyData?.videos || []).map((video, index) => ({
             id: `video-${index}`,
-            src: video.thumbnail,
-            alt: video.title,
+            src: video?.url || '',
+            alt: video?.title || 'video',
             category: "videos",
+            isVideo: true,
+            thumbnail: video?.thumbnail || video?.url || '',
          })),
       },
    ];
@@ -80,10 +84,6 @@ export default function PropertyDetailsPage({
 
    const handleCloseGallery = () => {
       setIsGalleryOpen(false);
-   };
-
-   const handleViewAllHighlights = () => {
-      setIsHighlightsSheetOpen(true);
    };
 
    const handleCloseHighlightsSheet = () => {
@@ -126,6 +126,14 @@ export default function PropertyDetailsPage({
       setIsMarketingDescriptionSheetOpen(false);
    };
 
+   const handleVideoClick = (video: { src: string; title?: string }) => {
+      setSelectedVideo(video);
+   };
+
+   const handleCloseVideoModal = () => {
+      setSelectedVideo(null);
+   };
+
    return (
       <div className="min-h-screen w-screen bg-gray-50">
          {/* Header */}
@@ -155,7 +163,7 @@ export default function PropertyDetailsPage({
 
                   <div onClick={handleViewAllPhotos}>
                      <ImageCarousel
-                        images={propertyData.heroImages}
+                        images={propertyData?.heroImages || []}
                         showNavigation={false}
                         autoPlay={true}
                         className="h-56"
@@ -169,10 +177,10 @@ export default function PropertyDetailsPage({
                         <div className="space-y-3">
                            <div className="space-y-3">
                               <h2 className="text-base lg:text-xl font-semibold text-gray-900">
-                                 {propertyData.title}
+                                 {propertyData?.title || 'Property'}
                               </h2>
                               <div className="flex gap-2 flex-wrap">
-                                 {propertyData.tags.map((tag) => (
+                                 {(propertyData?.tags || []).map((tag) => (
                                     <span
                                        key={tag}
                                        className="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg"
@@ -190,7 +198,7 @@ export default function PropertyDetailsPage({
                                  <div className="flex items-baseline gap-2">
                                     <span className="text-lg lg:text-2xl font-semibold text-blue-600">
                                        ₹
-                                       {propertyData.pricing.currentPrice.toLocaleString()}
+                                       {(propertyData?.pricing?.currentPrice || 0).toLocaleString()}
                                     </span>
                                     <span className="text-xs text-gray-500">
                                        monthly
@@ -202,21 +210,21 @@ export default function PropertyDetailsPage({
                                     Deposit
                                  </p>
                                  <span className="text-lg lg:text-2xl font-semibold text-blue-600">
-                                    ₹{propertyData.deposit.toLocaleString()}
+                                    ₹{(propertyData?.deposit || 0).toLocaleString()}
                                  </span>
                               </div>
                            </div>
 
                            {/* Savings */}
-                           {propertyData.pricing.originalPrice && (
+                           {propertyData?.pricing?.originalPrice && (
                               <div className="flex items-center gap-2">
                                  <span className="text-xs text-gray-400 line-through">
                                     ₹
-                                    {propertyData.pricing.originalPrice.toLocaleString()}
+                                    {(propertyData.pricing.originalPrice || 0).toLocaleString()}
                                  </span>
                                  <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg">
                                     Save ₹
-                                    {propertyData.pricing.savingsAmount?.toLocaleString()}
+                                    {(propertyData.pricing.savingsAmount || 0).toLocaleString()}
                                  </span>
                               </div>
                            )}
@@ -241,18 +249,18 @@ export default function PropertyDetailsPage({
                            {/* Horizontally scrollable units */}
                            <div className="overflow-x-auto scrollbar-hide">
                               <div className="flex gap-4 min-w-[340px]">
-                                 {propertyData.availableUnits.map((unit) => (
+                                 {(propertyData?.availableUnits || []).map((unit) => (
                                     <UnitCard
-                                       key={unit.id}
+                                       key={unit?.id || 'unknown'}
                                        unit={{
-                                          id: unit.id,
-                                          image: unit.image,
-                                          name: unit.name,
-                                          floor: unit.floor,
-                                          pricePerBed: unit.pricePerBed,
-                                          occupancy: unit.occupancy,
-                                          amenities: unit.amenities,
-                                          availableFrom: unit.availableFrom,
+                                          id: unit?.id || 'unknown',
+                                          image: unit?.image || '',
+                                          name: unit?.name || 'Unit',
+                                          floor: unit?.floor || 0,
+                                          pricePerBed: unit?.pricePerBed || 0,
+                                          occupancy: unit?.occupancy || '',
+                                          amenities: unit?.amenities || [],
+                                          availableFrom: unit?.availableFrom || '',
                                        }}
                                     />
                                  ))}
@@ -270,24 +278,16 @@ export default function PropertyDetailsPage({
                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {[
                            {
-                              label: "Weekly Rent/Rate",
-                              value: `₹${propertyData.rentalDetails.weeklyRate.min.toLocaleString()}-₹${propertyData.rentalDetails.weeklyRate.max.toLocaleString()}`,
-                           },
-                           {
-                              label: "Daily Rent/Rate",
-                              value: `₹${propertyData.rentalDetails.dailyRate.min}-₹${propertyData.rentalDetails.dailyRate.max}`,
-                           },
-                           {
                               label: "Lock-in Period",
-                              value: propertyData.rentalDetails.lockInPeriod,
+                              value: propertyData?.rentalDetails?.lockInPeriod || '',
                            },
                            {
                               label: "Stay Duration",
-                              value: propertyData.rentalDetails.stayDuration,
+                              value: propertyData?.rentalDetails?.stayDuration || '',
                            },
                            {
                               label: "Notice Period",
-                              value: propertyData.rentalDetails.noticePeriod,
+                              value: propertyData?.rentalDetails?.noticePeriod || '',
                            },
                         ].map((item) => (
                            <div
@@ -306,20 +306,20 @@ export default function PropertyDetailsPage({
                   </div>
 
                   {/* Description */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
+                  {/* <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
                      <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-3">
                         Description
                      </h3>
                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {propertyData.description}
+                        {propertyData?.description || 'No description available'}
                         <button className="text-blue-600 font-medium ml-2 hover:text-blue-700">
                            See more
                         </button>
                      </p>
-                  </div>
+                  </div> */}
 
                   {/* Option Highlights */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
+                  {/* <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
                      <div className="flex justify-between items-center mb-4">
                         <h3 className="text-sm lg:text-base font-semibold text-gray-900">
                            Highlights
@@ -329,7 +329,7 @@ export default function PropertyDetailsPage({
                         </button>
                      </div>
                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        {propertyData.highlights.map((highlight) => (
+                        {(propertyData?.highlights || []).map((highlight) => (
                            <div
                               key={highlight}
                               className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2"
@@ -345,7 +345,7 @@ export default function PropertyDetailsPage({
                            </div>
                         ))}
                      </div>
-                  </div>
+                  </div> */}
 
                   {/* Amenities & Features */}
                   <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
@@ -361,16 +361,16 @@ export default function PropertyDetailsPage({
                            </span>
                         </div>
                         <div className="grid grid-cols-3 lg:grid-cols-5 gap-3">
-                           {propertyData.furniture.map((item) => (
+                           {(propertyData?.furniture || []).map((item) => (
                               <div
-                                 key={item.id}
+                                 key={item?.id || 'unknown'}
                                  className="bg-white border border-gray-200 rounded-lg p-3 text-center hover:shadow-sm transition-shadow"
                               >
                                  <div className="w-7 h-7 bg-gray-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                                    <span className="text-sm">{item.icon}</span>
+                                    <span className="text-sm">{item?.icon || '📦'}</span>
                                  </div>
                                  <span className="text-xs text-gray-600">
-                                    {item.name}
+                                    {item?.name || 'Item'}
                                  </span>
                               </div>
                            ))}
@@ -385,16 +385,16 @@ export default function PropertyDetailsPage({
                            </span>
                         </div>
                         <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-                           {propertyData.appliances.map((item) => (
+                           {(propertyData?.appliances || []).map((item) => (
                               <div
-                                 key={item.id}
+                                 key={item?.id || 'unknown'}
                                  className="bg-white border border-gray-200 rounded-lg p-3 text-center hover:shadow-sm transition-shadow"
                               >
                                  <div className="w-7 h-7 bg-gray-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                                    <span className="text-sm">{item.icon}</span>
+                                    <span className="text-sm">{item?.icon || '📦'}</span>
                                  </div>
                                  <span className="text-xs text-gray-600">
-                                    {item.name}
+                                    {item?.name || 'Item'}
                                  </span>
                               </div>
                            ))}
@@ -403,19 +403,19 @@ export default function PropertyDetailsPage({
                   </div>
 
                   {/* Included Services */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
+                  {/* <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
                      <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-4">
                         Included Services
                      </h3>
                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                        {propertyData.includedServices.map((service) => (
+                        {(propertyData?.includedServices || []).map((service) => (
                            <div
-                              key={service.id}
+                              key={service?.id || 'unknown'}
                               className="flex items-center gap-3"
                            >
                               <img src={single_tick} alt="single_tick" className="w-6 h-6" />
                               <span className="text-xs text-gray-600">
-                                 {service.name}
+                                 {service?.name || 'Service'}
                               </span>
                            </div>
                         ))}
@@ -426,24 +426,24 @@ export default function PropertyDetailsPage({
                      >
                         View all details
                      </button>
-                  </div>
+                  </div> */}
 
                   {/* Add-On Services */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
+                  {/* <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
                      <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-4">
                         Add-On Services
                      </h3>
                      <div className="space-y-4">
-                        {propertyData.addOnServices.map((service) => (
+                        {(propertyData?.addOnServices || []).map((service) => (
                            <div
-                              key={service.id}
+                              key={service?.id || 'unknown'}
                               className="flex justify-between"
                            >
                               <span className="text-xs text-gray-500">
-                                 {service.name}
+                                 {service?.name || 'Service'}
                               </span>
                               <span className="text-xs font-semibold text-gray-900">
-                                 {service.price}
+                                 {service?.price || 'N/A'}
                               </span>
                            </div>
                         ))}
@@ -454,7 +454,7 @@ export default function PropertyDetailsPage({
                      >
                         View all details
                      </button>
-                  </div>
+                  </div> */}
 
                   {/* Location */}
                   <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
@@ -464,8 +464,8 @@ export default function PropertyDetailsPage({
                               Where you'll be
                            </h3>
                            <p className="text-xs text-gray-500">
-                              {propertyData.location.area},{" "}
-                              {propertyData.location.city}
+                              {propertyData?.location?.area || 'Area'},{" "}
+                              {propertyData?.location?.city || 'City'}
                            </p>
                         </div>
                         <button 
@@ -477,7 +477,7 @@ export default function PropertyDetailsPage({
                      </div>
                      <div className="h-42 lg:h-64 bg-gray-100 rounded-xl overflow-hidden">
                         <img
-                           src={propertyData.location.mapImage}
+                           src={propertyData?.location?.mapImage || ''}
                            alt="Location map"
                            className="w-full h-full object-cover"
                         />
@@ -502,21 +502,21 @@ export default function PropertyDetailsPage({
                      <div className="mb-4">
                         <p className="text-xs text-gray-500 mb-3">Photos</p>
                         <div className="grid grid-cols-4 lg:grid-cols-6 gap-3">
-                           {propertyData.photos.map((photo) => (
+                           {(propertyData?.photos?.slice(0, 6) || []).map((photo) => (
                               <div
-                                 key={photo.id}
+                                 key={photo?.id || 'unknown'}
                                  className="aspect-square bg-gray-100 rounded-lg overflow-hidden"
                               >
                                  <img
-                                    src={photo.url}
-                                    alt={photo.category}
+                                    src={photo?.url || ''}
+                                    alt={photo?.category || 'photo'}
                                     className="w-full h-full object-cover"
                                  />
                               </div>
                            ))}
                            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
                               <span className="text-xs font-medium text-gray-500">
-                                 +2
+                                 +{(propertyData?.photos?.length) - 6}
                               </span>
                            </div>
                         </div>
@@ -526,21 +526,19 @@ export default function PropertyDetailsPage({
                      <div>
                         <p className="text-xs text-gray-500 mb-3">Videos</p>
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                           {propertyData.videos.map((video) => (
+                           {(propertyData?.videos || []).map((video) => (
                               <div
-                                 key={video.id}
-                                 className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden"
+                                 key={video?.id || 'unknown'}
+                                 className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+                                 onClick={() => handleVideoClick({ src: video?.url || '', title: video?.title })}
                               >
-                                 <img
-                                    src={video.thumbnail}
-                                    alt={video.title}
-                                    className="w-full h-full object-cover"
+                                 <VideoPlayer
+                                    src={video?.url || ''}
+                                    thumbnail={video?.thumbnail || ''}
+                                    title={video?.title || 'Video'}
+                                    className="w-full h-full"
+                                    showControls={false}
                                  />
-                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
-                                       <FaPlay className="w-4 h-4 text-gray-600" />
-                                    </div>
-                                 </div>
                               </div>
                            ))}
                         </div>
@@ -553,13 +551,13 @@ export default function PropertyDetailsPage({
                         Policies and Rules
                      </h3>
                      <div className="space-y-2">
-                        {propertyData.policies.map((policy, index) => (
-                           <div key={policy.id} className="flex gap-2">
+                        {(propertyData?.policies || []).map((policy, index) => (
+                           <div key={policy?.id || index} className="flex gap-2">
                               <span className="text-xs font-medium text-gray-900">
                                  {index + 1}.
                               </span>
                               <span className="text-xs text-gray-600">
-                                 {policy.rule}
+                                 {policy?.rule || 'No rule specified'}
                               </span>
                            </div>
                         ))}
@@ -582,7 +580,7 @@ export default function PropertyDetailsPage({
                            Room Type
                         </p>
                         <p className="text-xs text-gray-600 leading-relaxed">
-                           {propertyData.marketingDescription}
+                           {propertyData?.marketingDescription || 'No marketing description available'}
                            <button 
                               onClick={handleOpenMarketingDescriptionSheet}
                               className="text-blue-600 font-bold underline ml-2 hover:text-blue-700"
@@ -628,7 +626,7 @@ export default function PropertyDetailsPage({
                               </span>
                               <span className="text-xs font-semibold text-gray-900">
                                  ₹
-                                 {propertyData.pricing.currentPrice.toLocaleString()}
+                                 {(propertyData?.pricing?.currentPrice || 0).toLocaleString()}
                               </span>
                            </div>
                            <div className="flex justify-between">
@@ -636,7 +634,7 @@ export default function PropertyDetailsPage({
                                  Deposit
                               </span>
                               <span className="text-xs font-semibold text-gray-900">
-                                 ₹{propertyData.deposit.toLocaleString()}
+                                 ₹{(propertyData?.deposit || 0).toLocaleString()}
                               </span>
                            </div>
                            <div className="flex justify-between">
@@ -644,7 +642,7 @@ export default function PropertyDetailsPage({
                                  Available Units
                               </span>
                               <span className="text-xs font-semibold text-gray-900">
-                                 {propertyData.availableUnits.length}
+                                 {propertyData?.availableUnits?.length || 0}
                               </span>
                            </div>
                         </div>
@@ -711,7 +709,7 @@ export default function PropertyDetailsPage({
          <HighlightsBottomSheet
             isOpen={isHighlightsSheetOpen}
             onClose={handleCloseHighlightsSheet}
-            highlights={propertyData.highlights.map((highlight, index) => ({
+            highlights={(propertyData?.highlights || []).map((highlight, index) => ({
                id: `highlight-${index}`,
                name: highlight,
             }))}
@@ -721,14 +719,14 @@ export default function PropertyDetailsPage({
          <IncludedServicesBottomSheet
             isOpen={isIncludedServicesSheetOpen}
             onClose={handleCloseIncludedServicesSheet}
-            services={propertyData.includedServices}
+            services={propertyData?.includedServices || []}
          />
 
          {/* Add-On Services Bottom Sheet */}
          <AddOnServicesBottomSheet
             isOpen={isAddOnServicesSheetOpen}
             onClose={handleCloseAddOnServicesSheet}
-            services={propertyData.addOnServices}
+            services={propertyData?.addOnServices || []}
          />
 
          {/* Location & Commute Bottom Sheet */}
@@ -749,6 +747,16 @@ export default function PropertyDetailsPage({
             isOpen={isMarketingDescriptionSheetOpen}
             onClose={handleCloseMarketingDescriptionSheet}
          />
+
+         {/* Video Modal */}
+         {selectedVideo && (
+            <VideoModal
+               isOpen={!!selectedVideo}
+               onClose={handleCloseVideoModal}
+               src={selectedVideo.src}
+               title={selectedVideo.title}
+            />
+         )}
       </div>
    );
 }
