@@ -747,6 +747,7 @@ export default function PropertyDetailsPage({
          <PoliciesAndRulesBottomSheet
             isOpen={isPoliciesRulesSheetOpen}
             onClose={handleClosePoliciesRulesSheet}
+            policies={propertyData?.policies || []}
          />
 
          {/* Marketing Description Bottom Sheet */}

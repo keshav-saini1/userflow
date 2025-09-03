@@ -216,7 +216,12 @@ export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
     policies: api?.policiesAndRules
       ? Object.entries(api.policiesAndRules).reduce((acc: { id: string; rule: string }[], [key, value]) => {
           if (value != null && value !== "") {
-            acc.push({ id: String(key), rule: `${key}: ${value}` });
+            // Convert camelCase to normal readable format
+            const readableKey = key
+              .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+              .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+              .trim();
+            acc.push({ id: String(key), rule: `${readableKey}: ${value}` });
           }
           return acc;
         }, [])
