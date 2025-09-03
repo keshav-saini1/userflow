@@ -20,6 +20,7 @@ interface PropertyCardProps {
 export const PropertyCard: React.FC<PropertyCardProps> = ({
    property,
    onReserve,
+   onBookVisit,
    onPropertyClick,
    onRemoveFromWishlist,
    isLongCardView = false,
@@ -44,8 +45,12 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    };
 
    const handleBookVisitClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      navigate("/book-visit");
+      e.stopPropagation(); // Always prevent event propagation
+      if (onBookVisit) {
+         onBookVisit(property.id);
+      } else {
+         navigate("/book-visit");
+      }
    };
 
 
@@ -57,9 +62,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
          <div className="flex flex-col-reverse pb-6">
             {/* Property Image */}
             <div
-               className={`relative ${
-                  isLongCardView ? "h-[296px]" : "h-[196px]"
-               } lg:h-[220px] overflow-hidden order-3`}
+               className={`relative ${isLongCardView ? "h-[296px]" : "h-[196px]"
+                  } lg:h-[220px] overflow-hidden order-3`}
             >
                <img
                   src={property.image}
@@ -185,7 +189,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            Included amenities:
                         </h4>
                         <div className="flex flex-col gap-[7px]">
-                           {property.amenities.slice(0,4).map((amenity) => (
+                           {property.amenities.slice(0, 4).map((amenity) => (
                               <div
                                  key={amenity.id}
                                  className="flex items-center gap-[10.5px]"

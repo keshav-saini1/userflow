@@ -1,51 +1,90 @@
 import React, { useState } from "react";
-import { PropertyCard } from "../components";
 import { useNavigate } from "react-router";
-import { samplePropertyListing } from "../data/sampleData";
+import { usePropertyDetails, useAvailableUnits } from "../store/propertyStore";
+import { PropertyCard } from "../components";
+import type { PropertyDetails } from "../types";
 import default_back from "@/assets/default_back.svg";
-import filter from "@/assets/property/filter.svg";
-import menu from "@/assets/property/menu.svg";
 
 const RentalOptionsPage: React.FC = () => {
    const navigate = useNavigate();
    const [searchQuery, setSearchQuery] = useState("");
    const [selectedFilter, setSelectedFilter] = useState<string>("all");
    
-   // Using sample data for rental options
-   const allProperties = samplePropertyListing.properties || [];
+   // Get data from Zustand store
+   const propertyDetails = usePropertyDetails();
+   const allUnits = useAvailableUnits();
+
+   // Transform units to PropertyDetails format for PropertyCard
+   const transformUnitToProperty = (unit: any): PropertyDetails => ({
+      id: unit.id,
+      name: unit.name,
+      type: unit.occupancy.toLowerCase().includes('single') ? 'single' : 
+            unit.occupancy.toLowerCase().includes('double') ? 'double' : 'shared',
+      occupancy: unit.occupancy,
+      pricing: {
+         currentPrice: unit.pricePerBed,
+         period: "per bed"
+      },
+      amenities: unit.amenities || [],
+      image: unit.image,
+      status: unit.availableFrom ? 'available' : 'booked',
+      availableFrom: unit.availableFrom
+   });
+
+   const transformedProperties = allUnits.map(transformUnitToProperty);
+
+   // Show loading state if no data available
+   if (!propertyDetails || allUnits.length === 0) {
+      return (
+         <div className="min-h-screen bg-gray-50 w-screen flex items-center justify-center">
+            <div className="text-center">
+               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+               </div>
+               <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading rental options...</h3>
+               <p className="text-gray-500">Please wait while we fetch the available units</p>
+            </div>
+         </div>
+      );
+   }
    
-   // Filter properties based on search and selected filter
-   const filteredProperties = allProperties.filter((property) => {
+   // Filter transformed properties based on search and selected filter
+   const filteredProperties = transformedProperties.filter((property) => {
       const matchesSearch = property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           property.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           property.occupancy.toLowerCase().includes(searchQuery.toLowerCase());
+                           property.occupancy.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           property.amenities.some(amenity => amenity.name.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesFilter = selectedFilter === "all" || 
                            property.type === selectedFilter ||
-                           property.status === selectedFilter;
+                           property.occupancy.toLowerCase().includes(selectedFilter.toLowerCase()) ||
+                           (selectedFilter === "available" && property.status === 'available');
       
       return matchesSearch && matchesFilter;
    });
 
-   const onPropertyClick = (propertyId: string) => {
-      navigate(`/property-details/${propertyId}`);
+   console.log({filteredProperties})
+
+   const onUnitClick = (unitId: string) => {
+      // Navigate to room details page
+      navigate(`/room-details/${unitId}`);
    };
    
-   const onReserve = (propertyId: string) => {
-      navigate(`/reservation/${propertyId}`);
+   const onReserve = (unitId: string) => {
+      navigate(`/reservation/${unitId}`);
    };
    
-   const onBookVisit = (propertyId: string) => {
-      navigate(`/book-visit/${propertyId}`);
+   const onBookVisit = (unitId: string) => {
+      navigate(`/book-visit/${unitId}`);
    };
 
    const filterOptions = [
-      { value: "all", label: "All Options" },
-      { value: "available", label: "Available" },
-      { value: "deluxe", label: "Deluxe" },
-      { value: "shared", label: "Shared" },
-      { value: "suite", label: "Suite" },
-      { value: "budget", label: "Budget" },
+      { value: "all", label: "All Units" },
+      { value: "single", label: "Single Occupancy" },
+      { value: "double", label: "Double Sharing" },
+      { value: "triple", label: "Triple Sharing" },
+      { value: "available", label: "Available Now" },
    ];
 
    return (
@@ -66,7 +105,7 @@ const RentalOptionsPage: React.FC = () => {
                         Available Rental Options
                      </h1>
                      <p className="text-sm text-gray-600">
-                        {filteredProperties.length} options available
+                        {filteredProperties.length} units available
                      </p>
                   </div>
                </div>
@@ -94,12 +133,12 @@ const RentalOptionsPage: React.FC = () => {
                      </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                     No rental options found
+                     No units found
                   </h3>
                   <p className="text-gray-500 text-center">
                      {searchQuery
                         ? "Try adjusting your search terms or filters"
-                        : "No properties match your current filters"}
+                        : "No units match your current filters"}
                   </p>
                </div>
             ) : (
@@ -107,18 +146,18 @@ const RentalOptionsPage: React.FC = () => {
                   {/* Results Summary */}
                   <div className="mb-4">
                      <p className="text-sm text-gray-600">
-                        Showing {filteredProperties.length} of {allProperties.length} rental options
+                        Showing {filteredProperties.length} of {transformedProperties.length} available units
                         {selectedFilter !== "all" && ` • Filtered by: ${filterOptions.find(f => f.value === selectedFilter)?.label}`}
                      </p>
                   </div>
 
-                  {/* Property Grid */}
+                  {/* Property Cards Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {filteredProperties.map((property) => (
                         <PropertyCard
                            key={property.id}
                            property={property}
-                           onPropertyClick={onPropertyClick}
+                           onPropertyClick={onUnitClick}
                            onReserve={onReserve}
                            onBookVisit={onBookVisit}
                            isLongCardView={true}

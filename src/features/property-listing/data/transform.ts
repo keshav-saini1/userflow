@@ -83,7 +83,9 @@ export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
   const availableUnits = (api?.rooms ?? []).map((room: any) => {
     const floorNum = Number.parseInt(String(room?.name).match(/(\d+)/)?.[0] || "0", 10) || 0;
     
-    // Process room images
+    // Process room images for this specific room
+    const roomImages: { id: string; category: string; url: string }[] = [];
+    
     if (Array.isArray(room?.images)) {
       room.images.forEach((img: any, index: number) => {
         if (img?.url) {
@@ -96,11 +98,14 @@ export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
               url: img.url,
             });
           } else {
-            allRoomImages.push({
+            // Add to both room-specific and global arrays
+            const roomImage = {
               id: `photo-${room.id}-${index}`,
               category: img?.category || 'room',
               url: img.url,
-            });
+            };
+            roomImages.push(roomImage);
+            allRoomImages.push(roomImage);
           }
         }
       });
@@ -115,6 +120,7 @@ export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
       amenities: [],
       availableFrom: room?.availableFrom || "",
       image: room?.images?.[0]?.url || fallbackImage,
+      images: roomImages, // Add room-specific images array
     };
   });
 

@@ -22,6 +22,7 @@ import {
    MyBookingsPage,
    ReviewBookingPage,
    RentalOptionsPage,
+   RoomDetailsPage,
 } from "../features/property-listing/pages";
 import {
    AddDocumentsPage,
@@ -82,6 +83,14 @@ export const router = createBrowserRouter([
       ),
    },
    {
+      path: "/room-details/:roomId",
+      element: (
+         <ProtectedRoute>
+            <RoomDetailsPage />
+         </ProtectedRoute>
+      ),
+   },
+   {
       path: "/location-commute",
       element: (
          <ProtectedRoute>
@@ -99,6 +108,14 @@ export const router = createBrowserRouter([
    },
    {
       path: "/book-visit",
+      element: (
+         <ProtectedRoute>
+            <BookVisitWrapper />
+         </ProtectedRoute>
+      ),
+   },
+   {
+      path: "/book-visit/:room_id",
       element: (
          <ProtectedRoute>
             <BookVisitWrapper />

@@ -63,6 +63,7 @@ export interface PropertyUnit {
   }[];
   availableFrom: string;
   image: string;
+  images?: PropertyPhoto[]; // Array of room images with category and url
 }
 
 export interface RentalDetails {
