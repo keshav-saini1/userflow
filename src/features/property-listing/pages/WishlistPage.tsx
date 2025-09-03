@@ -106,7 +106,7 @@ const WishlistPage: React.FC = () => {
                         onReserve={onReserve}
                         onBookVisit={onBookVisit}
                         onRemoveFromWishlist={onRemoveFromWishlist}
-                        isWishlistView={true}
+                        isLongCardView={true}
                      />
                   ))}
                </div>

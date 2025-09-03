@@ -21,6 +21,7 @@ import {
    WishlistPage,
    MyBookingsPage,
    ReviewBookingPage,
+   RentalOptionsPage,
 } from "../features/property-listing/pages";
 import {
    AddDocumentsPage,
@@ -69,6 +70,14 @@ export const router = createBrowserRouter([
       element: (
          <ProtectedRoute>
             <PropertyDetailsWrapper />
+         </ProtectedRoute>
+      ),
+   },
+   {
+      path: "/property-details/:sharing_type/rental-options",
+      element: (
+         <ProtectedRoute>
+            <RentalOptionsPage />
          </ProtectedRoute>
       ),
    },

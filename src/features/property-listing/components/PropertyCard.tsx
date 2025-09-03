@@ -14,7 +14,7 @@ interface PropertyCardProps {
    onBookVisit?: (propertyId: string) => void;
    onPropertyClick?: (propertyId: string) => void;
    onRemoveFromWishlist?: (propertyId: string) => void;
-   isWishlistView?: boolean;
+   isLongCardView?: boolean;
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -22,7 +22,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    onReserve,
    onPropertyClick,
    onRemoveFromWishlist,
-   isWishlistView = false,
+   isLongCardView = false,
 }) => {
    const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             {/* Property Image */}
             <div
                className={`relative ${
-                  isWishlistView ? "h-[296px]" : "h-[196px]"
+                  isLongCardView ? "h-[296px]" : "h-[196px]"
                } lg:h-[220px] overflow-hidden order-3`}
             >
                <img
@@ -89,7 +89,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                )}
 
                {/* Wishlist Remove Button */}
-               {isWishlistView && (
+               {isLongCardView && (
                   <div className="absolute top-3.5 right-3.5">
                      <button
                         onClick={(e) => {
@@ -153,14 +153,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            Entire Flat
                         </span>
                      </span>
-                     {!isWishlistView && (
+                     {!isLongCardView && (
                         <span className="text-[#6a7282] text-[12.3px] font-normal leading-[17.5px]">
                            {property.pricing.period}
                         </span>
                      )}
                   </div>
 
-                  {/* {property.pricing.originalPrice && !isWishlistView && (
+                  {/* {property.pricing.originalPrice && !isLongCardView && (
                      <div className="flex items-center gap-[7px]">
                         <span className="text-[#99a1af] text-[17.3px] font-normal leading-[17.5px] line-through">
                            {formatPrice(property.pricing.originalPrice)}
@@ -177,7 +177,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                   )} */}
                </div>
 
-               {!isWishlistView && (
+               {!isLongCardView && (
                   <>
                      {/* Amenities */}
                      <div className="flex flex-col gap-[10.5px] pb-[10.5px]">

@@ -95,7 +95,13 @@ const Calendar: React.FC<CalendarProps> = ({
   className = '',
   disabled = false,
 }) => {
-  const [currentDisplayDate, setCurrentDisplayDate] = useState(displayDate);
+  // Initialize with current month
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  };
+  
+  const [currentDisplayDate, setCurrentDisplayDate] = useState(getCurrentMonth());
   const [tempRangeStart, setTempRangeStart] = useState<Date | null>(null);
 
   // Update display date when prop changes or when selected date changes
@@ -107,8 +113,8 @@ const Calendar: React.FC<CalendarProps> = ({
       // If there's a selected start date, show its month
       setCurrentDisplayDate(new Date(selectedDateRange.startDate.getFullYear(), selectedDateRange.startDate.getMonth(), 1));
     } else {
-      // Otherwise use the provided display date
-      setCurrentDisplayDate(displayDate);
+      // Always default to current month if no selection
+      setCurrentDisplayDate(getCurrentMonth());
     }
   }, [displayDate, selectedDate, selectedDateRange, selectionMode]);
 

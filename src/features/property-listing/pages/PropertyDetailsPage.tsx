@@ -9,7 +9,7 @@ import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
 import { ImageCarousel, UnitCard, VideoPlayer, VideoModal } from "@/components";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 interface PropertyDetailsPageProps {
    propertyData: PropertyDetailPageData;
@@ -32,7 +32,8 @@ export default function PropertyDetailsPage({
    const [selectedVideo, setSelectedVideo] = useState<{ src: string; title?: string } | null>(null);
    const navigate = useNavigate();
 
-   console.log({propertyData})
+   const params = useParams();
+   console.log({params})
 
    // Convert property data to gallery categories format
    const galleryCategories: GalleryCategory[] = [
@@ -132,6 +133,11 @@ export default function PropertyDetailsPage({
    const handleCloseVideoModal = () => {
       setSelectedVideo(null);
    };
+
+   const handleRedirectToRentalUnits = () => {
+      const sharing_type = params?.sharing_type;
+      navigate(`/property-details/${sharing_type}/rental-options`);
+   }
 
    return (
       <div className="min-h-screen w-screen bg-gray-50">
@@ -240,7 +246,7 @@ export default function PropertyDetailsPage({
                                     Choose your perfect space
                                  </p>
                               </div>
-                              <button className="text-xs text-blue-600 underline hover:text-blue-700">
+                              <button className="text-xs text-blue-600 underline hover:text-blue-700" onClick={handleRedirectToRentalUnits}>
                                  View all
                               </button>
                            </div>
