@@ -26,6 +26,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
       selectedTime: null,
    });
    const params = useParams();
+   console.log({ params })
 
    const propertyId = localStorage.getItem('selectedPropertyId');
    const { createVisit, createVisitData, createVisitError } = useBookVisitApi();
@@ -61,14 +62,15 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
       formData.visitType && formData.selectedDate && formData.selectedTime;
 
    const handleSubmit = () => {
-      if (isFormComplete) {
-         console.log("Form submitted:", formData);
+      if (isFormComplete && propertyId) {
+         const roomId = params?.room_id;
          const body = {
-            visit_type: formData.visitType || "",
-            visit_date: formData.selectedDate?.toISOString() || "",
-            visit_time: formData.selectedTime || "",
-            property_id: propertyId || "",
-         }
+            visit_type: formData.visitType!,
+            visit_date: formData.selectedDate!.toISOString(),
+            visit_time: formData.selectedTime!,
+            property_id: propertyId,
+            ...(roomId && { room_id: roomId }),
+         };
 
          createVisit(body);
       }
@@ -76,23 +78,23 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
 
    useEffect(() => {
       if (createVisitData) {
-          // Prepare booking details for success page
-          const visitDate = createVisitData?.data?.visit_date;
-          const bookingDate = visitDate ? new Date(visitDate) : null;
-          const bookingDetails = {
+         // Prepare booking details for success page
+         const visitDate = createVisitData?.data?.visit_date;
+         const bookingDate = visitDate ? new Date(visitDate) : null;
+         const bookingDetails = {
             property: "Nirvana Rooms",
             visitType:
                createVisitData?.data?.visit_type === "live-video-tour"
                   ? "Live Video Tour"
                   : createVisitData?.data?.visit_type === "visit-property"
-                  ? "Visit Property"
-                  : "Phone Call",
+                     ? "Visit Property"
+                     : "Phone Call",
             date: bookingDate ? bookingDate.toLocaleDateString("en-US", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                 })
+               weekday: "long",
+               year: "numeric",
+               month: "long",
+               day: "numeric",
+            })
                : "",
             time: createVisitData?.data?.visit_time || "",
          };
@@ -106,7 +108,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
 
    useEffect(() => {
       if (createVisitError) {
-         console.log({createVisitError})
+         console.log({ createVisitError })
          toast.error(createVisitError?.response?.data?.message || "Error creating visit please try again");
       }
    }, [createVisitError]);
@@ -143,11 +145,10 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess }) => {
             <button
                onClick={handleSubmit}
                disabled={!isFormComplete}
-               className={`w-full py-3 sm:py-3.5 px-0 rounded-[14px] text-sm sm:text-[14px] font-semibold leading-tight sm:leading-[21px] transition-all duration-200 ${
-                  isFormComplete
+               className={`w-full py-3 sm:py-3.5 px-0 rounded-[14px] text-sm sm:text-[14px] font-semibold leading-tight sm:leading-[21px] transition-all duration-200 ${isFormComplete
                      ? "bg-[#101828] text-white hover:bg-[#1a1f2e]"
                      : "bg-gray-200 text-[#6a7282] cursor-not-allowed"
-               }`}
+                  }`}
             >
                {isFormComplete ? "Continue" : "Select time to continue"}
             </button>
