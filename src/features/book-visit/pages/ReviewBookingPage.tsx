@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router";
-import { bookingData } from "../data/bookingData";
+import { useBookVisitApi, type Visit } from "@/features/book-visit/api/useBookVisitApi";
+import { CancelVisitBottomSheet } from "@/features/book-visit/components";
 import { CiCalendar } from "react-icons/ci";
 import { FiPhone, FiShare } from "react-icons/fi";
 import { MdOutlineMap, MdOutlinePeopleAlt } from "react-icons/md";
@@ -14,22 +15,146 @@ import whatsapp from "@/assets/propertyvisit/whatsapp.svg";
 import chat_blue from "@/assets/propertyvisit/chat_blue.svg";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
+interface Booking {
+   id: string;
+   propertyName: string;
+   location: string;
+   status: 'active' | 'completed' | 'upcoming' | 'cancelled';
+   bookingType: 'visit' | 'live-tour' | 'call' | 'reservation';
+   scheduledDate: string;
+   scheduledTime: string;
+   bookingId?: string;
+   image: string;
+}
+
 const ReviewBookingPage: React.FC = () => {
    const navigate = useNavigate();
    const { bookingId } = useParams<{ bookingId: string }>();
+   const [booking, setBooking] = useState<Booking | null>(null);
+   const [isLoading, setIsLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
+   const [showCancelBottomSheet, setShowCancelBottomSheet] = useState(false);
 
-   // Find the booking data based on the bookingId
-   const booking = bookingData.find((b) => b.id === bookingId);
+   // API hook
+   const { listVisits, isLoadingVisits, listVisitsError, listVisitsData } = useBookVisitApi();
 
-   if (!booking) {
+   // Transform API Visit to Booking format
+   const transformVisitToBooking = (visit: Visit): Booking => {
+      const getBookingType = (visitType: string): Booking['bookingType'] => {
+         switch (visitType.toLowerCase()) {
+            case 'visit-property':
+            case 'property-visit':
+               return 'visit';
+            case 'live-video-tour':
+            case 'video-tour':
+               return 'live-tour';
+            case 'phone-call':
+            case 'call':
+               return 'call';
+            default:
+               return 'visit';
+         }
+      };
+
+      const getStatus = (apiStatus: string): Booking['status'] => {
+         switch (apiStatus.toLowerCase()) {
+            case 'scheduled':
+            case 'confirmed':
+               return 'upcoming';
+            case 'in-progress':
+            case 'active':
+               return 'active';
+            case 'completed':
+            case 'finished':
+               return 'completed';
+            case 'cancelled':
+               return 'cancelled';
+            default:
+               return 'upcoming';
+         }
+      };
+
+      const formatDate = (dateString: string): string => {
+         try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+               month: 'short',
+               day: 'numeric',
+               year: 'numeric'
+            });
+         } catch {
+            return dateString;
+         }
+      };
+
+      const formatTime = (timeString: string): string => {
+         try {
+            const time = new Date(`2000-01-01T${timeString}`);
+            const formatted = time.toLocaleTimeString('en-US', {
+               hour: 'numeric',
+               minute: '2-digit',
+               hour12: true
+            });
+            return `${formatted} - ${time.getHours() + 1}:${time.getMinutes().toString().padStart(2, '0')} ${time.getHours() + 1 >= 12 ? 'PM' : 'AM'}`;
+         } catch {
+            return timeString;
+         }
+      };
+
+      return {
+         id: visit.id,
+         propertyName: visit.propertyName || 'Property Name',
+         location: visit.propertyAddress || 'Location',
+         status: getStatus(visit.status),
+         bookingType: getBookingType(visit.visit_type),
+         scheduledDate: formatDate(visit.visit_date),
+         scheduledTime: visit.visit_time,
+         image: visit.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
+      };
+   };
+
+   // Fetch visits and find the specific booking
+   useEffect(() => {
+      listVisits();
+   }, [listVisits]);
+
+   useEffect(() => {
+      if (listVisitsData?.status === 200 && listVisitsData?.data) {
+         const visits = listVisitsData?.data;
+         const foundVisit = visits.find((visit: Visit) => visit.id === bookingId);
+         
+         if (foundVisit) {
+            setBooking(transformVisitToBooking(foundVisit));
+         } else {
+            setError('Booking not found');
+         }
+         setIsLoading(false);
+      } else if (listVisitsError) {
+         setError('Failed to load booking data');
+         setIsLoading(false);
+      }
+   }, [listVisitsData, listVisitsError, bookingId]);
+
+   // if (isLoading || isLoadingVisits) {
+   //    return (
+   //       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   //          <div className="text-center">
+   //             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+   //             <p className="text-gray-600">Loading booking details...</p>
+   //          </div>
+   //       </div>
+   //    );
+   // }
+
+   if (error || !booking) {
       return (
          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Booking not found
+                  {error || 'Booking not found'}
                </h2>
                <p className="text-gray-600 mb-4">
-                  The booking you're looking for doesn't exist.
+                  {error === 'Failed to load booking data' ? 'Unable to load booking data. Please try again.' : "The booking you're looking for doesn't exist."}
                </p>
                <button
                   onClick={() => navigate(-1)}
@@ -104,7 +229,15 @@ const ReviewBookingPage: React.FC = () => {
    };
 
    const handleCancel = () => {
-      console.log("Cancel clicked");
+      setShowCancelBottomSheet(true);
+   };
+
+   const handleConfirmCancel = async (reason?: string) => {
+      console.log("Canceling visit with reason:", reason);
+      // TODO: Implement actual API call to cancel visit
+      // await cancelVisit(bookingId, reason);
+      
+      // For now, just navigate back
       navigate(-1);
    };
 
@@ -135,7 +268,7 @@ const ReviewBookingPage: React.FC = () => {
          </div>
 
          {/* Content */}
-         <div className="max-w-6xl mx-auto px-4 py-[21px] md:py-8">
+         <div className="max-w-6xl mx-auto px-4 py-[21px] md:py-8 pb-20">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-7">
                {/* Left Column - Main Content */}
                <div className="xl:col-span-2 space-y-7">
@@ -201,28 +334,38 @@ const ReviewBookingPage: React.FC = () => {
                      </div>
 
                      <div className="bg-[#fdfdfd] border-t border-gray-100 px-[21px] md:px-6 lg:px-8 py-[15px]">
-                        <div className="flex items-center justify-between gap-4">
-                           <button className="w-[34px] h-[34px] md:w-10 md:h-10 lg:w-12 lg:h-12 border border-gray-200 rounded-[12.75px] flex items-center justify-center bg-white">
-                              <FiShare className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-[#364153]" />
-                           </button>
-                           <button
-                              className="bg-[#155dfc] flex-1 text-white px-3.5 py-[8.75px] rounded-[12.75px] flex items-center justify-center gap-[7px] lg:gap-3 hover:bg-blue-600 transition-colors"
-                              onClick={
-                                 booking.bookingType === "visit"
-                                    ? handleGetDirections
-                                    : booking.bookingType === "live-tour"
-                                    ? handleJoinNow
-                                    : booking.bookingType === "call"
-                                    ? handleCall
-                                    : handleReserve
-                              }
-                           >
-                              <MdOutlineMap className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-                              <span className="text-[14px] md:text-base lg:text-lg font-medium">
-                                 {getActionButtonText(booking.bookingType)}
-                              </span>
-                           </button>
-                        </div>
+                        {booking.status === "cancelled" ? (
+                           <div className="flex items-center justify-center">
+                              <div className="bg-red-50 border border-red-200 rounded-[12.75px] px-4 py-3 flex items-center justify-center">
+                                 <span className="text-[14px] md:text-base lg:text-lg font-medium text-red-600">
+                                    Visit Cancelled
+                                 </span>
+                              </div>
+                           </div>
+                        ) : (
+                           <div className="flex items-center justify-between gap-4">
+                              <button className="w-[34px] h-[34px] md:w-10 md:h-10 lg:w-12 lg:h-12 border border-gray-200 rounded-[12.75px] flex items-center justify-center bg-white">
+                                 <FiShare className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-[#364153]" />
+                              </button>
+                              <button
+                                 className="bg-[#155dfc] flex-1 text-white px-3.5 py-[8.75px] rounded-[12.75px] flex items-center justify-center gap-[7px] lg:gap-3 hover:bg-blue-600 transition-colors"
+                                 onClick={
+                                    booking.bookingType === "visit"
+                                       ? handleGetDirections
+                                       : booking.bookingType === "live-tour"
+                                       ? handleJoinNow
+                                       : booking.bookingType === "call"
+                                       ? handleCall
+                                       : handleReserve
+                                 }
+                              >
+                                 <MdOutlineMap className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                                 <span className="text-[14px] md:text-base lg:text-lg font-medium">
+                                    {getActionButtonText(booking.bookingType)}
+                                 </span>
+                              </button>
+                           </div>
+                        )}
                      </div>
                   </div>
 
@@ -381,7 +524,14 @@ const ReviewBookingPage: React.FC = () => {
                      </div>
                   </div>
 
-                  {/* Cancel Button */}
+               </div>
+            </div>
+         </div>
+
+         {/* Fixed Cancel Button at Bottom - Only show if not cancelled */}
+         {booking.status !== "cancelled" && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50">
+               <div className="max-w-6xl mx-auto">
                   <button
                      className="w-full h-[42px] md:h-12 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] bg-white hover:bg-gray-50 transition-colors"
                      onClick={handleCancel}
@@ -393,7 +543,21 @@ const ReviewBookingPage: React.FC = () => {
                   </button>
                </div>
             </div>
-         </div>
+         )}
+
+         {/* Cancel Visit Bottom Sheet */}
+         <CancelVisitBottomSheet
+            isOpen={showCancelBottomSheet}
+            onClose={() => setShowCancelBottomSheet(false)}
+            onConfirmCancel={handleConfirmCancel}
+            visitId={bookingId || ""}
+            visitDetails={booking ? {
+               propertyName: booking.propertyName,
+               scheduledDate: booking.scheduledDate,
+               scheduledTime: booking.scheduledTime,
+               bookingType: booking.bookingType
+            } : undefined}
+         />
       </div>
    );
 };

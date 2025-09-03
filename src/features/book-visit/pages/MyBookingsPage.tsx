@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
    FaSearch,
    FaCalendar,
@@ -6,7 +6,8 @@ import {
 import { useNavigate } from "react-router";
 import default_back from "@/assets/default_back.svg";
 import { GoChevronDown } from "react-icons/go";
-import BookingCard, { type Booking } from "../components/BookingCard";
+import BookingCard, { type Booking } from "../../property-listing/components/BookingCard";
+import { useBookVisitApi, type Visit } from "../api/useBookVisitApi";
 
 const MyBookingsPage: React.FC = () => {
    const navigate = useNavigate();
@@ -14,54 +15,89 @@ const MyBookingsPage: React.FC = () => {
    const [filterType] = useState("all");
    const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
 
-   // Dummy data within the component
-   const dummyBookings: Booking[] = [
-      {
-         id: 'booking-1',
-         propertyName: 'Nirvana Rooms Cyber City',
-         location: 'Iffco Chowk, Gurgaon',
-         status: 'active',
-         bookingType: 'visit',
-         scheduledDate: 'Jan 15, 2025',
-         scheduledTime: '03:00 PM - 04:00 PM',
-         image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
-      },
-      {
-         id: 'booking-2',
-         propertyName: 'Nirvana Rooms Cyber City',
-         location: 'Iffco Chowk, Gurgaon',
-         status: 'active',
-         bookingType: 'live-tour',
-         scheduledDate: 'Jan 15, 2025',
-         scheduledTime: '03:00 PM - 04:00 PM',
-         image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
-      },
-      {
-         id: 'booking-3',
-         propertyName: 'Nirvana Rooms Cyber City',
-         location: 'Iffco Chowk, Gurgaon',
-         status: 'completed',
-         bookingType: 'reservation',
-         scheduledDate: 'Jan 15, 2025',
-         scheduledTime: '03:00 PM - 04:00 PM',
-         bookingId: 'NR2025001',
-         image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
-      },
-      {
-         id: 'booking-4',
-         propertyName: 'Nirvana Rooms Cyber City',
-         location: 'Iffco Chowk, Gurgaon',
-         status: 'upcoming',
-         bookingType: 'call',
-         scheduledDate: 'Jan 15, 2025',
-         scheduledTime: '03:00 PM - 04:00 PM',
-         image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
-      },
-   ];
+   // API hook
+   const { listVisits, isLoadingVisits, listVisitsError, listVisitsData } = useBookVisitApi();
 
-   // Filter bookings based on search query and filter type
-   React.useEffect(() => {
-      let filtered = dummyBookings;
+
+   // Transform API data to Booking format using dummy data structure as reference
+   const transformVisitToBooking = (visit: Visit): Booking => {
+      // Map visit_type to bookingType based on dummy data patterns
+      const getBookingType = (visitType: string): Booking['bookingType'] => {
+         switch (visitType.toLowerCase()) {
+            case 'visit-property':
+            case 'property-visit':
+               return 'visit';
+            case 'live-video-tour':
+            case 'video-tour':
+               return 'live-tour';
+            case 'phone-call':
+            case 'call':
+               return 'call';
+            default:
+               return 'visit';
+         }
+      };
+
+      // Map status to match dummy data status values
+      const getStatus = (apiStatus: string): Booking['status'] => {
+         switch (apiStatus.toLowerCase()) {
+            case 'scheduled':
+            case 'confirmed':
+            case 'in-progress':
+            case 'active':
+               return 'upcoming';
+            case 'completed':
+            case 'finished':
+               return 'completed';
+            case 'cancelled':
+               return 'cancelled';
+            default:
+               return 'upcoming';
+         }
+      };
+
+      // Format date and time based on dummy data format
+      const formatDate = (dateString: string): string => {
+         try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+               month: 'short',
+               day: 'numeric',
+               year: 'numeric'
+            });
+         } catch {
+            return dateString;
+         }
+      };
+
+      return {
+         id: visit.id,
+         propertyName: visit.propertyName || 'Property Name',
+         location: visit.propertyAddress || 'Location',
+         status: getStatus(visit.status),
+         bookingType: getBookingType(visit.visit_type),
+         scheduledDate: formatDate(visit.visit_date),
+         scheduledTime: visit.visit_time || 'Time TBD',
+         image: visit.image || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'
+      };
+   };
+
+   // Fetch bookings on component mount
+   useEffect(() => {
+      listVisits();
+   }, [listVisits]);
+
+   // Transform API data and filter bookings
+   useEffect(() => {
+      // Use API data exclusively
+      const bookingsToUse = (listVisitsData?.status == 200 && listVisitsData?.data) 
+         ? listVisitsData.data.map(transformVisitToBooking) 
+         : [];
+
+         console.log({listVisitsData})
+
+      // Apply filters
+      let filtered = bookingsToUse;
 
       // Filter by type
       if (filterType !== "all") {
@@ -84,7 +120,7 @@ const MyBookingsPage: React.FC = () => {
       }
 
       setFilteredBookings(filtered);
-   }, [searchQuery, filterType]);
+   }, [searchQuery, filterType, listVisitsData]);
 
    const handleCall = (bookingId: string) => {
       console.log("Call booking:", bookingId);
@@ -130,7 +166,7 @@ const MyBookingsPage: React.FC = () => {
                            My Bookings
                         </h1>
                         <p className="text-[12.3px] md:text-sm text-[#6a7282] ">
-                           {dummyBookings.length} bookings
+                           {filteredBookings.length} bookings
                         </p>
                      </div>
                   </div>
@@ -167,7 +203,40 @@ const MyBookingsPage: React.FC = () => {
 
          {/* Content */}
          <div className="max-w-5xl mx-auto px-4 py-4 md:py-6">
-            {filteredBookings.length === 0 ? (
+            {/* Loading State */}
+            {isLoadingVisits ? (
+               <div className="flex flex-col items-center justify-center py-16 md:py-20">
+                  <div className="w-16 h-16 md:w-18 md:h-18 bg-gray-100 rounded-full flex items-center justify-center mb-4 md:mb-5 animate-pulse">
+                     <FaCalendar className="w-8 h-8 md:w-9 md:h-9 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 md:mb-3">
+                     Loading bookings...
+                  </h3>
+                  <p className="text-gray-500 text-center md:text-base">
+                     Please wait while we fetch your bookings
+                  </p>
+               </div>
+            ) : /* Error State */
+            listVisitsError ? (
+               <div className="flex flex-col items-center justify-center py-16 md:py-20">
+                  <div className="w-16 h-16 md:w-18 md:h-18 bg-red-100 rounded-full flex items-center justify-center mb-4 md:mb-5">
+                     <FaCalendar className="w-8 h-8 md:w-9 md:h-9 text-red-400" />
+                  </div>
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 md:mb-3">
+                     Error loading bookings
+                  </h3>
+                  <p className="text-gray-500 text-center md:text-base mb-4">
+                     Unable to fetch your bookings. Please try again.
+                  </p>
+                  <button
+                     onClick={() => listVisits()}
+                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                     Retry
+                  </button>
+               </div>
+            ) : /* Empty State */
+            filteredBookings.length === 0 ? (
                <div className="flex flex-col items-center justify-center py-16 md:py-20">
                   <div className="w-16 h-16 md:w-18 md:h-18 bg-gray-100 rounded-full flex items-center justify-center mb-4 md:mb-5">
                      <FaCalendar className="w-8 h-8 md:w-9 md:h-9 text-gray-400" />
@@ -182,6 +251,7 @@ const MyBookingsPage: React.FC = () => {
                   </p>
                </div>
             ) : (
+               /* Bookings Grid */
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {filteredBookings.map((booking: Booking) => (
                      <BookingCard

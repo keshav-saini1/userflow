@@ -11,7 +11,7 @@ export interface Booking {
   id: string;
   propertyName: string;
   location: string;
-  status: 'active' | 'completed' | 'upcoming';
+  status: 'active' | 'completed' | 'upcoming' | 'cancelled';
   bookingType: 'visit' | 'live-tour' | 'call' | 'reservation';
   scheduledDate: string;
   scheduledTime: string;
@@ -46,6 +46,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
         return "bg-[#eafff2] text-[#00a63e] border-[#00a63e]";
       case "upcoming":
         return "bg-[#dfe7fd] text-[#1447e6] border-[#1447e6]";
+      case "cancelled":
+        return "bg-red-50 text-red-600 border-red-300";
       default:
         return "bg-gray-100 text-gray-600 border-gray-300";
     }
@@ -58,6 +60,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
         return "bg-[#00a63e]";
       case "upcoming":
         return "bg-[#1447e6]";
+      case "cancelled":
+        return "bg-red-500";
       default:
         return "bg-gray-400";
     }
@@ -167,7 +171,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
 
         {/* Action Buttons */}
         <div className="mt-3.5 md:mt-3 flex gap-[18px] md:gap-3">
-          {booking.bookingType === "visit" && (
+          {booking.bookingType === "visit" && booking.status !== "cancelled" && (
             <>
               <button
                 onClick={(e) => {
@@ -200,7 +204,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
             </>
           )}
 
-          {booking.bookingType === "live-tour" && (
+          {booking.bookingType === "live-tour" && booking.status !== "cancelled" && (
             <>
               <button
                 onClick={(e) => {
@@ -248,7 +252,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
             </button>
           )}
 
-          {booking.bookingType === "call" && (
+          {booking.bookingType === "call" && booking.status !== "cancelled" && (
             <>
               <button
                 onClick={(e) => {
@@ -279,6 +283,15 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 </span>
               </button>
             </>
+          )}
+          
+          {/* Cancelled Status Message */}
+          {booking.status === "cancelled" && (
+            <div className="w-full h-[38px] md:h-10 bg-red-50 border border-red-200 rounded-[12.75px] flex items-center justify-center">
+              <span className="text-[14px] md:text-sm text-red-600 font-medium">
+                Visit Cancelled
+              </span>
+            </div>
           )}
         </div>
       </div>

@@ -20,7 +20,6 @@ import { CancelBookingSuccessWrapper } from "../features/modify-booking";
 import {
    WishlistPage,
    MyBookingsPage,
-   ReviewBookingPage,
    RentalOptionsPage,
    RoomDetailsPage,
 } from "../features/property-listing/pages";
@@ -35,6 +34,7 @@ import { FilterPropertiesPage } from "../features/property-filter";
 import DateInputTest from "../components/DynamicForm/fields/DateInputTest";
 import LocationCommutePage from "@/features/property-listing/pages/LocationCommutePage";
 import ProtectedRoute, { AuthenticatedRedirect } from "./ProtectedRoute";
+import ReviewBookingPage from "@/features/book-visit/pages/ReviewBookingPage";
 
 export const router = createBrowserRouter([
    {

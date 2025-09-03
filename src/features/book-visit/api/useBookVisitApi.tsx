@@ -65,14 +65,34 @@ export interface ListVisitsResponse {
   data: Visit[];
 }
 
+export interface CancelVisitRequest {
+  cancel_reason: string;
+}
+
+export interface CancelVisitResponse {
+  status: number;
+  message: string;
+  data: {
+    id: string;
+    status: string;
+    cancelled_at: string;
+    cancel_reason: string;
+  };
+}
+
 async function postCreateVisit(payload: CreateVisitRequest): Promise<ApiResponse<CreateVisitResponse>> {
-  const { data } = await api.post<ApiResponse<CreateVisitResponse>>('/visits/schedule', payload);
-  return data;
+  const response = await api.post<ApiResponse<CreateVisitResponse>>('/visits/schedule', payload);
+  return response.data;
 }
 
 async function getListVisits(): Promise<ApiResponse<ListVisitsResponse>> {
-  const { data } = await api.get<ApiResponse<ListVisitsResponse>>('/visits');
-  return data;
+  const response = await api.get<ApiResponse<ListVisitsResponse>>('/visits');
+  return response.data;
+}
+
+async function putCancelVisit(visitId: string, payload: CancelVisitRequest): Promise<ApiResponse<CancelVisitResponse>> {
+  const response = await api.put<ApiResponse<CancelVisitResponse>>(`/visits/cancel/${visitId}`, payload);
+  return response.data;
 }
 
 export function useBookVisitApi() {
@@ -85,6 +105,12 @@ export function useBookVisitApi() {
     queryKey: ['book-visit', 'list-visits'],
     queryFn: getListVisits,
     enabled: false, // Enable manually when needed
+  });
+
+  const cancelVisitMutation = useMutation({
+    mutationKey: ['book-visit', 'cancel-visit'],
+    mutationFn: ({ visitId, payload }: { visitId: string; payload: CancelVisitRequest }) => 
+      putCancelVisit(visitId, payload),
   });
 
   return {
@@ -102,6 +128,13 @@ export function useBookVisitApi() {
     listVisitsError: listVisitsQuery.error as unknown as Error | null,
     listVisitsData: listVisitsQuery.data,
     enableListVisits: () => listVisitsQuery.refetch(),
+
+    // Cancel Visit
+    cancelVisit: cancelVisitMutation.mutateAsync,
+    cancelVisitStatus: cancelVisitMutation.status,
+    isCancelingVisit: cancelVisitMutation.isPending,
+    cancelVisitError: cancelVisitMutation.error as unknown as Error | null,
+    cancelVisitData: cancelVisitMutation.data,
   };
 }
 
