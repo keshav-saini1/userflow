@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import room_reserve from '@/assets/room_reserve.svg';
-import CustomDurationPopup from './CustomDurationPopup';
+import { useNavigate } from 'react-router';
 
-interface DurationOption {
-  id: string;
-  label: string;
-  price: number;
-  originalPrice: number;
-  discount?: number;
-  isPopular?: boolean;
-  isCustom?: boolean;
+interface PricingBreakdown {
+  monthlyRent: number;
+  months: number;
+  securityDeposit: number;
+  joiningFee: number;
+  joiningFeeDiscount: number;
+  tokenAmount: number;
 }
 
 const ReservationStep2: React.FC = () => {
-  const { updateForm, nextStep, previousStep } = useReservation();
-  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
-  const [isCustomPopupOpen, setIsCustomPopupOpen] = useState(false);
-  const [customMonths, setCustomMonths] = useState<number>(24);
+  const navigate = useNavigate();
+  const { nextStep } = useReservation();
 
   // Sample property data - in real app this would come from props or API
   const property: Property = {
@@ -31,127 +28,87 @@ const ReservationStep2: React.FC = () => {
     type: 'Private Room'
   };
 
-  const durationOptions: DurationOption[] = [
-    {
-      id: 'monthly',
-      label: 'Monthly',
-      price: 15000,
-      originalPrice: 15000,
-    },
-    {
-      id: '3months',
-      label: '3 Months',
-      price: 14250,
-      originalPrice: 15000,
-      discount: 5,
-      isPopular: true,
-    },
-    {
-      id: '6months',
-      label: '6 Months',
-      price: 13500,
-      originalPrice: 15000,
-      discount: 10,
-    },
-    {
-      id: '12months',
-      label: '12 Months',
-      price: 12750,
-      originalPrice: 15000,
-      discount: 15,
-    },
-    {
-      id: 'custom',
-      label: selectedDuration === 'custom' ? `Custom duration (${customMonths} months)` : 'Custom duration',
-      price: 15000,
-      originalPrice: 15000,
-      isCustom: true,
-    },
-  ];
+  // Calculate pricing based on selected duration
+  const calculatePricing = (): PricingBreakdown => {
+    const securityDeposit = 30000;
+    const joiningFeeDiscount = 9000; // Automatic joining fee discount
+    const tokenAmount = 5000;
 
-  const handleDurationSelect = (durationId: string) => {
-    if (durationId === 'custom') {
-      setIsCustomPopupOpen(true);
-    } else {
-      setSelectedDuration(durationId);
-      updateForm({ selectedDuration: durationId });
-    }
+    return {
+      monthlyRent: 15000,
+      months: 6,
+      securityDeposit,
+      joiningFee: joiningFeeDiscount,
+      joiningFeeDiscount,
+      tokenAmount
+    };
   };
+
+  const pricing = calculatePricing();
 
   const handleContinue = () => {
-    if (selectedDuration) {
-      nextStep();
-    }
+    nextStep();
   };
-
-  const handleBack = () => {
-    previousStep();
-  };
-
-  const handleCustomDurationSubmit = (months: number) => {
-    setCustomMonths(months);
-    setSelectedDuration('custom');
-    updateForm({ selectedDuration: 'custom', customMonths: months });
-  };
-
-  const isContinueDisabled = !selectedDuration;
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header - Mobile Only */}
-      <div className="lg:hidden sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-100">
-        <div className="flex items-center justify-between p-5">
-          <div className="flex items-center gap-3.5">
-            <button 
-              onClick={handleBack}
-              className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center"
-            >
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div>
-              <h2 className="text-sm font-medium text-gray-900">Reserve Room</h2>
-              <p className="text-xs text-gray-500">Step 2 of 4</p>
+    <div className="bg-white relative rounded-tl-[21px] rounded-tr-[21px] h-screen max-h-screen overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-[21px]">
+        <div className="flex gap-3.5 items-center">
+          <div className="flex flex-col">
+            <div className="text-sm font-medium text-neutral-950">
+              Reserve Room
+            </div>
+            <div className="text-xs text-[#717182]">
+              Step 2 of 4
             </div>
           </div>
-          <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
+        <button 
+          onClick={() => navigate(-1)}
+          className="bg-[rgba(236,236,240,0.5)] flex items-center justify-center rounded-full w-[35px] h-[35px] hover:bg-[rgba(236,236,240,0.7)] transition-colors"
+        >
+          <svg className="w-[17.5px] h-[17.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      {/* Desktop Layout Container */}
-      <div className="max-w-7xl mx-auto lg:flex lg:min-h-screen">
-        {/* Left Side - Property Card (Desktop) */}
-        <div className="lg:w-1/2 lg:flex lg:flex-col lg:justify-center lg:bg-gray-50">
-          <div className="px-4 py-5 lg:px-12 lg:py-12 lg:h-full lg:flex lg:flex-col lg:justify-center">
-            <div className="relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm lg:shadow-xl lg:h-full lg:flex lg:flex-col">
-              <div className="h-40 lg:h-full lg:flex-1 relative" style={{ backgroundImage: `url(${room_reserve})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                {/* Property image overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-                
-                {/* Property info overlay */}
-                <div className="absolute bottom-4 left-4 right-4 lg:bottom-8 lg:left-8 lg:right-8 bg-white/10 backdrop-blur rounded-xl p-3 lg:p-6">
-                  <div className="flex items-center justify-between">
-                    <div className='flex flex-col items-start'>
-                      <div>
-                        <span className='text-white text-sm lg:text-2xl font-semibold lg:font-bold'>{property.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5 mt-1 lg:mt-3">
-                        <svg className="w-3 h-3 lg:w-5 lg:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="text-white text-xs lg:text-lg opacity-90">{property.location}</span>
-                      </div>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        {/* Property Card */}
+        <div className="px-3.5 pb-[21px]">
+          <div className="bg-white h-[156px] relative rounded-[21px] shadow-sm border border-gray-100">
+            <div 
+              className="h-full w-full rounded-[21px] relative" 
+              style={{ 
+                backgroundImage: `url('${room_reserve}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }} 
+            >
+              <div className="absolute bg-gradient-to-t from-[#00000066] inset-0 to-[#00000000] rounded-[21px]" />
+              <div className="absolute backdrop-blur-[6px] backdrop-filter bg-[rgba(255,255,255,0.1)] flex items-center justify-between h-[58px] left-1/2 p-[10.5px] rounded-[14px] top-[82px] translate-x-[-50%] w-[calc(100%-24px)]">
+                <div className="flex flex-col gap-[3.5px]">
+                  <div className="text-white font-semibold text-[15.8px] leading-[24.5px]">
+                    {property.name}
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <svg className="w-[10.5px] h-[10.5px] text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <div className="text-white text-[12.3px] leading-[17.5px] opacity-90">
+                      {property.location}
                     </div>
-                    <div className="text-right">
-                      <div className="text-white font-semibold text-sm lg:text-3xl lg:font-bold">₹{property.price.toLocaleString()}</div>
-                      <div className="text-white text-xs lg:text-lg opacity-90">{property.priceUnit}</div>
-                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-[3.5px] items-end">
+                  <div className="text-white font-semibold text-[15.8px] leading-[24.5px]">
+                    ₹{property.price.toLocaleString()}
+                  </div>
+                  <div className="text-white text-[12.3px] leading-[17.5px] opacity-90">
+                    {property.priceUnit}
                   </div>
                 </div>
               </div>
@@ -159,125 +116,125 @@ const ReservationStep2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side - Duration Selection (Desktop) */}
-        <div className="lg:w-1/2 lg:flex lg:flex-col lg:justify-center">
-          {/* Desktop Header */}
-          <div className="hidden lg:block lg:px-8 lg:py-6">
-            <div className="flex items-center gap-3.5">
-              <button 
-                onClick={handleBack}
-                className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Reserve Room</h2>
-                <p className="text-sm text-gray-500">Step 2 of 4</p>
+        {/* Review Section */}
+        <div className="px-3.5 pb-4">
+          <div className="flex flex-col gap-[21px]">
+            {/* Review Heading */}
+            <div className="flex flex-col gap-[7px] items-center">
+              <div className="text-[#101828] text-[18px] font-semibold leading-[21px] text-center">
+                Review your booking
+              </div>
+              <div className="text-[#6a7282] text-[14px] leading-[21px] text-center">
+                Transparent pricing with no hidden fees
               </div>
             </div>
-          </div>
 
-          {/* Duration Selection Section */}
-          <div className="px-4 lg:px-8 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
-            <div className="text-center lg:text-left mb-5 lg:mb-8">
-              <h2 className="text-lg lg:text-2xl font-semibold text-gray-900 mb-1 lg:mb-2">
-                Choose your stay duration
-              </h2>
-              <p className="text-sm lg:text-base text-gray-600">
-                Longer stays come with better discounts
-              </p>
-            </div>
-
-            {/* Duration Options */}
-            <div className="space-y-2.5 lg:space-y-3 mb-6 lg:mb-8">
-              {durationOptions.map((option) => (
-                <div key={option.id} className="relative">
-                  <button
-                    onClick={() => handleDurationSelect(option.id)}
-                    className={`
-                      w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-200 text-left
-                      ${selectedDuration === option.id
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 lg:gap-3">
-                        {/* Radio Button */}
-                        <div className={`
-                          w-5 h-5 lg:w-6 lg:h-6 rounded-full border-2 flex items-center justify-center
-                          ${selectedDuration === option.id
-                            ? 'border-blue-600 bg-blue-600'
-                            : 'border-gray-300'
-                          }
-                        `}>
-                          {selectedDuration === option.id && (
-                            <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 bg-white rounded-full" />
-                          )}
-                        </div>
-                        
-                        {/* Option Details */}
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-sm lg:text-base font-semibold text-gray-900">
-                              {option.label}
-                            </h3>
-                            {option.isPopular && (
-                              <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 border border-green-200 rounded-md">
-                                Most Popular
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs lg:text-sm text-gray-600 mt-0.5">
-                            ₹{option.price.toLocaleString()}/month
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Discount Badge */}
-                      {option.discount && (
-                        <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-1 text-xs font-medium text-orange-700 bg-orange-100 border border-orange-200 rounded-md">
-                            {option.discount}% off
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </button>
+            {/* Pricing Breakdown */}
+            <div className="bg-[#f9fafb] flex flex-col gap-[21px] p-[21px] rounded-[21px]">
+              <div className="text-[#101828] text-[14px] font-semibold leading-[21px]">
+                Secure Now, Pay Later at Move-In!
+              </div>
+              
+              <div className="flex flex-col gap-[14px]">
+                {/* Security Deposit */}
+                <div className="flex items-center justify-between">
+                  <div className="text-[#4a5565] text-[14px] leading-[21px]">
+                    Security deposit
+                  </div>
+                  <div className="text-[#101828] text-[14px] font-semibold leading-[21px]">
+                    ₹{pricing.securityDeposit.toLocaleString()}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Continue Button */}
-          <div className="fixed lg:relative bottom-0 left-0 right-0 p-4 lg:p-8 bg-white border-t lg:border-t-0 border-gray-100">
-            <button
-              onClick={handleContinue}
-              disabled={isContinueDisabled}
-              className={`
-                w-full py-3.5 lg:py-4 rounded-xl text-sm lg:text-base font-semibold transition-colors
-                ${isContinueDisabled
-                  ? 'bg-gray-200 text-gray-500'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-                }
-              `}
-            >
-              Continue
-            </button>
+                {/* Automatic Joining Fee */}
+                <div className="flex items-center justify-between">
+                  <div className="text-[#00a63e] text-[14px] leading-[21px]">
+                    Automatic Joining fee
+                  </div>
+                  <div className="text-[#00a63e] text-[14px] font-semibold leading-[21px]">
+                    ₹{pricing.joiningFeeDiscount.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="border-t border-[#e5e7eb] flex items-center justify-between pt-[21px]">
+                <div className="text-[#101828] text-[14px] font-bold leading-[21px]">
+                  Total
+                </div>
+                <div className="text-[#101828] text-[14px] font-bold leading-[21px]">
+                  ₹1,12,620
+                </div>
+              </div>
+              
+              <div className="text-[#6a7282] text-[12.3px] leading-[17.5px]">
+                *Security deposit is fully refundable
+              </div>
+
+              {/* Payable Token Amount */}
+              <div className="bg-[#f0fdf4] border border-[#b9f8cf] flex gap-[10.5px] items-center p-[10.5px] rounded-[10.5px]">
+                <div className="w-[21px] h-[21px]">
+                  <svg className="w-full h-full text-[#00a63e]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex items-center justify-between flex-1">
+                  <div className="text-[#00a63e] text-[12.3px] font-semibold leading-[17.5px]">
+                    Payable token amount
+                  </div>
+                  <div className="text-[#00a63e] text-[12.3px] font-semibold leading-[17.5px]">
+                    ₹{pricing.tokenAmount.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div className="flex flex-col gap-[10.5px]">
+              <div className="flex gap-[10.5px] items-center">
+                <svg className="w-3.5 h-3.5 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="text-[#364153] text-[12.3px] leading-[17.5px]">
+                  Free cancellation up to 24 hours before move-in
+                </div>
+              </div>
+              <div className="flex gap-[10.5px] items-center">
+                <svg className="w-3.5 h-3.5 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="text-[#364153] text-[12.3px] leading-[17.5px]">
+                  All utilities and amenities included
+                </div>
+              </div>
+              <div className="flex gap-[10.5px] items-center">
+                <svg className="w-3.5 h-3.5 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="text-[#364153] text-[12.3px] leading-[17.5px]">
+                  Security deposit fully refundable at checkout
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Custom Duration Popup */}
-      <CustomDurationPopup
-        isOpen={isCustomPopupOpen}
-        onClose={() => setIsCustomPopupOpen(false)}
-        onSubmit={handleCustomDurationSubmit}
-        initialValue={customMonths}
-      />
+      {/* Fixed Bottom Section */}
+      <div className="shrink-0 bg-white border-t border-gray-100 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-600">Token Amount</p>
+            <p className="text-lg font-semibold text-blue-600">₹{pricing.tokenAmount.toLocaleString()}</p>
+          </div>
+          <button
+            onClick={handleContinue}
+            className="px-6 py-3 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
+            Pay to Reserve
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

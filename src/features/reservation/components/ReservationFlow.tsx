@@ -4,7 +4,6 @@ import ReservationStep1 from './ReservationStep1';
 import ReservationStep2 from './ReservationStep2';
 import ReservationStep3 from './ReservationStep3';
 import ReservationStep4 from './ReservationStep4';
-import ReservationStep5 from './ReservationStep5';
 
 const ReservationFlow: React.FC = () => {
   const { form } = useReservation();
@@ -19,8 +18,6 @@ const ReservationFlow: React.FC = () => {
         return <ReservationStep3 />;
       case 4:
         return <ReservationStep4 />;
-      case 5:
-        return <ReservationStep5 />;
       default:
         return <ReservationStep1 />;
     }
