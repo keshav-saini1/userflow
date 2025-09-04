@@ -21,7 +21,7 @@ export function mapApiToPropertyListing(api: any): PropertyListing {
 
     return {
       id: `${opt.optionType?.toLowerCase?.() || "room"}-${index}`,
-      name: opt.occupancyType || "Room",
+      name: opt.name || "Room",
       sharing_type: opt.sharing_type,
       type: (opt.optionType || "room").toLowerCase(),
       occupancy: opt.occupancyType || "",
@@ -67,7 +67,7 @@ export function mapApiToPropertyListing(api: any): PropertyListing {
 export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
   const fallbackImage = FALLBACK_IMAGE;
 
-  const title = api?.occupancyName || "Room";
+  const title = api?.name || "Room";
   const currentPrice = api?.rentPerMonth?.max ?? api?.rentPerMonth?.min ?? 0;
 
   // Try to split location into area and city (best-effort)
@@ -179,7 +179,7 @@ export function mapApiToPropertyDetail(api: any): PropertyDetailPageData {
     id: String(api?.sharing_type || api?.occupancyType || "room"),
     title,
     type: "room",
-    tags: [title, "Room"],
+    tags: api?.tags,
     heroImages,
     pricing: {
       currentPrice,

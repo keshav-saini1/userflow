@@ -53,6 +53,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       }
    };
 
+   console.log({property})
 
    return (
       <div
@@ -81,7 +82,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
                {/* Recommended Badge */}
-               {property.isRecommended && (
+               {/* {property.isRecommended && (
                   <div className="absolute top-[13.75px] left-3.5">
                      <div className="bg-gradient-to-r from-[#fb2c36] to-[#f6339a] backdrop-blur-sm px-[10.5px] py-[5.25px] rounded-full shadow-[0px_10px_15px_-3px_rgba(251,44,54,0.25),0px_4px_6px_-4px_rgba(251,44,54,0.25)] flex items-center gap-[5.25px]">
                         <BiHeart />
@@ -90,7 +91,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                         </span>
                      </div>
                   </div>
-               )}
+               )} */}
 
                {/* Wishlist Remove Button */}
                {isLongCardView && (
@@ -121,7 +122,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="flex flex-col gap-[17.5px] p-[21px] lg:p-6 order-2">
                {/* Name and Type */}
                <div className="flex flex-col gap-[7px]">
-                  <h3 className="text-[#101828] text-[17.5px] lg:text-lg font-semibold leading-[21.88px] lg:leading-6">
+                  <h3 className="text-[#101828] text-[17.5px] lg:text-lg font-semibold leading-[21.88px] lg:leading-6 capitalize">
                      {property.name}
                   </h3>
                   <div className="flex items-center gap-2">
@@ -132,7 +133,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            className="w-4 h-4"
                         />
                         <p className="text-[#4a5565] text-[12.3px] font-normal leading-[17.5px]">
-                           {property?.address?.city}
+                           {property?.address?.address_line_2}
                         </p>
                      </div>
                      <div className="flex items-center gap-2">
@@ -141,8 +142,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            alt="location_home"
                            className="w-4 h-4"
                         />
-                        <p className="text-[#4a5565] text-[12.3px] font-normal leading-[17.5px]">
-                           {property.occupancy}
+                        <p className="text-[#4a5565] text-[12.3px] font-normal leading-[17.5px] uppercase">
+                           {property.type}
                         </p>
                      </div>
                   </div>
@@ -152,10 +153,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                <div className="flex flex-col gap-[6.75px]">
                   <div className="flex items-baseline gap-[7px]">
                      <span className="text-[#101828] text-[26.3px] lg:text-2xl font-bold leading-[31.5px] lg:leading-8">
-                        {formatPrice(property.pricing.currentPrice)} /{" "}
-                        <span className="text-[15px] font-normal">
-                           Entire Flat
-                        </span>
+                        {formatPrice(property.pricing.currentPrice)}
                      </span>
                      {!isLongCardView && (
                         <span className="text-[#6a7282] text-[12.3px] font-normal leading-[17.5px]">
@@ -188,19 +186,27 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                         <h4 className="text-[#101828] text-[12.3px] font-semibold leading-[17.5px]">
                            Included amenities:
                         </h4>
-                        <div className="flex flex-col gap-[7px]">
-                           {property.amenities.slice(0, 4).map((amenity) => (
-                              <div
-                                 key={amenity.id}
-                                 className="flex items-center gap-[10.5px]"
-                              >
-                                 <AmenitiesIcon {...amenity} />
-                                 <span className="text-[#364153] text-[12.3px] font-normal leading-[17.5px]">
-                                    {amenity.name}
-                                 </span>
-                              </div>
-                           ))}
-                           <span className="text-[#364153] text-[12.3px] font-normal leading-[17.5px]">+{(property.amenities.length) - 4} more</span>
+                        <div className="">
+                           <div className="flex flex-wrap gap-2">
+                              {property.amenities.slice(0, 4).map((amenity) => (
+                                 <div
+                                    key={amenity.id}
+                                    className="flex items-center gap-[6px] bg-white px-2.5 py-1.5 rounded-md border border-gray-200 shadow-sm"
+                                 >
+                                    <AmenitiesIcon {...amenity} />
+                                    <span className="text-[#364153] text-[11px] font-medium leading-tight whitespace-nowrap">
+                                       {amenity.name}
+                                    </span>
+                                 </div>
+                              ))}
+                              {property.amenities.length > 4 && (
+                                 <div className="flex items-center px-2.5 py-1.5 bg-blue-50 rounded-md border border-blue-200">
+                                    <span className="text-blue-600 text-[11px] font-medium leading-tight">
+                                       +{property.amenities.length - 4} more
+                                    </span>
+                                 </div>
+                              )}
+                           </div>
                         </div>
                      </div>
                   </>

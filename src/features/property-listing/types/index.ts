@@ -17,6 +17,7 @@ export interface PropertyDetails {
   type: string;
   occupancy: string;
   pricing: PropertyPricing;
+  address: any;
   amenities: PropertyAmenity[];
   image: string;
   isRecommended?: boolean;

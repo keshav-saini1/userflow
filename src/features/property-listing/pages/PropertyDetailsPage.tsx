@@ -139,6 +139,10 @@ export default function PropertyDetailsPage({
       navigate(`/property-details/${sharing_type}/rental-options`);
    }
 
+   const onReserve = () => { 
+      
+   }
+
    console.log({propertyData})
 
    return (
@@ -184,7 +188,7 @@ export default function PropertyDetailsPage({
                         <div className="space-y-3">
                            <div className="space-y-3">
                               <h2 className="text-base lg:text-xl font-semibold text-gray-900 capitalize">
-                                 {propertyData?.title || 'Property'} {propertyData?.type}
+                                 {propertyData?.title || 'Property'}
                               </h2>
                               <div className="flex gap-2 flex-wrap">
                                  {(propertyData?.tags || []).map((tag) => (
@@ -223,7 +227,7 @@ export default function PropertyDetailsPage({
                            </div>
 
                            {/* Savings */}
-                           {propertyData?.pricing?.originalPrice && (
+                           {/* {propertyData?.pricing?.originalPrice && (
                               <div className="flex items-center gap-2">
                                  <span className="text-xs text-gray-400 line-through">
                                     ₹
@@ -234,7 +238,7 @@ export default function PropertyDetailsPage({
                                     {(propertyData.pricing.savingsAmount || 0).toLocaleString()}
                                  </span>
                               </div>
-                           )}
+                           )} */}
                         </div>
 
                         {/* Available Units */}
@@ -619,7 +623,7 @@ export default function PropertyDetailsPage({
                            onClick={onAskQuestion}
                            className="w-full h-12 bg-white border border-gray-300 rounded-xl flex items-center justify-center text-gray-600 font-medium hover:bg-gray-50 transition-colors"
                         >
-                           Ask Question
+                           Reserve
                         </button>
                      </div>
 
@@ -665,11 +669,11 @@ export default function PropertyDetailsPage({
          <div className="lg:hidden bg-white border-t border-gray-100 sticky bottom-0 p-4">
             <div className="flex gap-3">
                <button
-                  onClick={onAskQuestion}
+                  onClick={onReserve}
                   className="flex-1 h-11 bg-white border border-gray-300 rounded-xl flex items-center justify-center gap-2"
                >
                   <span className="text-xs font-medium text-gray-600">
-                     Ask Question
+                     Reserve
                   </span>
                </button>
                <button
