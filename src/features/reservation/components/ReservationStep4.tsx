@@ -14,7 +14,7 @@ interface BookingSummary {
 }
 
 const ReservationStep4: React.FC = () => {
-  const { form, previousStep, resetForm } = useReservation();
+  const { form, previousStep } = useReservation();
   const navigate = useNavigate();
 
   // Sample property data - in real app this would come from props or API

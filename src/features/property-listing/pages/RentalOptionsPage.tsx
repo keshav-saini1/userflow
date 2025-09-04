@@ -25,6 +25,7 @@ const RentalOptionsPage: React.FC = () => {
          currentPrice: unit.pricePerBed,
          period: "per bed"
       },
+      address: unit.address,
       amenities: unit.amenities || [],
       image: unit.image,
       status: unit.availableFrom ? 'available' : 'booked',

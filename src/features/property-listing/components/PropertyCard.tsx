@@ -1,6 +1,5 @@
 import React from "react";
 import type { PropertyDetails } from "../types";
-import { BiHeart } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import location_home from "@/assets/property/location_home.svg";
 import single_bed from "@/assets/property/bed.svg";

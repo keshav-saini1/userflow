@@ -17,8 +17,5 @@ export {
   ImageGallery
 } from './components';
 
-// Data
-export { samplePropertyListing, samplePropertyDetailData } from './data/sampleData';
-
 // Types
 export type * from './types'; 

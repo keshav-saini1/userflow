@@ -13,6 +13,9 @@ export const wishlistProperties: PropertyDetails[] = [
       originalPrice: 30000,
       savingsAmount: 5000
     },
+    address: {
+      
+    },
     amenities: [
       { id: '1', name: 'Furnished', icon: 'furniture' },
       { id: '2', name: 'AC', icon: 'ac' },
@@ -33,6 +36,9 @@ export const wishlistProperties: PropertyDetails[] = [
     pricing: {
       currentPrice: 50000,
       period: 'monthly'
+    },
+    address: {
+      
     },
     amenities: [
       { id: '1', name: 'Furnished', icon: 'furniture' },
@@ -56,6 +62,9 @@ export const wishlistProperties: PropertyDetails[] = [
       currentPrice: 50000,
       period: 'monthly'
     },
+    address: {
+      
+    },
     amenities: [
       { id: '1', name: 'Furnished', icon: 'furniture' },
       { id: '2', name: 'AC', icon: 'ac' },
@@ -75,6 +84,9 @@ export const wishlistProperties: PropertyDetails[] = [
     pricing: {
       currentPrice: 50000,
       period: 'monthly'
+    },
+    address: {
+      
     },
     amenities: [
       { id: '1', name: 'Furnished', icon: 'furniture' },
