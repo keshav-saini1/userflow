@@ -27,6 +27,8 @@ interface Booking {
    scheduledTime: string;
    bookingId?: string;
    image: string;
+   displayName?: string;
+   rent?: number;
 }
 
 const ReviewBookingPage: React.FC = () => {
@@ -47,20 +49,20 @@ const ReviewBookingPage: React.FC = () => {
       if (parts.length >= 2) {
          const lastPart = parts[parts.length - 1].trim();
          const secondLastPart = parts[parts.length - 2].trim();
-         
+
          // Check if last part contains pincode (6 digits)
          const pincodeMatch = lastPart.match(/\d{6}/);
          if (pincodeMatch) {
             return `${secondLastPart}, ${lastPart}`;
          }
-         
+
          // If no pincode in last part, check second last
          const pincodeMatch2 = secondLastPart.match(/\d{6}/);
          if (pincodeMatch2) {
             return `${secondLastPart}, ${lastPart}`;
          }
       }
-      
+
       // Fallback to last two parts or full address if short
       return parts.length >= 2 ? `${parts[parts.length - 2].trim()}, ${parts[parts.length - 1].trim()}` : fullAddress;
    };
@@ -130,8 +132,9 @@ const ReviewBookingPage: React.FC = () => {
 
       return {
          id: visit.id,
-         propertyName: visit.propertyName || 'Property Name',
+         propertyName: visit?.displayName || visit?.propertyName || 'Property Name',
          location: visit.propertyAddress || 'Location',
+         rent: visit?.rent || 0,
          fullAddress: visit.propertyAddress || 'Location',
          cityAndPincode: getCityAndPincode(visit.propertyAddress || 'Location'),
          status: getStatus(visit.status),
@@ -148,10 +151,10 @@ const ReviewBookingPage: React.FC = () => {
    }, [listVisits]);
 
    useEffect(() => {
-      if (listVisitsData?.success && listVisitsData?.data) {
-         const visits = listVisitsData.data.data;
+      if (listVisitsData?.status === 200 && listVisitsData?.data) {
+         const visits = listVisitsData.data;
          const foundVisit = visits.find((visit: Visit) => visit.id === bookingId);
-         
+
          if (foundVisit) {
             setBooking(transformVisitToBooking(foundVisit));
          } else {
@@ -263,7 +266,7 @@ const ReviewBookingPage: React.FC = () => {
       console.log("Canceling visit with reason:", reason);
       // TODO: Implement actual API call to cancel visit
       // await cancelVisit(bookingId, reason);
-      
+
       // For now, just navigate back
       navigate(-1);
    };
@@ -323,7 +326,7 @@ const ReviewBookingPage: React.FC = () => {
                               </div>
                               <div className="text-right">
                                  <p className="text-[15.8px] md:text-lg font-semibold text-white leading-[24.5px]">
-                                    ₹8,000
+                                    ₹{booking?.rent}
                                  </p>
                                  <p className="text-[12.3px] text-white/90 leading-[17.5px]">
                                     per month
@@ -347,9 +350,7 @@ const ReviewBookingPage: React.FC = () => {
                                  <p className="text-[12.3px] md:text-sm lg:text-base text-[#4a5565] leading-[17.5px]">
                                     {booking.scheduledDate}
                                  </p>
-                                 <p className="text-[12.3px] md:text-sm lg:text-base text-[#4a5565] leading-[17.5px] mt-1">
-                                    <strong>Address:</strong> {booking.fullAddress}
-                                 </p>
+
                               </div>
                            </div>
                            <div className="text-right">
@@ -360,6 +361,11 @@ const ReviewBookingPage: React.FC = () => {
                                  {booking.scheduledTime.split(" - ")[0]}
                               </p>
                            </div>
+                        </div>
+                        <div>
+                           <p className="text-[12.3px] md:text-sm lg:text-base text-[#4a5565] leading-[17.5px] mt-1">
+                              <strong>Address:</strong> {booking.fullAddress}
+                           </p>
                         </div>
                      </div>
 
@@ -383,10 +389,10 @@ const ReviewBookingPage: React.FC = () => {
                                     booking.bookingType === "visit"
                                        ? handleGetDirections
                                        : booking.bookingType === "live-tour"
-                                       ? handleJoinNow
-                                       : booking.bookingType === "call"
-                                       ? handleCall
-                                       : handleReserve
+                                          ? handleJoinNow
+                                          : booking.bookingType === "call"
+                                             ? handleCall
+                                             : handleReserve
                                  }
                               >
                                  <MdOutlineMap className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />

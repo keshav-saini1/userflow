@@ -57,6 +57,8 @@ export interface Visit {
   image: string;
   locationCoordinates: LocationCoordinates;
   status: string;
+  displayName: string;
+  rent: number;
 }
 
 export interface ListVisitsResponse {

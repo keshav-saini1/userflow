@@ -3,14 +3,13 @@ import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import Calendar, { type DateRange } from '../../../components/Calendar';
 import room_reserve from '@/assets/room_reserve.svg';
-import default_back from '@/assets/default_back.svg';
 import { useNavigate } from 'react-router';
 
 const ReservationStep1: React.FC = () => {
   const navigate = useNavigate();
   const { updateForm, nextStep } = useReservation();
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({ startDate: null, endDate: null });
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
 
   // Sample property data - in real app this would come from props or API
   const property: Property = {
@@ -30,238 +29,222 @@ const ReservationStep1: React.FC = () => {
   };
 
   const handleContinue = () => {
-    if (selectedDateRange.startDate && selectedDateRange.endDate) {
+    if (selectedDateRange.startDate && selectedDateRange.endDate && selectedDuration) {
       nextStep();
     }
   };
 
-  const isContinueDisabled = !selectedDateRange.startDate || !selectedDateRange.endDate;
+  const isContinueDisabled = !selectedDateRange.startDate || !selectedDateRange.endDate || !selectedDuration;
 
-  // Function to calculate date range based on move-in option
-  const calculateDateRange = (option: string): DateRange => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
-    
-    switch (option) {
-      case 'immediate': {
-        // Immediate: today to today (same day)
-        return { startDate: today, endDate: today };
-      }
-      case '7days': {
-        // 7 days: today to 7 days from now
-        const sevenDays = new Date(today);
-        sevenDays.setDate(today.getDate() + 7);
-        return { startDate: today, endDate: sevenDays };
-      }
-      case '15days': {
-        // 15 days: today to 15 days from now
-        const fifteenDays = new Date(today);
-        fifteenDays.setDate(today.getDate() + 15);
-        return { startDate: today, endDate: fifteenDays };
-      }
-      case '30days': {
-        // 30 days: today to 30 days from now
-        const thirtyDays = new Date(today);
-        thirtyDays.setDate(today.getDate() + 30);
-        return { startDate: today, endDate: thirtyDays };
-      }
-      default: {
-        return { startDate: today, endDate: today };
-      }
-    }
+  // Duration options with pricing
+  const durationOptions = [
+    { id: 'monthly', label: 'Monthly', price: 15000, unit: 'month' },
+    { id: '3months', label: '3 Months', price: 13000, unit: 'month' },
+    { id: '6months', label: '6 Months', price: 12000, unit: 'month', discount: '10% Discount' },
+    { id: '12months', label: '12 Months', price: 10000, unit: 'month' },
+  ];
+
+  // Handle duration selection
+  const handleDurationSelect = (durationId: string) => {
+    setSelectedDuration(durationId);
+    // Note: duration is stored in local state for now
+    // updateForm({ duration: durationId }); // Commented out due to type constraints
   };
-
-  // Handle move-in option selection
-  const handleMoveInOption = (option: string) => {
-    const calculatedRange = calculateDateRange(option);
-    setSelectedOption(option);
-    setSelectedDateRange(calculatedRange);
-    // Update form with the start date (end date is maintained in local state)
-    updateForm({ 
-      selectedDate: calculatedRange.startDate
-    });
-  };
-
-  // Calendar configuration - all future and present dates are available
-  // Past dates are automatically disabled by the Calendar component
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      {/* Header - Mobile Only */}
-      <div className="lg:hidden sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-100">
-        <div className="flex items-center justify-between p-5">
-          <div className="flex items-center gap-3.5">
-            <button className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center" onClick={() => navigate(-1)}>
-              <img src={default_back} alt="back" className="w-10 h-10" />
-            </button>
-            <div>
-              <h2 className="text-sm font-medium text-gray-900">Reserve Room</h2>
-              <p className="text-xs text-gray-500">Step 1 of 4</p>
+    <div className="bg-white flex flex-col h-screen max-h-screen rounded-tl-[21px] rounded-tr-[21px] relative overflow-hidden">
+      {/* Header - Fixed at top */}
+      <div className="backdrop-blur backdrop-filter bg-[rgba(255,255,255,0.95)] box-border content-stretch flex flex-col h-[85px] items-start justify-start pb-px pt-0 px-0 rounded-tl-[21px] rounded-tr-[21px] shrink-0 w-full z-10">
+        <div className="box-border content-stretch flex items-center justify-between p-[21px] relative shrink-0 w-full">
+          <div className="content-stretch flex gap-3.5 items-center justify-start relative shrink-0">
+            <div className="content-stretch flex flex-col items-start justify-start relative shrink-0">
+              <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
+                <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-neutral-950 text-nowrap">
+                  <p className="leading-[21px] whitespace-pre">Reserve Room</p>
+                </div>
+              </div>
+              <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
+                <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#717182] text-[12.3px] text-nowrap">
+                  <p className="leading-[17.5px] whitespace-pre">Step 1 of 4</p>
+                </div>
+              </div>
             </div>
           </div>
-          {/* <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <button 
+            onClick={() => navigate(-1)}
+            className="bg-[rgba(236,236,240,0.5)] content-stretch flex items-center justify-center relative rounded-full shrink-0 size-[35px] hover:bg-[rgba(236,236,240,0.7)] transition-colors"
+          >
+            <svg className="relative shrink-0 size-[17.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button> */}
+          </button>
         </div>
       </div>
 
-      {/* Desktop Layout Container */}
-      <div className="max-w-7xl mx-auto lg:flex lg:min-h-screen">
-        {/* Left Side - Property Card (Desktop) */}
-        <div className="lg:w-1/2 lg:flex lg:flex-col lg:justify-center lg:bg-gray-50">
-          <div className="px-4 py-5 lg:px-12 lg:py-12 lg:h-full lg:flex lg:flex-col lg:justify-center">
-            <div className="relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm lg:shadow-xl lg:h-full lg:flex lg:flex-col">
-              <div className="h-40 lg:h-full lg:flex-1 relative" style={{ backgroundImage: `url(${room_reserve})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                {/* Property image overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-                
-                {/* Property info overlay */}
-                <div className="absolute bottom-4 left-4 right-4 lg:bottom-8 lg:left-8 lg:right-8 bg-white/10 backdrop-blur rounded-xl p-3 lg:p-6">
-                  <div className="flex items-center justify-between">
-                    <div className='flex flex-col items-start'>
-                      <div>
-                        <span className='text-white text-sm lg:text-2xl font-semibold lg:font-bold'>{property.name}</span>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex flex-col gap-4 pb-4">
+          {/* Property Card */}
+          <div className="box-border content-stretch flex flex-col h-[168px] items-start justify-start pb-[21px] pt-0 px-3.5 relative shrink-0 w-full">
+            <div className="bg-white h-[156px] relative rounded-[21px] shrink-0 w-full shadow-sm border border-gray-100">
+              <div className="box-border content-stretch flex flex-col h-[156px] items-start justify-start overflow-clip p-px relative w-full">
+                <div className="content-stretch flex flex-col items-start justify-center relative shrink-0 w-full">
+                  <div 
+                    className="bg-left bg-no-repeat h-[154px] shrink-0 w-full rounded-[21px]" 
+                    style={{ 
+                      backgroundImage: `url('${room_reserve}')`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }} 
+                  />
+                  <div className="absolute bg-gradient-to-t from-[#00000066] inset-0 to-[#00000000] rounded-[21px]" />
+                  <div className="absolute backdrop-blur-[6px] backdrop-filter bg-[rgba(255,255,255,0.1)] box-border content-stretch flex gap-[10.5px] h-[58px] items-center justify-start left-1/2 p-[10.5px] rounded-[14px] top-[82px] translate-x-[-50%] w-[calc(100%-24px)]">
+                    <div className="absolute bottom-[5.5px] content-stretch flex flex-col gap-[3.5px] items-start justify-center left-3 w-[180px]">
+                      <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
+                        <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[15.8px] text-white w-full">
+                          <p className="leading-[24.5px]">{property.name}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2.5 mt-1 lg:mt-3">
-                        <svg className="w-3 h-3 lg:w-5 lg:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="content-stretch flex gap-1 items-center justify-start relative shrink-0 w-full">
+                        <svg className="relative shrink-0 size-[10.5px] text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="text-white text-xs lg:text-lg opacity-90">{property.location}</span>
+                        <div className="content-stretch flex flex-col items-start justify-start opacity-90 relative shrink-0">
+                          <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.3px] text-nowrap text-white">
+                            <p className="leading-[17.5px] whitespace-pre">{property.location}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-white font-semibold text-sm lg:text-3xl lg:font-bold">₹{property.price.toLocaleString()}</div>
-                      <div className="text-white text-xs lg:text-lg opacity-90">{property.priceUnit}</div>
+                    <div className="absolute bottom-1.5 content-stretch flex flex-col gap-[3.5px] items-end justify-start right-3 w-[145px]">
+                      <div className="content-stretch flex flex-col items-end justify-start relative shrink-0 w-full">
+                        <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[15.8px] text-nowrap text-white">
+                          <p className="leading-[24.5px] whitespace-pre">₹{property.price.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="content-stretch flex gap-1 items-center justify-end relative shrink-0 w-[90px]">
+                        <div className="content-stretch flex flex-col items-start justify-start opacity-90 relative shrink-0">
+                          <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.3px] text-nowrap text-white">
+                            <p className="leading-[17.5px] whitespace-pre">{property.priceUnit}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Side - Calendar and Options (Desktop) */}
-        <div className="lg:w-1/2 lg:flex lg:flex-col lg:justify-center">
-          {/* Desktop Header */}
-          <div className="hidden lg:block lg:px-8 lg:py-6">
-            <div className="flex items-center gap-3.5">
-              <button className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Reserve Room</h2>
-                <p className="text-sm text-gray-500">Step 1 of 4</p>
+          {/* Calendar and Check-in/Check-out Section */}
+          <div className="content-stretch flex flex-col gap-4 items-start justify-start px-3.5 relative shrink-0 w-full">
+            {/* Check-in/Check-out Display */}
+            <div className="bg-[#f3f4f6] rounded-[14px] border border-[#e5e7eb] p-[14px] w-full">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>Check-in</div>
+                  <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    {selectedDateRange.startDate 
+                      ? selectedDateRange.startDate.toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'short'
+                        })
+                      : 'Aug 5'
+                    }
+                  </div>
+                </div>
+                <div className="w-[1px] h-[28px] bg-[#e5e7eb]"></div>
+                <div className="flex flex-col">
+                  <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>Check-out</div>
+                  <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    {selectedDateRange.endDate 
+                      ? selectedDateRange.endDate.toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'short'
+                        })
+                      : 'Aug 13'
+                    }
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Calendar Section */}
-          <div className="px-4 lg:px-8 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
-            <div className="text-center lg:text-left mb-5 lg:mb-8">
-              <h2 className="text-lg lg:text-2xl font-semibold text-gray-900 mb-1 lg:mb-2">
-                When would you like to move in?
-              </h2>
-              <p className="text-sm lg:text-base text-gray-600">
-                Choose your preferred move-in date
-              </p>
             </div>
 
             {/* Calendar */}
-            <div className="mb-6 lg:mb-8">
+            <div className="w-full">
               <Calendar
-                 selectionMode="range"
-                 selectedDateRange={selectedDateRange}
-                 onDateRangeSelect={handleDateRangeSelect}
-                 displayDate={new Date(2025, 7, 1)} // August 2025
-                 isDateAvailable={(date) => {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    return date >= today;
-                 }}
-                 className="w-full"
+                selectionMode="range"
+                selectedDateRange={selectedDateRange}
+                onDateRangeSelect={handleDateRangeSelect}
+                displayDate={new Date(2025, 7, 1)} // August 2025
+                isDateAvailable={(date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return date >= today;
+                }}
+                className="w-full"
               />
             </div>
 
-            {/* Check-in/Check-out Display */}
-            <div className="mb-6 lg:mb-8">
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <div className="text-sm font-medium text-gray-900">Check-in</div>
-                    <div className="text-sm text-gray-600">
-                      {selectedDateRange.startDate 
-                        ? selectedDateRange.startDate.toLocaleDateString('en-US', {
-                            day: 'numeric',
-                            month: 'short'
-                          })
-                        : 'Select date'
-                      }
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="text-sm font-medium text-gray-900">Check-out</div>
-                    <div className="text-sm text-gray-600">
-                      {selectedDateRange.endDate 
-                        ? selectedDateRange.endDate.toLocaleDateString('en-US', {
-                            day: 'numeric',
-                            month: 'short'
-                          })
-                        : 'Select date'
-                      }
-                    </div>
-                  </div>
+            {/* Duration Options */}
+            <div className="content-stretch flex flex-col gap-[10.5px] items-start justify-start relative shrink-0 w-full">
+              <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
+                <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#101828] text-[12.3px] w-full">
+                  <p className="leading-[17.5px]">Or choose duration</p>
                 </div>
               </div>
+              <div className="content-start flex flex-wrap gap-[11px] items-start justify-between relative shrink-0 w-full">
+                {durationOptions.map((option) => (
+                  <div key={option.id} className="relative">
+                    <button
+                      onClick={() => handleDurationSelect(option.id)}
+                      className={`
+                        box-border content-stretch flex flex-col items-start justify-center px-[15px] py-2 relative rounded-[12px] shrink-0 w-[170px] transition-all
+                        ${selectedDuration === option.id
+                          ? 'border border-[#030213] bg-[#030213]/5'
+                          : 'border border-[#d1d5dc] hover:border-[#030213]/30'
+                        }
+                      `}
+                    >
+                      <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
+                        <p className="leading-[17.5px] whitespace-pre">{option.label}</p>
+                      </div>
+                      <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
+                        <p className="leading-[17.5px] whitespace-pre">₹{option.price.toLocaleString()}/{option.unit}</p>
+                      </div>
+                    </button>
+                    {option.discount && (
+                      <div className="absolute bg-green-100 right-[-8px] top-[-8px] rounded-[6.75px] border border-[#b9f8cf]">
+                        <div className="box-border content-stretch flex items-center justify-center overflow-clip px-2 py-[2.75px] relative">
+                          <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#008236] text-[10.5px] text-center text-nowrap">
+                            <p className="leading-[14px] whitespace-pre">{option.discount}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-            
-
-            {/* Move-in Options */}
-            <div className="flex gap-2 lg:gap-3 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
-              {[
-                { id: 'immediate', label: 'Immediate', value: 'immediate' },
-                { id: '15days', label: '15 days', value: '15days' },
-                { id: '30days', label: '30 days', value: '30days' },
-                { id: '7days', label: '7 days', value: '7days' }
-              ].map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => handleMoveInOption(option.value)}
-                  className={`
-                    rounded-xl px-3 py-2 lg:px-4 lg:py-3 text-xs lg:text-sm whitespace-nowrap transition-colors
-                    ${selectedOption === option.value
-                      ? 'bg-blue-600 border border-blue-600 text-white'
-                      : 'bg-blue-50 border border-blue-200 text-blue-800 hover:bg-blue-100'
-                    }
-                  `}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Continue Button */}
-          <div className="fixed lg:relative bottom-0 left-0 right-0 p-4 lg:p-8 bg-white border-t lg:border-t-0 border-gray-100">
-            <button
-              onClick={handleContinue}
-              disabled={isContinueDisabled}
-              className={`
-                w-full py-3.5 lg:py-4 rounded-xl text-sm lg:text-base font-semibold transition-colors
-                ${isContinueDisabled
-                  ? 'bg-gray-200 text-gray-500'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-                }
-              `}
-            >
-              Continue
-            </button>
           </div>
         </div>
+      </div>
+
+      {/* Continue Button - Fixed at bottom */}
+      <div className="shrink-0 bg-white border-t border-gray-100 p-4">
+        <button
+          onClick={handleContinue}
+          disabled={isContinueDisabled}
+          className={`
+            w-full py-3.5 rounded-[14px] font-['SF_Pro_Text',_sans-serif] font-semibold text-[14px] text-center transition-all
+            ${isContinueDisabled 
+              ? 'bg-gray-200 text-[#6a7282]' 
+              : 'bg-[#030213] text-white hover:bg-[#030213]/90'
+            }
+          `}
+        >
+          Continue
+        </button>
       </div>
     </div>
   );
