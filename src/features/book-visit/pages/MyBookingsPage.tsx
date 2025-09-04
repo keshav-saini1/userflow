@@ -12,8 +12,17 @@ import { useBookVisitApi, type Visit } from "../api/useBookVisitApi";
 const MyBookingsPage: React.FC = () => {
    const navigate = useNavigate();
    const [searchQuery, setSearchQuery] = useState("");
-   const [filterType] = useState("all");
+   const [filterType, setFilterType] = useState("all");
+   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
    const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+
+   // Filter options
+   const filterOptions = [
+      { value: "all", label: "All Bookings" },
+      { value: "upcoming", label: "Upcoming" },
+      { value: "completed", label: "Done" },
+      { value: "cancelled", label: "Cancelled" }
+   ];
 
    // API hook
    const { listVisits, isLoadingVisits, listVisitsError, listVisitsData } = useBookVisitApi();
@@ -190,11 +199,40 @@ const MyBookingsPage: React.FC = () => {
                      </div>
 
                      {/* Filter Dropdown */}
-                     <div className="bg-gray-50 border border-gray-200 rounded-[12.75px] px-4 py-2 md:py-2.5 flex items-center justify-between md:justify-start gap-2 md:w-40">
-                        <span className="text-[14px] md:text-sm text-gray-900">
-                           All Bookings
-                        </span>
-                        <GoChevronDown className="text-gray-600 w-6 h-6" />
+                     <div className="relative md:w-40">
+                        <button
+                           onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                           className="w-full bg-gray-50 border border-gray-200 rounded-[12.75px] px-4 py-2 md:py-2.5 flex items-center justify-between gap-2 hover:bg-gray-100 transition-colors"
+                        >
+                           <span className="text-[14px] md:text-sm text-gray-900">
+                              {filterOptions.find(option => option.value === filterType)?.label}
+                           </span>
+                           <GoChevronDown className={`text-gray-600 w-6 h-6 transition-transform ${
+                              isFilterDropdownOpen ? 'rotate-180' : ''
+                           }`} />
+                        </button>
+                        
+                        {/* Dropdown Menu */}
+                        {isFilterDropdownOpen && (
+                           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-[12.75px] shadow-lg z-50">
+                              {filterOptions.map((option) => (
+                                 <button
+                                    key={option.value}
+                                    onClick={() => {
+                                       setFilterType(option.value);
+                                       setIsFilterDropdownOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2.5 text-left text-[14px] md:text-sm hover:bg-gray-50 transition-colors first:rounded-t-[12.75px] last:rounded-b-[12.75px] ${
+                                       filterType === option.value
+                                          ? 'text-blue-600 bg-blue-50'
+                                          : 'text-gray-900'
+                                    }`}
+                                 >
+                                    {option.label}
+                                 </button>
+                              ))}
+                           </div>
+                        )}
                      </div>
                   </div>
                </div>

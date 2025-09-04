@@ -2,6 +2,7 @@ import React from 'react';
 import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import room_reserve from '@/assets/room_reserve.svg';
+import { useNavigate } from 'react-router';
 
 interface BookingSummary {
   bookingId: string;
@@ -14,6 +15,7 @@ interface BookingSummary {
 
 const ReservationStep4: React.FC = () => {
   const { form, previousStep, resetForm } = useReservation();
+  const navigate = useNavigate();
 
   // Sample property data - in real app this would come from props or API
   const property: Property = {
@@ -75,7 +77,9 @@ const ReservationStep4: React.FC = () => {
 
   const handleComplete = () => {
     // Reset form and navigate to home or success page
-    resetForm();
+    // resetForm();
+    navigate('/bookings')
+
     // In a real app, you might navigate to a success page or home
     console.log('Reservation completed successfully');
   };
@@ -167,7 +171,7 @@ const ReservationStep4: React.FC = () => {
               </button>
               <div>
                 <h2 className="text-lg font-medium text-gray-900">Reserve Room</h2>
-                <p className="text-sm text-gray-500">Step 5 of 5</p>
+                <p className="text-sm text-gray-500">Step 4 of 4</p>
               </div>
             </div>
           </div>

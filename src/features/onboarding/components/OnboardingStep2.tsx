@@ -5,6 +5,7 @@ import { useButtonAnimation } from "../hooks/useOnboarding";
 import whiteArrow from "@/assets/white_arrow 1.svg";
 import verified from "@/assets/onboarding/verified.svg";
 import { BaseBottomSheet } from "@/components";
+import { useOnboardingStore } from "../store/useOnboardingStore";
 
 interface FormData {
    name: string;
@@ -18,6 +19,9 @@ const OnboardingStep2: OnboardingStepComponent = ({
 }) => {
    const { animateSuccess } = useButtonAnimation();
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
+   const { propertyData } = useOnboardingStore();
+
+   console.log({ propertyData })
 
    const {
       register,
@@ -59,35 +63,53 @@ const OnboardingStep2: OnboardingStepComponent = ({
       onPrev();
    };
 
+   const getPropertyInitals = () => {
+      if (!propertyData?.propertyName) return "";
+      const words = propertyData.propertyName.split(" ");
+      const firstWord = words[0];
+      return firstWord.slice(0, 2);
+   };
+
    return (
       <BaseBottomSheet
          isOpen={true}
          onClose={handleClose}
-         title="Nirvana Rooms"
+         title={""}
          bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-6 lg:pb-8"
       >
          {/* Subheader with verification */}
-         <div className="flex items-center gap-[10.5px] mb-4">
-            <div className="w-7 h-7 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
-               <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">
-                  N
-               </span>
+         <div className="flex items-center gap-[10.5px] mb-4 -mt-3">
+            <div className="w-12 h-12 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
+               <div className="flex items-center justify-center">
+                  {
+                     propertyData?.logo_url ? (
+                        <img src={propertyData?.logo_url} alt="logo" className="w-full h-full object-contain" />
+                     ) : (
+                        <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">
+                           {getPropertyInitals()}
+                        </span>
+                     )
+                  }
+               </div>
             </div>
-            <div className="flex items-center gap-[3.5px]">
-               <img src={verified} alt="verified" className="w-3 h-3" />
-               <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
-                  Verified property
-               </span>
+            <div className="flex flex-col -mt-1">
+               <span className="text-sm">{propertyData?.propertyName}</span>
+               <div className="flex items-center gap-[3.5px]">
+                  <img src={verified} alt="verified" className="w-3 h-3" />
+                  <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
+                     Verified property
+                  </span>
+               </div>
             </div>
          </div>
 
-         <form onSubmit={handleSubmit(onSubmit)}>
+         <form onSubmit={handleSubmit(onSubmit)} className="mt-16">
             {/* Main content */}
             <div className="h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
                {/* Welcome heading */}
                <div className="text-center mb-4 lg:mb-10 animate-form-element flex flex-col gap-4">
-                  <span className="text-[#030213] text-2xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
-                     Welcome to Nirvana Rooms! 🏠
+                  <span className="text-[#030213] text-xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
+                     Welcome to {propertyData?.propertyName}! 🏠
                   </span>
                   <span className="text-neutral-500 text-md lg:text-sm font-medium leading-[17.5px]">
                      What should we call you?
@@ -176,7 +198,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                <div className="text-center mb-[21px] lg:mb-8 mt-4 lg:mt-6 animate-form-element">
                   <p className="text-[#717182] text-[12.3px] lg:text-sm leading-[19.91px] lg:leading-relaxed">
                      We'll use this to personalize your room recommendations
-                     at our Iffco Chowk property.
+                     at our {propertyData?.propertyAddress?.address_line_1} property.
                   </p>
                </div>
             </div>
@@ -188,11 +210,10 @@ const OnboardingStep2: OnboardingStepComponent = ({
                   ref={submitButtonRef}
                   type="submit"
                   disabled={!isFormValid}
-                  className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                     isFormValid
+                  className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${isFormValid
                         ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
                         : "bg-[#030213]/40"
-                  }`}
+                     }`}
                >
                   <span className="text-white text-[14px] lg:text-base font-medium leading-[21px]">
                      Continue
@@ -203,7 +224,7 @@ const OnboardingStep2: OnboardingStepComponent = ({
                {/* Trust indicators */}
                <div className="flex items-center justify-center gap-[7px] lg:gap-2">
                   <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
-                     200+ residents joined safely
+                     {propertyData?.total_tenants_count}+ residents joined safely
                   </span>
                   <div className="w-[3.5px] h-[3.5px] bg-[#717182]/50 rounded-full" />
                   <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">

@@ -24,17 +24,31 @@ const ReservationStep1: React.FC = () => {
 
   const handleDateRangeSelect = (range: DateRange) => {
     setSelectedDateRange(range);
+    // Clear duration selection when both dates are selected
+    if (range.startDate && range.endDate) {
+      setSelectedDuration(null);
+    }
     // Persist at least the start date to the form for compatibility
     updateForm({ selectedDate: range.startDate });
   };
 
   const handleContinue = () => {
-    if (selectedDateRange.startDate && selectedDateRange.endDate && selectedDuration) {
+    // Two scenarios:
+    // 1. Both dates selected (no duration needed)
+    // 2. Only start date selected + duration selected
+    const hasBothDates = selectedDateRange.startDate && selectedDateRange.endDate;
+    const hasStartDateAndDuration = selectedDateRange.startDate && !selectedDateRange.endDate && selectedDuration;
+    
+    if (hasBothDates || hasStartDateAndDuration) {
       nextStep();
     }
   };
 
-  const isContinueDisabled = !selectedDateRange.startDate || !selectedDateRange.endDate || !selectedDuration;
+  const isContinueDisabled = (() => {
+    const hasBothDates = selectedDateRange.startDate && selectedDateRange.endDate;
+    const hasStartDateAndDuration = selectedDateRange.startDate && !selectedDateRange.endDate && selectedDuration;
+    return !(hasBothDates || hasStartDateAndDuration);
+  })();
 
   // Duration options with pricing
   const durationOptions = [
@@ -141,32 +155,35 @@ const ReservationStep1: React.FC = () => {
           <div className="content-stretch flex flex-col gap-4 items-start justify-start px-3.5 relative shrink-0 w-full">
             {/* Check-in/Check-out Display */}
             <div className="bg-[#f3f4f6] rounded-[14px] border border-[#e5e7eb] p-[14px] w-full">
-              <div className="flex items-center justify-between">
+              <div className={`flex items-center ${selectedDateRange.endDate ? 'justify-between' : 'justify-start'}`}>
                 <div className="flex flex-col">
-                  <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>Check-in</div>
+                  <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                    {selectedDateRange.endDate ? 'Check-in' : 'Move-in Date'}
+                  </div>
                   <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
                     {selectedDateRange.startDate 
                       ? selectedDateRange.startDate.toLocaleDateString('en-US', {
                           day: 'numeric',
                           month: 'short'
                         })
-                      : 'Aug 5'
+                      : 'Select date'
                     }
                   </div>
                 </div>
-                <div className="w-[1px] h-[28px] bg-[#e5e7eb]"></div>
-                <div className="flex flex-col">
-                  <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>Check-out</div>
-                  <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                    {selectedDateRange.endDate 
-                      ? selectedDateRange.endDate.toLocaleDateString('en-US', {
+                {selectedDateRange.endDate && (
+                  <>
+                    <div className="w-[1px] h-[28px] bg-[#e5e7eb]"></div>
+                    <div className="flex flex-col">
+                      <div className="text-[12.3px] font-medium text-[#101828]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>Check-out</div>
+                      <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
+                        {selectedDateRange.endDate.toLocaleDateString('en-US', {
                           day: 'numeric',
                           month: 'short'
-                        })
-                      : 'Aug 13'
-                    }
-                  </div>
-                </div>
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -186,13 +203,14 @@ const ReservationStep1: React.FC = () => {
               />
             </div>
 
-            {/* Duration Options */}
-            <div className="content-stretch flex flex-col gap-[10.5px] items-start justify-start relative shrink-0 w-full">
-              <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
-                <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#101828] text-[12.3px] w-full">
-                  <p className="leading-[17.5px]">Or choose duration</p>
+            {/* Duration Options - Only show when only check-in date is selected */}
+            {selectedDateRange.startDate && !selectedDateRange.endDate && (
+              <div className="content-stretch flex flex-col gap-[10.5px] items-start justify-start relative shrink-0 w-full">
+                <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
+                  <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#101828] text-[12.3px] w-full">
+                    <p className="leading-[17.5px]">Choose duration</p>
+                  </div>
                 </div>
-              </div>
               <div className="content-start flex flex-wrap gap-[11px] items-start justify-between relative shrink-0 w-full">
                 {durationOptions.map((option) => (
                   <div key={option.id} className="relative">
@@ -225,7 +243,8 @@ const ReservationStep1: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

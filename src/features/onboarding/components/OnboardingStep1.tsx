@@ -5,9 +5,9 @@ import room from "@/assets/onboarding/room.svg";
 import crew from "@/assets/onboarding/crew.svg";
 import adulting from "@/assets/onboarding/adulting.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
-import { useOnboardingApi, type PropertyPageData } from "../api/useOnboardingApi";
 import { useSearchParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useOnboardingStore } from "../store/useOnboardingStore";
 
 const feature_images: Record<number, string> = {
    1: room,
@@ -18,25 +18,20 @@ const feature_images: Record<number, string> = {
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
    // eazypg_id from url query params
    const [searchParams] = useSearchParams();
-   const [pageData, setPageData] = useState<PropertyPageData | null>(null);
-   const { getPublicProperty, getPublicPropertyData } = useOnboardingApi();
-   const [propertyData, setPropertyData] = useState<any>();
-
    const eazypgId = searchParams.get('eazypg_id');
+   
+   // Use Zustand store
+   const {
+      propertyData,
+      pageData,
+      fetchPublicProperty
+   } = useOnboardingStore();
 
    useEffect(() => {
       if (eazypgId) {
-         getPublicProperty(eazypgId);
+         fetchPublicProperty(eazypgId);
       }
-   }, [eazypgId, getPublicProperty]);
-
-   useEffect(() => {
-      if (getPublicPropertyData) {
-         setPageData(JSON.parse(getPublicPropertyData?.data?.pageData))
-         setPropertyData(getPublicPropertyData?.data);
-         localStorage.setItem('selectedPropertyId', getPublicPropertyData?.data?.id);
-      }
-   }, [getPublicPropertyData])
+   }, [eazypgId, fetchPublicProperty]);
 
    const handleContinue = () => {
       // Trigger Step 2 overlay

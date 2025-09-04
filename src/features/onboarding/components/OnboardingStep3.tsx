@@ -8,6 +8,7 @@ import whiteArrow from "@/assets/white_arrow 1.svg";
 import { BaseBottomSheet } from "@/components";
 import { useOnboardingApi } from "../api/useOnboardingApi";
 import { toast } from "sonner"
+import { useOnboardingStore } from "../store/useOnboardingStore";
 
 interface FormData {
   phone: string;
@@ -22,8 +23,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
   const { animateSuccess } = useButtonAnimation();
   const submitButtonRef = React.useRef<HTMLButtonElement>(null);
   const username = useMemo(() => currentData.personalInfo?.name, [currentData.personalInfo?.name]);
-  console.log({ username });
-
+  const { propertyData } = useOnboardingStore();
   // Initialize country code from existing data or default to +91
   const initializeCountryCode = () => {
     const existingPhone = currentData.personalInfo?.phone;
@@ -174,30 +174,53 @@ const OnboardingStep3: OnboardingStepComponent = ({
     onPrev();
   };
 
+  const getPropertyInitals = () => {
+    if (!propertyData?.propertyName) return "";
+    const words = propertyData.propertyName.split(" ");
+    const firstWord = words[0];
+    return firstWord.slice(0, 2);
+  };
+
   return (
     <BaseBottomSheet
       isOpen={true}
       onClose={handleClose}
-      title="Nirvana Rooms"
-      bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-6 lg:pb-8"
+      title=""
+      bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-0 flex flex-col"
+      minHeight="75vh"
     >
       {/* Subheader with verification */}
-      <div className="flex items-center gap-[10.5px] mb-4">
-        <div className="w-7 h-7 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
-          <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">N</span>
+      <div className="flex items-center gap-[10.5px] mb-4 -mt-3">
+        <div className="w-12 h-12 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
+          <div className="flex items-center justify-center">
+            {
+              propertyData?.logo_url ? (
+                <img src={propertyData?.logo_url} alt="logo" className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">
+                  {getPropertyInitals()}
+                </span>
+              )
+            }
+          </div>
         </div>
-        <div className="flex items-center gap-[3.5px]">
-          <img src={verified} alt="verified" className="w-3 h-3" />
-          <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">Verified property</span>
+        <div className="flex flex-col -mt-1">
+          <span className="text-sm">{propertyData?.propertyName}</span>
+          <div className="flex items-center gap-[3.5px]">
+            <img src={verified} alt="verified" className="w-3 h-3" />
+            <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
+              Verified property
+            </span>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-12 flex flex-col h-full">
         {/* Main content */}
-        <div className="lg:h-auto lg:max-h-[60vh] overflow-auto">
+        <div className="flex-1 overflow-auto pb-24">
           {/* Welcome heading */}
-          <div className="text-center mb-4 lg:mb-10 animate-form-element w-[80%] mx-auto flex flex-col gap-4">
-            <span className="text-[#030213] text-2xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
+          <div className="text-center mb-4 lg:mb-10 animate-form-element w-[85%] mx-auto flex flex-col gap-4">
+            <span className="text-[#030213] text-xl lg:text-4xl font-medium leading-[26.25px] lg:leading-tight">
               Great to meet you, {username}! 👋
             </span>
             <span className="text-neutral-500 text-md lg:text-sm font-medium  leading-[25.5px]">
@@ -264,15 +287,15 @@ const OnboardingStep3: OnboardingStepComponent = ({
         </div>
 
         {/* Bottom section with button and trust indicators */}
-        <div className="absolute lg:relative bottom-0 left-0 right-0 bg-white/95 lg:bg-white backdrop-blur lg:backdrop-blur-none rounded-t-[14px] lg:rounded-none px-[14px] lg:px-8 pt-3 lg:pt-0 pb-4 lg:pb-8 border-t lg:border-t-0 border-gray-100">
+        <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur rounded-t-[14px] px-[21px] pt-3 pb-4 border-t border-gray-100">
           {/* Continue button */}
           <button
             ref={submitButtonRef}
             type="submit"
             disabled={!isFormValid}
             className={`w-full h-[49px] lg:h-12 rounded-[14px] lg:rounded-2xl flex items-center justify-center gap-[10.5px] lg:gap-3 mb-2 lg:mb-4 transition-all hover:scale-[1.02] active:scale-[0.98] ${isFormValid
-                ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
-                : "bg-[#030213]/40"
+              ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
+              : "bg-[#030213]/40"
               }`}
           >
             <span className="text-white text-[14px] lg:text-base font-medium leading-[21px]">

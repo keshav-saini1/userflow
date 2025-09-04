@@ -76,6 +76,8 @@ export interface PublicPropertyResponse {
     moveInStatus: string;
     verifiedStatus: boolean;
     propertyTag: string[];
+    logo_url: string | null;
+    total_tenants_count: number;
     pageData: string; // JSON string that can be parsed to PropertyPageData
   }
 }
@@ -91,7 +93,7 @@ async function postVerifyOtp(payload: VerifyOtpRequest): Promise<any> {
 }
 
 async function getPublicProperty(eazypgId: string): Promise<any> {
-  const { data } = await api.get<any>(`/property/public/${eazypgId}`);
+  const { data } = await api.get<any>(`/property/${eazypgId}/public`);
   return data;
 }
 
