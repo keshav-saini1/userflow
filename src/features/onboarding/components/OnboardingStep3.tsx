@@ -7,7 +7,7 @@ import verified from "@/assets/onboarding/verified.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
 import { BaseBottomSheet } from "@/components";
 import { useOnboardingApi } from "../api/useOnboardingApi";
-import { toast } from "sonner"
+import { showToast } from "@/components"
 import { useOnboardingStore } from "../store/useOnboardingStore";
 
 interface FormData {
@@ -160,11 +160,12 @@ const OnboardingStep3: OnboardingStepComponent = ({
 
   useEffect(() => {
     if (getOtpError) {
-      toast.error(getOtpError.message);
+      const errorMessage = (getOtpError as any)?.response?.data?.message || getOtpError.message || 'Something went wrong';
+      showToast.error('Failed to send OTP', errorMessage);
     }
 
     if (getOtpData) {
-      toast.success(getOtpData.message);
+      showToast.success('OTP sent successfully', getOtpData.message);
       onNext();
     }
   }, [getOtpData, getOtpError])
@@ -187,7 +188,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
       onClose={handleClose}
       title=""
       bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-0 flex flex-col"
-      minHeight="75vh"
+      minHeight="60vh"
     >
       {/* Subheader with verification */}
       <div className="flex items-center gap-[10.5px] mb-4 -mt-3">
@@ -215,7 +216,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-12 flex flex-col h-full">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 flex flex-col h-full">
         {/* Main content */}
         <div className="flex-1 overflow-auto pb-24">
           {/* Welcome heading */}

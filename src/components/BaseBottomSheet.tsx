@@ -112,7 +112,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: title ? 0.4 : 0.2, duration: 0.3 }}
-              className={`flex-1 overflow-y-auto ${title ? '' : 'pt-4'} ${bodyClassName}`}
+              className={`flex-1 min-h-0 overflow-y-auto ${title ? '' : 'pt-4'} ${bodyClassName}`}
             >
               {children}
             </motion.div>

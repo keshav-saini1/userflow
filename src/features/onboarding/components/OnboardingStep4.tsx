@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router';
 import verified from "@/assets/onboarding/verified.svg";
 import { BaseBottomSheet } from "@/components";
 import { useOnboardingApi } from '../api/useOnboardingApi';
-import { toast } from 'sonner';
+import { showToast } from '@/components';
+import { useOnboardingStore } from '../store/useOnboardingStore';
 
 interface OtpFormData {
   otp0: string;
@@ -24,6 +25,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const { animateSuccess } = useButtonAnimation();
   const navigate = useNavigate();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const { propertyData } = useOnboardingStore();
 
   const {
     control,
@@ -127,11 +129,13 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
   useEffect(() => {
     if (verifyOtpError) {
-      toast.error(verifyOtpError.message);
+      const errorMessage = (verifyOtpError as any)?.response?.data?.message || verifyOtpError.message || 'Something went wrong';
+      showToast.error('OTP verification failed', errorMessage);
     }
     if (verifyOtpData) {
-      toast.success(verifyOtpData.message);
+      showToast.success('OTP verified successfully', verifyOtpData.message);
       console.log({verifyOtpData});
+      localStorage.setItem('tenant_status', verifyOtpData?.data?.verifyResponse?.tenant_status || '')
       localStorage.setItem('token', verifyOtpData?.data?.token || '');
       navigate('/persona-selection')
     }
@@ -158,25 +162,46 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   // OTP field names for mapping
   const otpFields: (keyof OtpFormData)[] = ['otp0', 'otp1', 'otp2', 'otp3', 'otp4', 'otp5'];
 
+  const getPropertyInitals = () => {
+    if (!propertyData?.propertyName) return "";
+    const words = propertyData.propertyName.split(" ");
+    const firstWord = words[0];
+    return firstWord.slice(0, 2);
+  };
+
   return (
     <BaseBottomSheet
       isOpen={true}
       onClose={handleClose}
-      title="Nirvana Rooms"
       bodyClassName="px-[21px] lg:px-8 pt-7 lg:pt-8 pb-[84px] lg:pb-8"
     >
       {/* Header subtext */}
-      <div className="flex items-center gap-[10.5px] mb-4">
-        <div className="w-7 h-7 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
-          <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">N</span>
+      <div className="flex items-center gap-[10.5px] mb-4 -mt-3">
+        <div className="w-12 h-12 lg:w-10 lg:h-10 bg-[#030213]/10 rounded-[8.75px] lg:rounded-xl flex items-center justify-center">
+          <div className="flex items-center justify-center">
+            {
+              propertyData?.logo_url ? (
+                <img src={propertyData?.logo_url} alt="logo" className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-[#030213] text-[12.3px] lg:text-base font-medium leading-[17.5px]">
+                  {getPropertyInitals()}
+                </span>
+              )
+            }
+          </div>
         </div>
-        <div className="flex items-center gap-[3.5px]">
-          <img src={verified} alt="verified" className="w-3 h-3" />
-          <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">Verify code</span>
+        <div className="flex flex-col -mt-1">
+          <span className="text-sm">{propertyData?.propertyName}</span>
+          <div className="flex items-center gap-[3.5px]">
+            <img src={verified} alt="verified" className="w-3 h-3" />
+            <span className="text-[#717182] text-[10.5px] lg:text-xs leading-[14px]">
+              Verified property
+            </span>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-10 flex flex-col h-full">
         {/* Content */}
         <div className="h-[287px] lg:h-auto lg:max-h-[60vh] overflow-auto">
           <div className="flex flex-col gap-[35px] lg:gap-10">

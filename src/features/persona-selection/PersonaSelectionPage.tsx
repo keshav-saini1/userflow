@@ -6,7 +6,8 @@ import app from "../../assets/persona/app.svg";
 import { FiArrowRight, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import ConfirmSheet from "../joining-form/components/ConfirmSheet";
-
+import { useOnboardingStore } from "../onboarding/store/useOnboardingStore";
+import { BadgeCheck } from "lucide-react";
 interface PersonaOption {
    id: string;
    title: string;
@@ -15,11 +16,15 @@ interface PersonaOption {
    href: string;
 }
 
+// 0-evicted,1-tenant,2-booking,3-lead,4-Invite,5-Permanently Deleted Tenant,6- Deleted Invitation,7 - deleted lead
+
 const PersonaSelectionPage: React.FC = () => {
    const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
    const [showConfirmSheet, setShowConfirmSheet] = useState(false);
    const navigate = useNavigate();
    const username = localStorage.getItem("username");
+   const tenantStatus = localStorage.getItem("tenant_status");
+   const {propertyData} = useOnboardingStore();
 
    const personaOptions: PersonaOption[] = [
       {
@@ -29,13 +34,13 @@ const PersonaSelectionPage: React.FC = () => {
          icon: newPlace,
          href: "/property-listing",
       },
-      {
+      ...(tenantStatus !== "3" ? [{
          id: "existing-tenant",
          title: "I'm an existing tenant",
          description: "But I'm using a different phone number now",
          icon: existingTenant,
          href: "/bookings",
-      },
+      }] : []),
       {
          id: "not-added",
          title: "I wasn't added to the app",
@@ -87,19 +92,19 @@ const PersonaSelectionPage: React.FC = () => {
                style={{
                   backgroundImage: `linear-gradient(to bottom, 
               rgba(0,0,0,0.4) 0%, 
-              rgba(0,0,0,0.2) 50%, 
-              rgba(0,0,0,0.6) 100%
+              rgba(0,0,0,0.5) 50%, 
+              rgba(0,0,0,0.5) 100%
             ), url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')`,
                }}
             >
                {/* User Greeting Overlay */}
                <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 lg:left-12 lg:right-12 flex flex-col gap-1.5">
-                  <span className="font-bold text-white text-2xl md:text-3xl lg:text-3xl leading-tight tracking-tight">
+                  <span className="font-bold text-white text-2xl md:text-3xl lg:text-3xl leading-tight tracking-tight capitalize">
                      Hey {username}!
                   </span>
-                  <p className="text-white/90 text-sm md:text-base lg:text-base">
-                     Gurugram, India
-                  </p>
+                  <p className="text-white/90 text-sm md:text-base lg:text-base uppercase ">
+                     Welcome to { propertyData?.propertyName }
+                  </p> 
                </div>
             </div>
 
@@ -179,7 +184,7 @@ const PersonaSelectionPage: React.FC = () => {
                {/* Security Note */}
                <div className="flex justify-center pt-6 md:pt-6 lg:pt-8 w-full">
                   <div className="bg-green-50 flex items-center gap-3 px-4 md:px-6 py-3 md:py-3 lg:py-4 rounded-full">
-                     <div className="w-2 h-2 md:w-3 md:h-3 bg-[#00c950] rounded-full" />
+                     <BadgeCheck className="w-5 h-5 text-green-500" />
                      <p className="text-[#45556c] text-xs md:text-base lg:text-base">
                         Your information is secure and will never be shared
                      </p>
