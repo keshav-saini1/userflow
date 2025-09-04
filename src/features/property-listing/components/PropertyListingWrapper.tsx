@@ -41,6 +41,7 @@ const PropertyListingWrapper = () => {
       if(getPropertyListData) {
          console.log({getPropertyListData})
          const uiListing = mapApiToPropertyListing(getPropertyListData);
+         console.log({uiListing})
          setPropertyListing(uiListing);
          setPropertyListLoading(false);
       } 

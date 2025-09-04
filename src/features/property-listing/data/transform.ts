@@ -25,6 +25,7 @@ export function mapApiToPropertyListing(api: any): PropertyListing {
       sharing_type: opt.sharing_type,
       type: (opt.optionType || "room").toLowerCase(),
       occupancy: opt.occupancyType || "",
+      address: opt.locationObject,
       pricing: {
         currentPrice,
         originalPrice,

@@ -132,7 +132,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                            className="w-4 h-4"
                         />
                         <p className="text-[#4a5565] text-[12.3px] font-normal leading-[17.5px]">
-                           Koromangala
+                           {property?.address?.city}
                         </p>
                      </div>
                      <div className="flex items-center gap-2">

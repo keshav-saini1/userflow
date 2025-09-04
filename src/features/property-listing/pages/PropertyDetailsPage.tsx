@@ -139,6 +139,8 @@ export default function PropertyDetailsPage({
       navigate(`/property-details/${sharing_type}/rental-options`);
    }
 
+   console.log({propertyData})
+
    return (
       <div className="min-h-screen w-screen bg-gray-50">
          {/* Header */}
@@ -181,8 +183,8 @@ export default function PropertyDetailsPage({
                         {/* Title and Tags */}
                         <div className="space-y-3">
                            <div className="space-y-3">
-                              <h2 className="text-base lg:text-xl font-semibold text-gray-900">
-                                 {propertyData?.title || 'Property'}
+                              <h2 className="text-base lg:text-xl font-semibold text-gray-900 capitalize">
+                                 {propertyData?.title || 'Property'} {propertyData?.type}
                               </h2>
                               <div className="flex gap-2 flex-wrap">
                                  {(propertyData?.tags || []).map((tag) => (
