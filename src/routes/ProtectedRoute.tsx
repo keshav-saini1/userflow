@@ -94,8 +94,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole = false,
   fallbackPath = '/',
-  redirectAuthenticated = false,
-  authenticatedRedirectPath = '/property-listing',
+  // redirectAuthenticated = false,
+  // authenticatedRedirectPath = '/property-listing',
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();

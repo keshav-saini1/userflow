@@ -20,7 +20,7 @@ const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
    const [searchParams] = useSearchParams();
    const [pageData, setPageData] = useState<PropertyPageData | null>(null);
    const { getPublicProperty, getPublicPropertyData } = useOnboardingApi();
-   const [propertyData, setPropertyData] = useState();
+   const [propertyData, setPropertyData] = useState<any>();
 
    const eazypgId = searchParams.get('eazypg_id');
 

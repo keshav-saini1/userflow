@@ -80,13 +80,13 @@ export interface CancelVisitResponse {
   };
 }
 
-async function postCreateVisit(payload: CreateVisitRequest): Promise<ApiResponse<CreateVisitResponse>> {
-  const response = await api.post<ApiResponse<CreateVisitResponse>>('/visits/schedule', payload);
+async function postCreateVisit(payload: CreateVisitRequest): Promise<any> {
+  const response = await api.post<ApiResponse<any>>('/visits/schedule', payload);
   return response.data;
 }
 
-async function getListVisits(): Promise<ApiResponse<ListVisitsResponse>> {
-  const response = await api.get<ApiResponse<ListVisitsResponse>>('/visits');
+async function getListVisits(): Promise<any> {
+  const response = await api.get<any>('/visits');
   return response.data;
 }
 
@@ -118,14 +118,14 @@ export function useBookVisitApi() {
     createVisit: createVisitMutation.mutateAsync,
     createVisitStatus: createVisitMutation.status,
     isCreatingVisit: createVisitMutation.isPending,
-    createVisitError: createVisitMutation.error as unknown as Error | null,
+    createVisitError: createVisitMutation.error as any,
     createVisitData: createVisitMutation.data,
 
     // List Visits
     listVisits: listVisitsQuery.refetch,
     listVisitsStatus: listVisitsQuery.status,
     isLoadingVisits: listVisitsQuery.isLoading,
-    listVisitsError: listVisitsQuery.error as unknown as Error | null,
+    listVisitsError: listVisitsQuery.error as any,
     listVisitsData: listVisitsQuery.data,
     enableListVisits: () => listVisitsQuery.refetch(),
 
@@ -133,7 +133,7 @@ export function useBookVisitApi() {
     cancelVisit: cancelVisitMutation.mutateAsync,
     cancelVisitStatus: cancelVisitMutation.status,
     isCancelingVisit: cancelVisitMutation.isPending,
-    cancelVisitError: cancelVisitMutation.error as unknown as Error | null,
+    cancelVisitError: cancelVisitMutation.error as any,
     cancelVisitData: cancelVisitMutation.data,
   };
 }

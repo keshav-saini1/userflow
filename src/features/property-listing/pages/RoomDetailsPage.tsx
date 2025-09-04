@@ -4,7 +4,7 @@ import { FaChevronLeft } from "react-icons/fa";
 import { usePropertyStore } from "../store";
 import ImageGallery, { type GalleryCategory } from "../../../components/ImageGallery";
 import { IncludedServicesBottomSheet, AddOnServicesBottomSheet, PoliciesAndRulesBottomSheet } from "../components";
-import { VideoPlayer, VideoModal } from "@/components";
+import { VideoModal } from "@/components";
 import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
 import share from "@/assets/default_share.svg";
@@ -89,9 +89,9 @@ export default function RoomDetailsPage() {
       navigate('/location-commute');
    };
 
-   const handleVideoClick = (video: { src: string; title?: string }) => {
-      setSelectedVideo(video);
-   };
+   // const handleVideoClick = (video: { src: string; title?: string }) => {
+   //    setSelectedVideo(video);
+   // };
 
    const handleCloseVideoModal = () => {
       setSelectedVideo(null);

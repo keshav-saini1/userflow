@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, use } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import type { OnboardingStepComponent } from "../types";
 import { CountryCodePicker } from "@/components";
-import { useButtonAnimation, useOnboarding } from "../hooks/useOnboarding";
+import { useButtonAnimation } from "../hooks/useOnboarding";
 import verified from "@/assets/onboarding/verified.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
 import { BaseBottomSheet } from "@/components";
@@ -82,7 +82,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
     },
   });
 
-  const { getOtp, isGettingOtp, getOtpError, getOtpData } = useOnboardingApi();
+  const { getOtp, getOtpError, getOtpData } = useOnboardingApi();
 
   // Revalidate phone field when country code changes (only if user has interacted)
   useEffect(() => {

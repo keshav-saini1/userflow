@@ -46,7 +46,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     },
   });
 
-  const { verifyOtp, isVerifyingOtp, verifyOtpError, verifyOtpData } = useOnboardingApi();
+  const { verifyOtp, verifyOtpError, verifyOtpData } = useOnboardingApi();
 
   // Watch all OTP values to check completion
   const otpValues = watch();

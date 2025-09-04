@@ -80,18 +80,18 @@ export interface PublicPropertyResponse {
   }
 }
 
-async function postGetOtp(payload: GetOtpRequest): Promise<ApiResponse<GetOtpResponse>> {
-  const { data } = await api.post<ApiResponse<GetOtpResponse>>('/tenant/unified/otp/send', payload);
+async function postGetOtp(payload: GetOtpRequest): Promise<any> {
+  const { data } = await api.post<any>('/tenant/unified/otp/send', payload);
   return data;
 }
 
-async function postVerifyOtp(payload: VerifyOtpRequest): Promise<ApiResponse<VerifyOtpResponse>> {
-  const { data } = await api.post<ApiResponse<VerifyOtpResponse>>('/tenant/unified/otp/verify', payload);
+async function postVerifyOtp(payload: VerifyOtpRequest): Promise<any> {
+  const { data } = await api.post<any>('/tenant/unified/otp/verify', payload);
   return data;
 }
 
-async function getPublicProperty(eazypgId: string): Promise<ApiResponse<PublicPropertyResponse>> {
-  const { data } = await api.get<ApiResponse<PublicPropertyResponse>>(`/property/public/${eazypgId}`);
+async function getPublicProperty(eazypgId: string): Promise<any> {
+  const { data } = await api.get<any>(`/property/public/${eazypgId}`);
   return data;
 }
 

@@ -19,6 +19,8 @@ interface Booking {
    id: string;
    propertyName: string;
    location: string;
+   fullAddress: string;
+   cityAndPincode: string;
    status: 'active' | 'completed' | 'upcoming' | 'cancelled';
    bookingType: 'visit' | 'live-tour' | 'call' | 'reservation';
    scheduledDate: string;
@@ -31,12 +33,37 @@ const ReviewBookingPage: React.FC = () => {
    const navigate = useNavigate();
    const { bookingId } = useParams<{ bookingId: string }>();
    const [booking, setBooking] = useState<Booking | null>(null);
-   const [isLoading, setIsLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
    const [showCancelBottomSheet, setShowCancelBottomSheet] = useState(false);
 
    // API hook
-   const { listVisits, isLoadingVisits, listVisitsError, listVisitsData } = useBookVisitApi();
+   const { listVisits, listVisitsError, listVisitsData } = useBookVisitApi();
+
+   // Helper function to extract city and pincode from address
+   const getCityAndPincode = (fullAddress: string): string => {
+      // Extract city and pincode from full address
+      // Assuming format like "Street, Area, City, State - Pincode"
+      const parts = fullAddress.split(',');
+      if (parts.length >= 2) {
+         const lastPart = parts[parts.length - 1].trim();
+         const secondLastPart = parts[parts.length - 2].trim();
+         
+         // Check if last part contains pincode (6 digits)
+         const pincodeMatch = lastPart.match(/\d{6}/);
+         if (pincodeMatch) {
+            return `${secondLastPart}, ${lastPart}`;
+         }
+         
+         // If no pincode in last part, check second last
+         const pincodeMatch2 = secondLastPart.match(/\d{6}/);
+         if (pincodeMatch2) {
+            return `${secondLastPart}, ${lastPart}`;
+         }
+      }
+      
+      // Fallback to last two parts or full address if short
+      return parts.length >= 2 ? `${parts[parts.length - 2].trim()}, ${parts[parts.length - 1].trim()}` : fullAddress;
+   };
 
    // Transform API Visit to Booking format
    const transformVisitToBooking = (visit: Visit): Booking => {
@@ -87,24 +114,26 @@ const ReviewBookingPage: React.FC = () => {
          }
       };
 
-      const formatTime = (timeString: string): string => {
-         try {
-            const time = new Date(`2000-01-01T${timeString}`);
-            const formatted = time.toLocaleTimeString('en-US', {
-               hour: 'numeric',
-               minute: '2-digit',
-               hour12: true
-            });
-            return `${formatted} - ${time.getHours() + 1}:${time.getMinutes().toString().padStart(2, '0')} ${time.getHours() + 1 >= 12 ? 'PM' : 'AM'}`;
-         } catch {
-            return timeString;
-         }
-      };
+      // const formatTime = (timeString: string): string => {
+      //    try {
+      //       const time = new Date(`2000-01-01T${timeString}`);
+      //       const formatted = time.toLocaleTimeString('en-US', {
+      //          hour: 'numeric',
+      //          minute: '2-digit',
+      //          hour12: true
+      //       });
+      //       return `${formatted} - ${time.getHours() + 1}:${time.getMinutes().toString().padStart(2, '0')} ${time.getHours() + 1 >= 12 ? 'PM' : 'AM'}`;
+      //    } catch {
+      //       return timeString;
+      //    }
+      // };
 
       return {
          id: visit.id,
          propertyName: visit.propertyName || 'Property Name',
          location: visit.propertyAddress || 'Location',
+         fullAddress: visit.propertyAddress || 'Location',
+         cityAndPincode: getCityAndPincode(visit.propertyAddress || 'Location'),
          status: getStatus(visit.status),
          bookingType: getBookingType(visit.visit_type),
          scheduledDate: formatDate(visit.visit_date),
@@ -119,8 +148,8 @@ const ReviewBookingPage: React.FC = () => {
    }, [listVisits]);
 
    useEffect(() => {
-      if (listVisitsData?.status === 200 && listVisitsData?.data) {
-         const visits = listVisitsData?.data;
+      if (listVisitsData?.success && listVisitsData?.data) {
+         const visits = listVisitsData.data.data;
          const foundVisit = visits.find((visit: Visit) => visit.id === bookingId);
          
          if (foundVisit) {
@@ -128,10 +157,8 @@ const ReviewBookingPage: React.FC = () => {
          } else {
             setError('Booking not found');
          }
-         setIsLoading(false);
       } else if (listVisitsError) {
          setError('Failed to load booking data');
-         setIsLoading(false);
       }
    }, [listVisitsData, listVisitsError, bookingId]);
 
@@ -290,7 +317,7 @@ const ReviewBookingPage: React.FC = () => {
                                        {booking.propertyName}
                                     </h3>
                                     <p className="text-[12.3px] text-white/90 leading-[17.5px]">
-                                       {booking.location}
+                                       {booking.cityAndPincode}
                                     </p>
                                  </div>
                               </div>
@@ -319,6 +346,9 @@ const ReviewBookingPage: React.FC = () => {
                                  </p>
                                  <p className="text-[12.3px] md:text-sm lg:text-base text-[#4a5565] leading-[17.5px]">
                                     {booking.scheduledDate}
+                                 </p>
+                                 <p className="text-[12.3px] md:text-sm lg:text-base text-[#4a5565] leading-[17.5px] mt-1">
+                                    <strong>Address:</strong> {booking.fullAddress}
                                  </p>
                               </div>
                            </div>

@@ -90,17 +90,17 @@ export default function PropertyDetailsPage({
       setIsHighlightsSheetOpen(false);
    };
 
-   const handleViewAllIncludedServices = () => {
-      setIsIncludedServicesSheetOpen(true);
-   };
+   // const handleViewAllIncludedServices = () => {
+   //    setIsIncludedServicesSheetOpen(true);
+   // };
 
    const handleCloseIncludedServicesSheet = () => {
       setIsIncludedServicesSheetOpen(false);
    };
 
-   const handleViewAllAddOnServices = () => {
-      setIsAddOnServicesSheetOpen(true);
-   };
+   // const handleViewAllAddOnServices = () => {
+   //    setIsAddOnServicesSheetOpen(true);
+   // };
 
    const handleCloseAddOnServicesSheet = () => {
       setIsAddOnServicesSheetOpen(false);

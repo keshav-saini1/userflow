@@ -7,8 +7,8 @@ import default_back from "@/assets/default_back.svg";
 
 const RentalOptionsPage: React.FC = () => {
    const navigate = useNavigate();
-   const [searchQuery, setSearchQuery] = useState("");
-   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+   const [searchQuery] = useState("");
+   const [selectedFilter] = useState<string>("all");
    
    // Get data from Zustand store
    const propertyDetails = usePropertyDetails();
