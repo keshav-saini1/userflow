@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaMapMarkerAlt, FaCalendar } from "react-icons/fa";
 import { ImMap2 } from "react-icons/im";
 import { VscDeviceCameraVideo } from "react-icons/vsc";
 import { LuCopy } from "react-icons/lu";
 import { IoDocumentTextOutline } from "react-icons/io5";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import phone_outline from "@/assets/bookvisit/phone_outline.svg";
 import phone_outline_white from "@/assets/bookvisit/phone_outline_white.svg";
+import CancelVisitBottomSheet from "@/features/book-visit/components/CancelVisitBottomSheet";
 
 export interface Booking {
   id: string;
@@ -26,6 +28,7 @@ interface BookingCardProps {
   onLiveTour: (bookingId: string) => void;
   onReserve: (bookingId: string) => void;
   onModifyBooking: (bookingId: string) => void;
+  onCancelBooking?: (bookingId: string) => void;
   onClick: () => void;
 }
 
@@ -36,8 +39,11 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onLiveTour,
   onReserve,
   onModifyBooking,
+  onCancelBooking,
   onClick
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCancelBottomSheetOpen, setIsCancelBottomSheetOpen] = useState(false);
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -85,7 +91,18 @@ const BookingCard: React.FC<BookingCardProps> = ({
   return (
     <div
       className="bg-white rounded-[14px] md:rounded-[12px] border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-      onClick={onClick}
+      onClick={(e) => {
+        // Don't trigger onClick if bottom sheet is open
+        if (isCancelBottomSheetOpen) {
+          return;
+        }
+        
+        // Close menu if clicking outside of it
+        if (isMenuOpen && !(e.target as Element).closest('.menu-container')) {
+          setIsMenuOpen(false);
+        }
+        onClick();
+      }}
     >
       {/* Header */}
       <div className="p-[17.5px] md:p-4 border-b border-gray-100">
@@ -98,20 +115,70 @@ const BookingCard: React.FC<BookingCardProps> = ({
             </div>
           </div>
 
-          {/* Status Badge */}
-          <div
-            className={`px-[10.5px] py-[7px] md:px-2 md:py-1.5 rounded-[12.75px] flex items-center gap-[7px] md:gap-1.5 ${getStatusColor(
-              booking.status
-            )}`}
-          >
+          <div className="flex items-center gap-2">
+            {/* Status Badge */}
             <div
-              className={`w-[7px] h-[7px] md:w-1.5 md:h-1.5 rounded-full ${getStatusDot(
+              className={`px-[10.5px] py-[7px] md:px-2 md:py-1.5 rounded-[12.75px] flex items-center gap-[7px] md:gap-1.5 ${getStatusColor(
                 booking.status
               )}`}
-            />
-            <span className="text-[10px] md:text-xs font-medium capitalize">
-              {booking.status}
-            </span>
+            >
+              <div
+                className={`w-[7px] h-[7px] md:w-1.5 md:h-1.5 rounded-full ${getStatusDot(
+                  booking.status
+                )}`}
+              />
+              <span className="text-[10px] md:text-xs font-medium capitalize">
+                {booking.status}
+              </span>
+            </div>
+
+            {/* Menu Button for upcoming bookings */}
+            {booking.status === "upcoming" && (onModifyBooking || onCancelBooking) && (
+              <div className="relative menu-container">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMenuOpen(!isMenuOpen);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <BsThreeDotsVertical className="w-4 h-4 text-gray-600" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[140px]">
+                    <div className="py-1">
+                      {onModifyBooking && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsMenuOpen(false);
+                            onModifyBooking(booking.id);
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"
+                        >
+                          <IoDocumentTextOutline className="w-4 h-4" />
+                          Edit Booking
+                        </button>
+                      )}
+                      {onCancelBooking && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsMenuOpen(false);
+                            setIsCancelBottomSheetOpen(true);
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          Cancel Booking
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -295,6 +362,24 @@ const BookingCard: React.FC<BookingCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Cancel Visit Bottom Sheet */}
+      <CancelVisitBottomSheet
+        isOpen={isCancelBottomSheetOpen}
+        onClose={() => setIsCancelBottomSheetOpen(false)}
+        onConfirmCancel={(_reason) => {
+          if (onCancelBooking) {
+            onCancelBooking(booking.id);
+          }
+        }}
+        visitId={booking.id}
+        visitDetails={{
+          propertyName: booking.propertyName,
+          scheduledDate: booking.scheduledDate,
+          scheduledTime: booking.scheduledTime,
+          bookingType: booking.bookingType,
+        }}
+      />
     </div>
   );
 };

@@ -149,7 +149,32 @@ const MyBookingsPage: React.FC = () => {
 
    const handleModifyBooking = (bookingId: string) => {
       console.log("Modify booking:", bookingId);
-      navigate("/modify-booking");
+      
+      // Find the booking data to pass to edit page
+      const bookingToEdit = filteredBookings.find(booking => booking.id === bookingId);
+      
+      if (bookingToEdit) {
+         // Navigate to BookVisitPage with edit mode and booking data
+         navigate("/book-visit", { 
+            state: { 
+               editMode: true, 
+               bookingData: bookingToEdit,
+               originalVisitData: listVisitsData?.data?.find((visit: Visit) => visit.id === bookingId)
+            } 
+         });
+      }
+   };
+
+   const handleCancelBooking = (bookingId: string) => {
+      console.log("Cancel booking:", bookingId);
+      
+      // No confirmation dialog - the CancelVisitBottomSheet handles confirmation
+      console.log("Booking cancelled:", bookingId);
+      
+      // Show success message and refresh bookings
+      setTimeout(() => {
+         listVisits(); // Refresh the bookings list
+      }, 500);
    };
 
    const handleBookingClick = (bookingId: string) => {
@@ -300,6 +325,7 @@ const MyBookingsPage: React.FC = () => {
                         onLiveTour={handleLiveTour}
                         onReserve={handleReserve}
                         onModifyBooking={handleModifyBooking}
+                        onCancelBooking={handleCancelBooking}
                         onClick={() => handleBookingClick(booking.id)}
                      />
                   ))}

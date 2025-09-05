@@ -97,6 +97,11 @@ async function putCancelVisit(visitId: string, payload: CancelVisitRequest): Pro
   return response.data;
 }
 
+async function putUpdateVisit(visitId: string, payload: CreateVisitRequest): Promise<any> {
+  const response = await api.put<ApiResponse<any>>(`/visits/${visitId}`, payload);
+  return response.data;
+}
+
 export function useBookVisitApi() {
   const createVisitMutation = useMutation({
     mutationKey: ['book-visit', 'create-visit'],
@@ -113,6 +118,12 @@ export function useBookVisitApi() {
     mutationKey: ['book-visit', 'cancel-visit'],
     mutationFn: ({ visitId, payload }: { visitId: string; payload: CancelVisitRequest }) => 
       putCancelVisit(visitId, payload),
+  });
+
+  const updateVisitMutation = useMutation({
+    mutationKey: ['book-visit', 'update-visit'],
+    mutationFn: ({ visitId, payload }: { visitId: string; payload: CreateVisitRequest }) => 
+      putUpdateVisit(visitId, payload),
   });
 
   return {
@@ -137,6 +148,13 @@ export function useBookVisitApi() {
     isCancelingVisit: cancelVisitMutation.isPending,
     cancelVisitError: cancelVisitMutation.error as any,
     cancelVisitData: cancelVisitMutation.data,
+
+    // Update Visit
+    updateVisit: updateVisitMutation.mutateAsync,
+    updateVisitStatus: updateVisitMutation.status,
+    isUpdatingVisit: updateVisitMutation.isPending,
+    updateVisitError: updateVisitMutation.error as any,
+    updateVisitData: updateVisitMutation.data,
   };
 }
 

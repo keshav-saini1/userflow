@@ -1,5 +1,6 @@
 import React from "react";
 import calendar from "@/assets/property/calendar_bw.svg";
+import { useNavigate } from "react-router";
 
 export interface UnitAmenity {
    icon: string;
@@ -22,8 +23,13 @@ interface UnitCardProps {
 }
 
 const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
+   const navigate = useNavigate();
+
+   const handleRedirect = () => {
+      navigate(`/room-details/${unit.id}`);
+   }
    return (
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow min-w-[280px] max-w-xs flex-shrink-0">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow min-w-[280px] max-w-xs flex-shrink-0" onClick={handleRedirect}>
          <img
             src={unit.image}
             alt={unit.name}
@@ -60,7 +66,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
             <div className="bg-blue-50 rounded-lg p-2">
                <p className="text-xs text-gray-600 flex items-center gap-2">
                   <img src={calendar} alt="calendar" className="w-4 h-4 object-contain" />
-                  {unit.availableFrom}
+                  Available From: {unit.availableFrom}
                </p>
             </div>
          </div>
