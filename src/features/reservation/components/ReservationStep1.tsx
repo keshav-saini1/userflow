@@ -4,12 +4,16 @@ import type { Property } from '../types';
 import Calendar, { type DateRange } from '../../../components/Calendar';
 import room_reserve from '@/assets/room_reserve.svg';
 import { useNavigate } from 'react-router';
+import { useReservationStore } from '../store/useReservationStore';
 
 const ReservationStep1: React.FC = () => {
   const navigate = useNavigate();
   const { updateForm, nextStep } = useReservation();
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({ startDate: null, endDate: null });
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
+  const { currentProperty } = useReservationStore();
+
+  console.log({currentProperty})
 
   // Sample property data - in real app this would come from props or API
   const property: Property = {
@@ -106,7 +110,7 @@ const ReservationStep1: React.FC = () => {
                   <div 
                     className="bg-left bg-no-repeat h-[154px] shrink-0 w-full rounded-[21px]" 
                     style={{ 
-                      backgroundImage: `url('${room_reserve}')`,
+                      backgroundImage: `url('${currentProperty?.image || property.image}')`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }} 
@@ -116,7 +120,7 @@ const ReservationStep1: React.FC = () => {
                     <div className="absolute bottom-[5.5px] content-stretch flex flex-col gap-[3.5px] items-start justify-center left-3 w-[180px]">
                       <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
                         <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[15.8px] text-white w-full">
-                          <p className="leading-[24.5px]">{property.name}</p>
+                          <p className="leading-[24.5px]">{currentProperty?.propertyName}</p>
                         </div>
                       </div>
                       <div className="content-stretch flex gap-1 items-center justify-start relative shrink-0 w-full">
@@ -126,7 +130,7 @@ const ReservationStep1: React.FC = () => {
                         </svg>
                         <div className="content-stretch flex flex-col items-start justify-start opacity-90 relative shrink-0">
                           <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.3px] text-nowrap text-white">
-                            <p className="leading-[17.5px] whitespace-pre">{property.location}</p>
+                            <p className="leading-[17.5px] whitespace-pre">{currentProperty?.propertyAddress?.address_line_2}</p>
                           </div>
                         </div>
                       </div>
@@ -134,7 +138,7 @@ const ReservationStep1: React.FC = () => {
                     <div className="absolute bottom-1.5 content-stretch flex flex-col gap-[3.5px] items-end justify-start right-3 w-[145px]">
                       <div className="content-stretch flex flex-col items-end justify-start relative shrink-0 w-full">
                         <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[15.8px] text-nowrap text-white">
-                          <p className="leading-[24.5px] whitespace-pre">₹{property.price.toLocaleString()}</p>
+                          <p className="leading-[24.5px] whitespace-pre">₹{currentProperty?.rent}</p>
                         </div>
                       </div>
                       <div className="content-stretch flex gap-1 items-center justify-end relative shrink-0 w-[90px]">

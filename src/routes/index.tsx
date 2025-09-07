@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/property-details/:sharing_type",
+      path: "/property-details/:sharing_type/:property_id",
       element: (
          <ProtectedRoute>
             <PropertyDetailsWrapper />
@@ -75,7 +75,7 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/property-details/:sharing_type/rental-options",
+      path: "/property-details/:sharing_type/rental-options/:property_id",
       element: (
          <ProtectedRoute>
             <RentalOptionsPage />
@@ -131,7 +131,15 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/reservation",
+      path: "/reservation/:property_id",
+      element: (
+         <ProtectedRoute>
+            <ReservationPage />
+         </ProtectedRoute>
+      ),
+   },
+   {
+      path: "/reservation/:property_id/:room_id",
       element: (
          <ProtectedRoute>
             <ReservationPage />

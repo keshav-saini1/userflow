@@ -8,8 +8,9 @@ import { BsHeartFill } from "react-icons/bs";
 import booked from '@/assets/property/booked.svg'
 
 interface PropertyCardProps {
+   propertyId: string;
    property: PropertyDetails;
-   onReserve?: (propertyId: string) => void;
+   onReserve?: (propertyId: string, roomId?: string) => void;
    onBookVisit?: (propertyId: string) => void;
    onPropertyClick?: (propertyId: string) => void;
    onRemoveFromWishlist?: (propertyId: string) => void;
@@ -17,6 +18,7 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
+   propertyId,
    property,
    onReserve,
    onBookVisit,
@@ -25,6 +27,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    isLongCardView = false,
 }) => {
    const navigate = useNavigate();
+   const [isRoomCard, setIsRoomCard] = React.useState(false);
+
+   React.useEffect(() => {
+      const href = window.location.href;
+      if(href.includes('rental-options')) {
+         setIsRoomCard(true);
+      }
+   }, []);
 
    const formatPrice = (price: number) => {
       return new Intl.NumberFormat("en-IN", {
@@ -51,8 +61,6 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
          navigate("/book-visit");
       }
    };
-
-   console.log({property})
 
    return (
       <div
@@ -229,9 +237,13 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                ) : (
                   <div className="flex justify-between gap-3 h-[37.5px] lg:h-12">
                      <button
-                        onClick={(e) =>
-                           handleActionClick(e, () => onReserve?.(property.id))
-                        }
+                        onClick={(e) => {
+                          if(isRoomCard) {
+                           handleActionClick(e, () => onReserve?.(propertyId, property.id))
+                          } else {
+                           handleActionClick(e, () => onReserve?.(propertyId))
+                          }
+                        }}
                         className="bg-white border border-[#d1d5dc] rounded-[12.75px] px-[11.5px] py-2 flex items-center justify-center gap-[7px] w-[174.5px] lg:w-full h-[42px] lg:h-12 hover:bg-gray-50 transition-colors"
                      >
                         <span className="text-[#364153] text-[12.3px] font-medium leading-[17.5px]">

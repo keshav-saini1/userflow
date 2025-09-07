@@ -15,7 +15,7 @@ interface PropertyListingPageProps {
    onBackClick?: () => void;
    onShareClick?: () => void;
    onSetupClick?: () => void;
-   onReserve?: (propertyId: string) => void;
+   onReserve?: (propertyId: string, roomId?: string) => void;
    onBookVisit?: (propertyId: string) => void;
    onMapClick?: () => void;
    onPropertyClick?: (sharing_type: number) => void;
@@ -30,8 +30,6 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
    onPropertyClick,
 }) => {
    const [showBottomSheet, setShowBottomSheet] = useState(false);
-   console.log({propertyListing})
-
    return (
       <div className="bg-white h-screen w-screen flex flex-col overflow-hidden">
          {/* Fixed Header */}
@@ -90,6 +88,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                                  <div className="w-full max-w-[400px] xl:max-w-none">
                                     <PropertyCard
                                        property={property}
+                                       propertyId={propertyListing?.id}
                                        onReserve={onReserve}
                                        onBookVisit={onBookVisit}
                                        onPropertyClick={

@@ -136,6 +136,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       showToast.success('OTP verified successfully', verifyOtpData.message);
       console.log({verifyOtpData});
       localStorage.setItem('tenant_status', verifyOtpData?.data?.verifyResponse?.tenant_status || '')
+      localStorage.setItem('tenant_id', verifyOtpData?.data?.verifyResponse?.tenant_id || '')
       localStorage.setItem('token', verifyOtpData?.data?.token || '');
       navigate('/persona-selection')
     }

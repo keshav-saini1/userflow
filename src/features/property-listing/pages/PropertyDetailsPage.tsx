@@ -33,7 +33,7 @@ export default function PropertyDetailsPage({
    const navigate = useNavigate();
 
    const params = useParams();
-   console.log({params})
+   const { property_id } = params;
 
    // Convert property data to gallery categories format
    const galleryCategories: GalleryCategory[] = [
@@ -136,14 +136,12 @@ export default function PropertyDetailsPage({
 
    const handleRedirectToRentalUnits = () => {
       const sharing_type = params?.sharing_type;
-      navigate(`/property-details/${sharing_type}/rental-options`);
+      navigate(`/property-details/${sharing_type}/rental-options/${property_id}`);
    }
 
    const onReserve = () => { 
       
    }
-
-   console.log({propertyData})
 
    return (
       <div className="min-h-screen w-screen bg-gray-50">

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { usePropertyDetails, useAvailableUnits } from "../store/propertyStore";
 import { PropertyCard } from "../components";
 import type { PropertyDetails } from "../types";
@@ -13,6 +13,9 @@ const RentalOptionsPage: React.FC = () => {
    // Get data from Zustand store
    const propertyDetails = usePropertyDetails();
    const allUnits = useAvailableUnits();
+
+   const params = useParams();
+   const { property_id } = params;
 
    // Transform units to PropertyDetails format for PropertyCard
    const transformUnitToProperty = (unit: any): PropertyDetails => ({
@@ -157,6 +160,7 @@ const RentalOptionsPage: React.FC = () => {
                      {filteredProperties.map((property) => (
                         <PropertyCard
                            key={property.id}
+                           propertyId={property_id || ''}
                            property={property}
                            onPropertyClick={onUnitClick}
                            onReserve={onReserve}

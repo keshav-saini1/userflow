@@ -4,7 +4,6 @@ import parking from '@/assets/property/parking.svg'
 import housekeeping from '@/assets/property/housekeeping.svg'
 
 const AmenitiesIcon = (amenity: PropertyAmenity) => {
-    console.log(amenity)
   switch(amenity.id) {
     case "wifi":
       return <img src={wifi} alt="wifi" className='w-7 h-7' />

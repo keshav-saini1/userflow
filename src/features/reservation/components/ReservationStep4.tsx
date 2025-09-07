@@ -3,6 +3,7 @@ import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import room_reserve from '@/assets/room_reserve.svg';
 import { useNavigate } from 'react-router';
+import { useReservationStore } from '../store/useReservationStore';
 
 interface BookingSummary {
   bookingId: string;
@@ -16,8 +17,9 @@ interface BookingSummary {
 const ReservationStep4: React.FC = () => {
   const { form, previousStep } = useReservation();
   const navigate = useNavigate();
+  const { currentProperty } = useReservationStore();
 
-  // Sample property data - in real app this would come from props or API
+  // Sample property data - fallback if store data not available
   const property: Property = {
     id: '1',
     name: 'Premium Private Room',
@@ -126,7 +128,7 @@ const ReservationStep4: React.FC = () => {
         <div className="lg:w-1/2 lg:flex lg:flex-col lg:justify-center lg:bg-gray-50">
           <div className="px-4 py-5 lg:px-12 lg:py-12 lg:h-full lg:flex lg:flex-col lg:justify-center">
             <div className="relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm lg:shadow-xl lg:h-full lg:flex lg:flex-col">
-              <div className="h-40 lg:h-full lg:flex-1 relative" style={{ backgroundImage: `url(${room_reserve})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+              <div className="h-40 lg:h-full lg:flex-1 relative" style={{ backgroundImage: `url(${currentProperty?.image || room_reserve})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 {/* Property image overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
                 
@@ -135,19 +137,19 @@ const ReservationStep4: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className='flex flex-col items-start'>
                       <div>
-                        <span className='text-white text-sm lg:text-2xl font-semibold lg:font-bold'>{property.name}</span>
+                        <span className='text-white text-sm lg:text-2xl font-semibold lg:font-bold'>{currentProperty?.propertyName || property.name}</span>
                       </div>
                       <div className="flex items-center gap-2.5 mt-1 lg:mt-3">
                         <svg className="w-3 h-3 lg:w-5 lg:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="text-white text-xs lg:text-lg opacity-90">{property.location}</span>
+                        <span className="text-white text-xs lg:text-lg opacity-90">{currentProperty?.propertyAddress?.city || property.location}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-white font-semibold text-sm lg:text-3xl lg:font-bold">₹{property.price.toLocaleString()}</div>
-                      <div className="text-white text-xs lg:text-lg opacity-90">{property.priceUnit}</div>
+                      <div className="text-white font-semibold text-sm lg:text-3xl lg:font-bold">₹{currentProperty?.rent?.toLocaleString() || property.price.toLocaleString()}</div>
+                      <div className="text-white text-xs lg:text-lg opacity-90">per month</div>
                     </div>
                   </div>
                 </div>

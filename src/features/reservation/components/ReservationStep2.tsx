@@ -3,6 +3,7 @@ import { useReservation } from '../context/ReservationContext';
 import type { Property } from '../types';
 import room_reserve from '@/assets/room_reserve.svg';
 import { useNavigate } from 'react-router';
+import { useReservationStore } from '../store/useReservationStore';
 
 interface PricingBreakdown {
   monthlyRent: number;
@@ -16,8 +17,9 @@ interface PricingBreakdown {
 const ReservationStep2: React.FC = () => {
   const navigate = useNavigate();
   const { nextStep } = useReservation();
+  const { currentProperty } = useReservationStore();
 
-  // Sample property data - in real app this would come from props or API
+  // Sample property data - fallback if store data not available
   const property: Property = {
     id: '1',
     name: 'Premium Private Room',
@@ -82,7 +84,7 @@ const ReservationStep2: React.FC = () => {
             <div 
               className="h-full w-full rounded-[21px] relative" 
               style={{ 
-                backgroundImage: `url('${room_reserve}')`,
+                backgroundImage: `url('${currentProperty?.image || room_reserve}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }} 
@@ -91,7 +93,7 @@ const ReservationStep2: React.FC = () => {
               <div className="absolute backdrop-blur-[6px] backdrop-filter bg-[rgba(255,255,255,0.1)] flex items-center justify-between h-[58px] left-1/2 p-[10.5px] rounded-[14px] top-[82px] translate-x-[-50%] w-[calc(100%-24px)]">
                 <div className="flex flex-col gap-[3.5px]">
                   <div className="text-white font-semibold text-[15.8px] leading-[24.5px]">
-                    {property.name}
+                    {currentProperty?.propertyName || property.name}
                   </div>
                   <div className="flex gap-1 items-center">
                     <svg className="w-[10.5px] h-[10.5px] text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,16 +101,16 @@ const ReservationStep2: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <div className="text-white text-[12.3px] leading-[17.5px] opacity-90">
-                      {property.location}
+                      {currentProperty?.propertyAddress?.city || property.location}
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-[3.5px] items-end">
                   <div className="text-white font-semibold text-[15.8px] leading-[24.5px]">
-                    ₹{property.price.toLocaleString()}
+                    ₹{currentProperty?.rent?.toLocaleString() || property.price.toLocaleString()}
                   </div>
                   <div className="text-white text-[12.3px] leading-[17.5px] opacity-90">
-                    {property.priceUnit}
+                    per month
                   </div>
                 </div>
               </div>

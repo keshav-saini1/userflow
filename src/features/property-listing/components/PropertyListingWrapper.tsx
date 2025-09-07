@@ -58,7 +58,17 @@ const PropertyListingWrapper = () => {
    }
 
    const handlePropertyDetails = (sharing_type: number) => {
-      navigate(`/property-details/${sharing_type}`)
+      navigate(`/property-details/${sharing_type}/${selectedPropertyId}`)
+   }
+
+
+   const handleReservation = (propertyId: string, roomId?: string) => {
+      if(!propertyId) return;
+      if(roomId) {
+         navigate(`/reservation/${propertyId}/${roomId}`)
+      } else {
+         navigate(`/reservation/${propertyId}`)
+      }
    }
 
    // Don't render if no property listing data
@@ -71,7 +81,7 @@ const PropertyListingWrapper = () => {
          propertyListing={propertyListing}
          onBackClick={() => window.history.back()}
          onShareClick={() => console.log("Share clicked")}
-         onReserve={() => navigate("/reservation")}
+         onReserve={handleReservation}
          onBookVisit={() => navigate("/book-visit")}
          onMapClick={() => console.log("Map clicked")}
          onPropertyClick={(s: any) => handlePropertyDetails(s)}

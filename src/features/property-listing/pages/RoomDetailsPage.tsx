@@ -12,6 +12,7 @@ import calendar from "@/assets/property/calendar_bw.svg";
 
 export default function RoomDetailsPage() {
    const navigate = useNavigate();
+   const propertyId = localStorage.getItem('selectedPropertyId');
    const { roomId } = useParams();
    const { propertyDetails, getAvailableUnits } = usePropertyStore();
    const availableUnits = getAvailableUnits();
@@ -49,7 +50,7 @@ export default function RoomDetailsPage() {
    };
 
    const handleReserve = () => {
-      navigate(`/reservation/${roomId}`);
+      navigate(`/reservation/${propertyId}/${roomId}`);
    };
 
    // Gallery and bottom sheet handlers
