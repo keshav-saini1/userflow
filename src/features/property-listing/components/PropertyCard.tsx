@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { PropertyDetails } from "../types";
 import { useNavigate } from "react-router";
 import location_home from "@/assets/property/location_home.svg";
@@ -6,6 +6,8 @@ import single_bed from "@/assets/property/bed.svg";
 import AmenitiesIcon from "./AmenitiesIcon";
 import { BsHeartFill } from "react-icons/bs";
 import booked from '@/assets/property/booked.svg'
+import { useWishlistApi } from "../api/useWishlistApi";
+import { showToast } from "@/components";
 
 interface PropertyCardProps {
    propertyId: string;
@@ -13,8 +15,8 @@ interface PropertyCardProps {
    onReserve?: (propertyId: string, roomId?: string) => void;
    onBookVisit?: (propertyId: string) => void;
    onPropertyClick?: (propertyId: string) => void;
-   onRemoveFromWishlist?: (propertyId: string) => void;
    isLongCardView?: boolean;
+   room_id?: string;
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -23,15 +25,16 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    onReserve,
    onBookVisit,
    onPropertyClick,
-   onRemoveFromWishlist,
    isLongCardView = false,
+   room_id
 }) => {
    const navigate = useNavigate();
+   const { createWishlistItem, createWishlistData, createWishlistError, refetchWishlist } = useWishlistApi();
    const [isRoomCard, setIsRoomCard] = React.useState(false);
 
    React.useEffect(() => {
       const href = window.location.href;
-      if(href.includes('rental-options')) {
+      if (href.includes('rental-options')) {
          setIsRoomCard(true);
       }
    }, []);
@@ -61,6 +64,33 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
          navigate("/book-visit");
       }
    };
+
+   const handleWishlist = (e: React.MouseEvent) => {
+      e.stopPropagation(); // Prevent card click when wishlist button is clicked
+      if (isRoomCard || room_id) {
+         createWishlistItem({
+            property_id: propertyId,
+            room_id: room_id || property.id,
+         });
+      } else {
+         createWishlistItem({
+            property_id: propertyId,
+         });
+      }
+   }
+
+   useEffect(() => {
+      if(createWishlistData) {
+         refetchWishlist();
+         showToast.success("Wishlists updated");
+      }
+   }, [createWishlistData])
+
+   useEffect(() => {
+      if(createWishlistError) {
+         showToast.error("Failed to add property to wishlist");
+      }
+   }, [createWishlistError])
 
    return (
       <div
@@ -101,19 +131,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                )} */}
 
                {/* Wishlist Remove Button */}
-               {isLongCardView && (
                   <div className="absolute top-3.5 right-3.5">
                      <button
-                        onClick={(e) => {
-                           e.stopPropagation();
-                           onRemoveFromWishlist?.(property.id);
-                        }}
+                        onClick={handleWishlist}
                         className="backdrop-blur-sm bg-white/80 rounded-2xl p-2 w-12 h-12 flex items-center justify-center shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-white/90 transition-colors"
                      >
                         <BsHeartFill className="text-red-500" />
                      </button>
                   </div>
-               )}
 
                {property.status === "available" && (
                   <div className="absolute bottom-3.5 right-3.5 flex justify-center items-center gap-1.5 px-2 py-1 bg-green-200 border border-green-200 rounded-full shadow-[0_2px_8px_0_rgba(16,185,129,0.10)]">
@@ -238,11 +263,11 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                   <div className="flex justify-between gap-3 h-[37.5px] lg:h-12">
                      <button
                         onClick={(e) => {
-                          if(isRoomCard) {
-                           handleActionClick(e, () => onReserve?.(propertyId, property.id))
-                          } else {
-                           handleActionClick(e, () => onReserve?.(propertyId))
-                          }
+                           if (isRoomCard) {
+                              handleActionClick(e, () => onReserve?.(propertyId, property.id))
+                           } else {
+                              handleActionClick(e, () => onReserve?.(propertyId))
+                           }
                         }}
                         className="bg-white border border-[#d1d5dc] rounded-[12.75px] px-[11.5px] py-2 flex items-center justify-center gap-[7px] w-[174.5px] lg:w-full h-[42px] lg:h-12 hover:bg-gray-50 transition-colors"
                      >

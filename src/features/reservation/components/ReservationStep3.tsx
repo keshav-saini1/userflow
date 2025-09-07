@@ -44,13 +44,13 @@ const ReservationStep3: React.FC = () => {
       icon: '💳'
     },
     {
-      id: 'card',
+      id: 'cc',
       name: 'Credit/Debit Card',
       description: 'Secure card payment',
       icon: '💳'
     },
     {
-      id: 'netbanking',
+      id: 'nb',
       name: 'Net Banking',
       description: 'Bank transfer',
       icon: '🏦'
