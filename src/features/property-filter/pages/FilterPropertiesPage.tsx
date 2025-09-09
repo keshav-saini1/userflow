@@ -147,6 +147,7 @@ const FilterPropertiesPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
             >
               <PropertyCard
+                propertyId={property.id}
                 property={property}
                 onPropertyClick={handlePropertyClick}
                 onReserve={handleReserve}

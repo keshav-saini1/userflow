@@ -5,14 +5,6 @@ import room_reserve from '@/assets/room_reserve.svg';
 import { useNavigate } from 'react-router';
 import { useReservationStore } from '../store/useReservationStore';
 
-interface PricingBreakdown {
-  monthlyRent: number;
-  months: number;
-  securityDeposit: number;
-  joiningFee: number;
-  joiningFeeDiscount: number;
-  tokenAmount: number;
-}
 
 const ReservationStep2: React.FC = () => {
   const navigate = useNavigate();

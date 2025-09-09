@@ -5,7 +5,6 @@ import {
    LocationSection,
    PropertyHeader,
    AvailabilityAlert,
-   SetupCard,
    FloatingMenu,
 } from "../components";
 import type { PropertyListing } from "../types";
@@ -29,7 +28,7 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
    onMapClick,
    onPropertyClick,
 }) => {
-   const [showBottomSheet, setShowBottomSheet] = useState(false);
+   const [showBottomSheet] = useState(false);
    return (
       <div className="bg-white h-screen w-screen flex flex-col overflow-hidden">
          {/* Fixed Header */}
