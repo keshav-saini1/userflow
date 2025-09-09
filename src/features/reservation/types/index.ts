@@ -40,6 +40,28 @@ export interface RoomChangeData {
   image: string;
 }
 
+export interface ConfirmPaymentData {
+  status: number;
+  message: string;
+  responseText: string;
+  paymentKeys: string[];
+  offerButton: {
+    offerText: string;
+    offerURL: string;
+    openFrom: number;
+  };
+  data: {
+    paymentKeys: string[];
+    paymentID: string;
+    offerButton: {
+      offerText: string;
+      offerURL: string;
+      openFrom: number;
+    };
+    show_rating: boolean;
+  };
+}
+
 export interface ReservationForm {
   selectedDate: Date | null;
   moveInOption: string | null;
@@ -49,6 +71,7 @@ export interface ReservationForm {
   currentStep: number;
   totalSteps: number;
   roomChangeData?: RoomChangeData | null;
+  confirmPaymentData?: ConfirmPaymentData | null;
 }
 
 export interface ReservationContextType {

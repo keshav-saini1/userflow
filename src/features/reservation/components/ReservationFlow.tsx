@@ -14,21 +14,18 @@ const ReservationFlow: React.FC = () => {
 
   // Handle payment confirmation when orderId is present in URL
   useEffect(() => {
-    async function handlePaymentConfirmation() {
-      const orderId = searchParams.get('orderId');
-      if (orderId) {
-        await confirmPaymentByOrderId({ order_id: orderId });
-      }
+    const orderId = searchParams.get('orderId');
+    if (orderId) {
+      confirmPaymentByOrderId({ order_id: orderId });
     }
-    handlePaymentConfirmation();
-  }, [searchParams, confirmPaymentByOrderId]);
+  }, [searchParams.get('orderId')]);
 
   useEffect(() => {
     if (confirmPaymentData) {
       console.log({ confirmPaymentData })
       goToStep(4);
     }
-  }, [confirmPaymentData, goToStep]);
+  }, [confirmPaymentData]);
 
   const renderStep = () => {
     switch (form.currentStep) {

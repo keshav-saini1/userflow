@@ -17,6 +17,7 @@ export interface PropertyDetailsData {
   image: string;
   pg_id: string;
   pg_number: string;
+  min_token_amount: number;
 }
 
 export interface ApiSuccess<T> {

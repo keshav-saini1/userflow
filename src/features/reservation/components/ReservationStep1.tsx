@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useReservation } from '../context/ReservationContext';
-import type { Property } from '../types';
 import Calendar, { type DateRange } from '../../../components/Calendar';
-import room_reserve from '@/assets/room_reserve.svg';
 import { useNavigate } from 'react-router';
 import { useReservationStore } from '../store/useReservationStore';
+import { useTenantApi } from '../api/useTenantApi';
+import { showToast } from '@/components';
 
 const ReservationStep1: React.FC = () => {
   const navigate = useNavigate();
@@ -12,19 +12,7 @@ const ReservationStep1: React.FC = () => {
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({ startDate: null, endDate: null });
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const { currentProperty } = useReservationStore();
-
-  console.log({currentProperty})
-
-  // Sample property data - in real app this would come from props or API
-  const property: Property = {
-    id: '1',
-    name: 'Premium Private Room',
-    location: 'Gurugram',
-    price: 8000,
-    priceUnit: 'per month',
-    image: '/api/placeholder/400/200',
-    type: 'Private Room'
-  };
+  const { updateTenantDetails, updateTenantData, updateTenantError } = useTenantApi();
 
   const handleDateRangeSelect = (range: DateRange) => {
     setSelectedDateRange(range);
@@ -44,9 +32,23 @@ const ReservationStep1: React.FC = () => {
     const hasStartDateAndDuration = selectedDateRange.startDate && !selectedDateRange.endDate && selectedDuration;
     
     if (hasBothDates || hasStartDateAndDuration) {
-      nextStep();
+      const data = {
+        date_of_joining: selectedDateRange.startDate,
+        ...(selectedDateRange?.endDate ? { checkout_date: selectedDateRange.endDate } : {}),
+      }
+      updateTenantDetails({ property_id: currentProperty?.id || '', data });
+      
     }
   };
+
+  useEffect(() => {
+    if (updateTenantData?.data) {
+      nextStep();
+    }
+    if (updateTenantError) {
+      showToast.error("Error updating tenant profile please try again, or contact our support")
+    }
+  }, [updateTenantData, updateTenantError])
 
   const isContinueDisabled = (() => {
     const hasBothDates = selectedDateRange.startDate && selectedDateRange.endDate;
@@ -110,7 +112,7 @@ const ReservationStep1: React.FC = () => {
                   <div 
                     className="bg-left bg-no-repeat h-[154px] shrink-0 w-full rounded-[21px]" 
                     style={{ 
-                      backgroundImage: `url('${currentProperty?.image || property.image}')`,
+                      backgroundImage: `url('${currentProperty?.image}')`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }} 
@@ -144,7 +146,7 @@ const ReservationStep1: React.FC = () => {
                       <div className="content-stretch flex gap-1 items-center justify-end relative shrink-0 w-[90px]">
                         <div className="content-stretch flex flex-col items-start justify-start opacity-90 relative shrink-0">
                           <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.3px] text-nowrap text-white">
-                            <p className="leading-[17.5px] whitespace-pre">{property.priceUnit}</p>
+                            {/* <p className="leading-[17.5px] whitespace-pre">{property.priceUnit}</p> */}
                           </div>
                         </div>
                       </div>

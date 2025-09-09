@@ -83,6 +83,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
   });
 
   const { getOtp, getOtpError, getOtpData } = useOnboardingApi();
+  const selectedPropertyId = localStorage.getItem('selectedPropertyId');
 
   // Revalidate phone field when country code changes (only if user has interacted)
   useEffect(() => {
@@ -155,6 +156,7 @@ const OnboardingStep3: OnboardingStepComponent = ({
     getOtp({
       tenant_phone: `${selectedCountryCode}${data.phone.trim()}`,
       name: username || "",
+      selectedPropertyId: selectedPropertyId || "",
     });
   };
 

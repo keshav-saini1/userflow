@@ -3,6 +3,7 @@ import api from '@/api/axios';
 
 export interface PaymentSuccessData {
     tenant_id: string | null;
+    tenant_uuid: string | null;
     paying_amount: number;
     pg_id: string;
     pg_number: number;
@@ -54,6 +55,22 @@ export interface ConfirmPaymentResponse {
   data?: any;
 }
 
+export interface GetOrderDetailsRequest {
+  order_id: string;
+}
+
+export interface OrderDetailsData {
+  amount_paid: number;
+  paid_date: string;
+  order_id: string;
+}
+
+export interface GetOrderDetailsResponse {
+  status: number;
+  message: string;
+  data: OrderDetailsData;
+}
+
 export interface ApiSuccess<T> {
   success: true;
   data: T;
@@ -78,6 +95,12 @@ async function confirmPaymentByOrderId(requestData: ConfirmPaymentRequest): Prom
   return response.data;
 }
 
+async function getOrderDetails(requestData: GetOrderDetailsRequest): Promise<GetOrderDetailsResponse> {
+  const { order_id } = requestData;
+  const response = await api.get<GetOrderDetailsResponse>(`/payment/unified/${order_id}/details`);
+  return response.data;
+}
+
 export function usePaymentApi() {
   const getCashfreeTokenMutation = useMutation({
     mutationKey: ['payment', 'cashfree-token'],
@@ -87,6 +110,11 @@ export function usePaymentApi() {
   const confirmPaymentMutation = useMutation({
     mutationKey: ['payment', 'confirm-payment'],
     mutationFn: confirmPaymentByOrderId,
+  });
+
+  const getOrderDetailsMutation = useMutation({
+    mutationKey: ['payment', 'order-details'],
+    mutationFn: getOrderDetails,
   });
 
   return {
@@ -103,10 +131,18 @@ export function usePaymentApi() {
     isConfirmingPayment: confirmPaymentMutation.isPending,
     confirmPaymentError: confirmPaymentMutation.error as unknown as Error | null,
     confirmPaymentData: confirmPaymentMutation.data,
+
+    // Get Order Details
+    getOrderDetails: getOrderDetailsMutation.mutateAsync,
+    getOrderDetailsStatus: getOrderDetailsMutation.status,
+    isGettingOrderDetails: getOrderDetailsMutation.isPending,
+    getOrderDetailsError: getOrderDetailsMutation.error as unknown as Error | null,
+    getOrderDetailsData: getOrderDetailsMutation.data,
   };
 }
 
 export const PaymentApi = {
   getCashfreeToken,
   confirmPaymentByOrderId,
+  getOrderDetails,
 };

@@ -18,6 +18,7 @@ const ReservationStep2: React.FC = () => {
   const navigate = useNavigate();
   const { nextStep } = useReservation();
   const { currentProperty } = useReservationStore();
+  console.log({currentProperty})
 
   // Sample property data - fallback if store data not available
   const property: Property = {
@@ -29,24 +30,6 @@ const ReservationStep2: React.FC = () => {
     image: '/api/placeholder/400/200',
     type: 'Private Room'
   };
-
-  // Calculate pricing based on selected duration
-  const calculatePricing = (): PricingBreakdown => {
-    const securityDeposit = 30000;
-    const joiningFeeDiscount = 9000; // Automatic joining fee discount
-    const tokenAmount = 5000;
-
-    return {
-      monthlyRent: 15000,
-      months: 6,
-      securityDeposit,
-      joiningFee: joiningFeeDiscount,
-      joiningFeeDiscount,
-      tokenAmount
-    };
-  };
-
-  const pricing = calculatePricing();
 
   const handleContinue = () => {
     nextStep();
@@ -141,22 +124,22 @@ const ReservationStep2: React.FC = () => {
                 {/* Security Deposit */}
                 <div className="flex items-center justify-between">
                   <div className="text-[#4a5565] text-[14px] leading-[21px]">
-                    Security deposit
+                    Monthly Rent
                   </div>
                   <div className="text-[#101828] text-[14px] font-semibold leading-[21px]">
-                    ₹{pricing.securityDeposit.toLocaleString()}
+                    ₹{currentProperty?.rent}
                   </div>
                 </div>
 
                 {/* Automatic Joining Fee */}
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <div className="text-[#00a63e] text-[14px] leading-[21px]">
                     Automatic Joining fee
                   </div>
                   <div className="text-[#00a63e] text-[14px] font-semibold leading-[21px]">
                     ₹{pricing.joiningFeeDiscount.toLocaleString()}
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Total */}
@@ -165,12 +148,12 @@ const ReservationStep2: React.FC = () => {
                   Total
                 </div>
                 <div className="text-[#101828] text-[14px] font-bold leading-[21px]">
-                  ₹1,12,620
+                  ₹{currentProperty?.rent}
                 </div>
               </div>
               
               <div className="text-[#6a7282] text-[12.3px] leading-[17.5px]">
-                *Security deposit is fully refundable
+                *Security deposit is fully refundable if taken
               </div>
 
               {/* Payable Token Amount */}
@@ -185,7 +168,7 @@ const ReservationStep2: React.FC = () => {
                     Payable token amount
                   </div>
                   <div className="text-[#00a63e] text-[12.3px] font-semibold leading-[17.5px]">
-                    ₹{pricing.tokenAmount.toLocaleString()}
+                    ₹{currentProperty?.min_token_amount}
                   </div>
                 </div>
               </div>
@@ -227,7 +210,7 @@ const ReservationStep2: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-600">Token Amount</p>
-            <p className="text-lg font-semibold text-blue-600">₹{pricing.tokenAmount.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-blue-600">₹{currentProperty?.min_token_amount}</p>
           </div>
           <button
             onClick={handleContinue}

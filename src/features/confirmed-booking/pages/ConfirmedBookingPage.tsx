@@ -36,7 +36,7 @@ export default function ConfirmedBookingPage({
   onModifyBooking,
   onRequestRefund
 }: ConfirmedBookingPageProps) {
-  const { bookingDetails, paymentSummary, supportOptions, propertyInfo } = data;
+  const { bookingDetails, paymentSummary, supportOptions, propertyInfo } = data || {};
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -70,7 +70,7 @@ export default function ConfirmedBookingPage({
       <div className="relative h-[293px] lg:h-[60vh] xl:h-[50vh] w-full">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${bookingDetails.propertyImage}')` }}
+          style={{ backgroundImage: `url('${bookingDetails?.propertyImage || '/placeholder-property.jpg'}')` }}
         />
         {/* Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
@@ -95,12 +95,12 @@ export default function ConfirmedBookingPage({
           <div className="max-w-4xl mx-auto">
             <div className="space-y-2.5 lg:space-y-4">
               <h1 className="text-white text-lg lg:text-4xl xl:text-5xl font-bold tracking-tight">
-                {propertyInfo.name}
+                {propertyInfo?.name || 'Property Name'}
               </h1>
               <div className="flex items-center gap-2 lg:gap-3">
                 <div className="w-1.5 h-1.5 lg:w-3 lg:h-3 bg-green-500 rounded-full" />
                 <span className="text-white/90 text-sm lg:text-lg font-medium">
-                  {propertyInfo.location}
+                  {propertyInfo?.location || 'Location'}
                 </span>
               </div>
               
@@ -123,7 +123,7 @@ export default function ConfirmedBookingPage({
                           alt="building"
                           className="w-4 h-4 lg:w-6 lg:h-6"
                         />
-                        <span className="text-white/90 text-xs lg:text-sm">15-25 min</span>
+                        <span className="text-white/90 text-xs lg:text-sm">{propertyInfo?.commuteTimes?.metro || '15-25 min'}</span>
                       </div>
                       <div className="flex items-center gap-1 lg:gap-2">
                         <img
@@ -131,7 +131,7 @@ export default function ConfirmedBookingPage({
                           alt="train"
                           className="w-4 h-4 lg:w-6 lg:h-6"
                         />
-                        <span className="text-white/90 text-xs lg:text-sm">2 min walk</span>
+                        <span className="text-white/90 text-xs lg:text-sm">{propertyInfo?.commuteTimes?.walk || '2 min walk'}</span>
                       </div>
                       <div className="flex items-center gap-1 lg:gap-2">
                         <img
@@ -139,7 +139,7 @@ export default function ConfirmedBookingPage({
                           alt="food"
                           className="w-4 h-4 lg:w-6 lg:h-6"
                         />
-                        <span className="text-white/90 text-xs lg:text-sm">5-8 min</span>
+                        <span className="text-white/90 text-xs lg:text-sm">{propertyInfo?.commuteTimes?.bus || '5-8 min'}</span>
                       </div>
                     </div>
                     <p className="text-white/70 text-xs lg:text-sm mt-1 lg:mt-2">
@@ -164,7 +164,7 @@ export default function ConfirmedBookingPage({
                 {/* Room Image */}
                 <div className="w-[70px] h-[70px] lg:w-20 lg:h-20 bg-gray-100 rounded-xl overflow-hidden">
                   <img
-                    src={bookingDetails.roomImage}
+                    src={bookingDetails?.roomImage || '/placeholder-room.jpg'}
                     alt="Room"
                     className="w-full h-full object-cover"
                   />
@@ -175,16 +175,16 @@ export default function ConfirmedBookingPage({
                   <div className="flex justify-between items-start">
                     <div>
                       <h2 className="text-sm lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
-                        {bookingDetails.roomNumber} | {bookingDetails.roomType}
+                        {bookingDetails?.roomNumber || 'N/A'} | {bookingDetails?.roomType || 'Room Type'}
                       </h2>
-                      <div className={`inline-flex items-center gap-1 px-2 py-1 lg:px-3 lg:py-2 rounded-full text-xs lg:text-sm font-medium ${getStatusColor(bookingDetails.status)}`}>
-                        <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${getStatusDotColor(bookingDetails.status)}`} />
-                        {bookingDetails.status.charAt(0).toUpperCase() + bookingDetails.status.slice(1)}
+                      <div className={`inline-flex items-center gap-1 px-2 py-1 lg:px-3 lg:py-2 rounded-full text-xs lg:text-sm font-medium ${getStatusColor(bookingDetails?.status || 'pending')}`}>
+                        <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${getStatusDotColor(bookingDetails?.status || 'pending')}`} />
+                        {(bookingDetails?.status || 'pending').charAt(0).toUpperCase() + (bookingDetails?.status || 'pending').slice(1)}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-base lg:text-xl font-bold text-gray-900">
-                        {bookingDetails.daysUntilMoveIn} Days
+                        {bookingDetails?.daysUntilMoveIn || 0} Days
                       </div>
                       <div className="text-xs lg:text-sm text-gray-500">
                         Till Move-in
@@ -198,31 +198,31 @@ export default function ConfirmedBookingPage({
               <div className="space-y-3 lg:space-y-4">
                 <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
                   <span className="text-xs lg:text-sm text-gray-600">Move-in Date</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails.moveInDate}</span>
+                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.moveInDate || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
                   <span className="text-xs lg:text-sm text-gray-600">Room Number</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails.roomNumber}</span>
+                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.roomNumber || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
                   <span className="text-xs lg:text-sm text-gray-600">Room Type</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails.roomType}</span>
+                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.roomType || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 lg:py-3">
                   <span className="text-xs lg:text-sm text-gray-600">Token Paid</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">₹{bookingDetails.tokenPaid.toLocaleString()}</span>
+                  <span className="text-xs lg:text-sm font-semibold text-gray-900">₹{bookingDetails?.tokenPaid?.toLocaleString() || '0'}</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-2.5 lg:gap-4 mt-4 lg:mt-6">
                 {
-                  bookingDetails.status === 'pending' && (
+                  bookingDetails?.status === 'pending' && (
                     <img src={edit_btn} alt="edit" className="" />
                   )
                 }
                 
-                {bookingDetails.status === 'pending' && (
+                {bookingDetails?.status === 'pending' && (
                   <button
                     onClick={onSendReminder}
                     className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-gray-800 transition-colors"
@@ -232,7 +232,7 @@ export default function ConfirmedBookingPage({
                   </button>
                 )}
                 
-                {bookingDetails.status === 'approved' && (
+                {bookingDetails?.status === 'approved' && (
                   <button
                     onClick={onModifyBooking}
                     className="flex-1 bg-gray-900 text-white rounded-xl py-3 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -242,7 +242,7 @@ export default function ConfirmedBookingPage({
                   </button>
                 )}
                 
-                {bookingDetails.status === 'cancelled' && (
+                {bookingDetails?.status === 'cancelled' && (
                   <button
                     onClick={onRequestRefund}
                     className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-red-700 transition-colors"
@@ -267,11 +267,11 @@ export default function ConfirmedBookingPage({
                   <h4 className="text-sm lg:text-base font-medium text-gray-900 mb-1 lg:mb-2">
                     Payment Due Soon
                   </h4>
-                  <p className="text-xs lg:text-sm text-gray-500">Due {paymentSummary.dueDate}</p>
+                  <p className="text-xs lg:text-sm text-gray-500">Due {paymentSummary?.dueDate || 'N/A'}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-lg lg:text-2xl font-bold text-gray-900">
-                    ₹{paymentSummary.totalOutstanding.toLocaleString()}
+                    ₹{paymentSummary?.totalOutstanding?.toLocaleString() || '0'}
                   </div>
                   <div className="text-xs lg:text-sm text-gray-500">Total Outstanding</div>
                 </div>
@@ -279,19 +279,19 @@ export default function ConfirmedBookingPage({
 
               {/* Payment Items */}
               <div className="space-y-5 lg:space-y-6 mb-4 lg:mb-6">
-                {paymentSummary.items.map((item) => (
+                {(paymentSummary?.items || []).map((item) => (
                   <div key={item.id} className="flex justify-between items-center">
                     <div className="flex gap-2.5 lg:gap-3 items-center">
                       <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-orange-500 rounded-full" />
                       <div>
-                        <div className="text-xs lg:text-sm font-semibold text-gray-900">{item.name}</div>
+                        <div className="text-xs lg:text-sm font-semibold text-gray-900">{item?.name || 'Payment Item'}</div>
                         <div className="text-xs lg:text-sm text-gray-500">
-                          {item.isOneTime ? 'One-Time' : item.period}
+                          {item?.isOneTime ? 'One-Time' : (item?.period || 'N/A')}
                         </div>
                       </div>
                     </div>
                     <div className="text-xs lg:text-sm font-bold text-gray-900">
-                      ₹{item.amount.toLocaleString()}
+                      ₹{item?.amount?.toLocaleString() || '0'}
                     </div>
                   </div>
                 ))}
@@ -326,21 +326,21 @@ export default function ConfirmedBookingPage({
               </div>
 
               <div className="space-y-2 lg:space-y-3">
-                {supportOptions.map((option) => (
+                {(supportOptions || []).map((option) => (
                   <button
                     key={option.id}
-                    onClick={() => onSupportAction(option.action)}
+                    onClick={() => onSupportAction(option?.action || 'chat')}
                     className="w-full bg-gray-50 rounded-xl p-2.5 lg:p-4 flex items-center gap-2.5 lg:gap-4 hover:bg-gray-100 transition-colors"
                   >
                     <div 
                       className="w-5 h-5 lg:w-6 lg:h-6 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: option.iconBgColor }}
+                      style={{ backgroundColor: option?.iconBgColor || '#f3f4f6' }}
                     >
                       <div className="w-2.5 h-2.5 lg:w-3 lg:h-3 bg-white rounded-full" />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="text-xs lg:text-sm font-medium text-gray-900">{option.title}</div>
-                      <div className="text-xs lg:text-sm text-gray-500">{option.description}</div>
+                      <div className="text-xs lg:text-sm font-medium text-gray-900">{option?.title || 'Support Option'}</div>
+                      <div className="text-xs lg:text-sm text-gray-500">{option?.description || 'Get help from our team'}</div>
                     </div>
                     <FaArrowRight className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-gray-400" />
                   </button>

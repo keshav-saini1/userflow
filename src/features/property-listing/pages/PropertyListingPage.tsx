@@ -57,9 +57,9 @@ export const PropertyListingPage: React.FC<PropertyListingPageProps> = ({
                   <div className="flex-1 lg:max-w-4xl xl:max-w-5xl">
                      {/* Setup Card and Availability Alert - Mobile: stacked, Desktop: side by side */}
                      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 xl:gap-8 mb-8 lg:mb-12">
-                        <div className="flex-1">
+                        {/* <div className="flex-1">
                            <SetupCard setShowBottomSheet={setShowBottomSheet} />
-                        </div>
+                        </div> */}
                         <div className="flex-1 lg:max-w-md">
                            <AvailabilityAlert
                               availableUnits={propertyListing.availableUnits}

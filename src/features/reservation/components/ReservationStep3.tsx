@@ -79,8 +79,13 @@ const ReservationStep3: React.FC = () => {
       return;
     }
 
+    if(!currentProperty?.min_token_amount) {
+      showToast.error('Token amount not found');
+      return;
+    }
+
     // For online payment methods, process payment
-    await handlePayToken(5000); // Token amount of ₹5,000
+    await handlePayToken(currentProperty?.min_token_amount); // Token amount of ₹5,000
   };
 
   const handlePayToken = async (amount: number) => {
@@ -99,21 +104,22 @@ const ReservationStep3: React.FC = () => {
       // Create the payment success data structure
       const paymentSuccessData: PaymentSuccessData = {
         tenant_id: tenantDetails?.id || null,
+        tenant_uuid: tenantDetails?.id || null,
         paying_amount: amount,
         pg_id: propertyDetails?.pg_id || '',
         pg_number: parseInt(propertyDetails?.pg_number || '0'),
         property_id: propertyDetails?.id || '',
-        gateway_charges: 0, // You may need to calculate this
-        payment_mode: selectedPaymentMethod === 'upi' ? 1 : selectedPaymentMethod === 'card' ? 2 : 3,
+        gateway_charges: 0, // You may neesd to calculate this
+        payment_mode: 205,
         received_by: '', // This should be set by the backend
         paid_date: new Date(),
-        initiated_by: tenantDetails?.id || '',
-        description: `Token payment for room reservation`,
-        source: 'web',
+        initiated_by: 'Tenant',
+        description: 'Paid via web online',
+        source: 'payment_pages',
         order_id: orderId,
         payment_gateway: 'cashfree',
         credit_obj: {},
-        version: 1,
+        version: 2,
         selected_room: tenantDetails?.room || '',
         url: window.location.origin
       };
@@ -127,7 +133,7 @@ const ReservationStep3: React.FC = () => {
         pg_id: propertyDetails?.pg_id || '',
         pg_number: parseInt(propertyDetails?.pg_number || '0'),
         return_url: returnURL.toString(),
-        source: 'web',
+        source: 'payment_pages',
         is_test: true, // Set to false for production
         payment_modes: selectedPaymentMethod || 'all'
       };
@@ -296,7 +302,7 @@ const ReservationStep3: React.FC = () => {
                   </div>
                   <span className="text-sm font-medium text-green-800">Token Amount</span>
                 </div>
-                <span className="text-lg font-semibold text-green-800">₹5,000</span>
+                <span className="text-lg font-semibold text-green-800">₹{currentProperty?.min_token_amount}</span>
               </div>
             </div>
 

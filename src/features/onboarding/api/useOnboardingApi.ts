@@ -4,6 +4,7 @@ import api from '@/api/axios';
 export interface GetOtpRequest {
   tenant_phone: string;
   name: string;
+  selectedPropertyId: string;
 }
 
 export interface VerifyOtpRequest {
