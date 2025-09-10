@@ -1,13 +1,11 @@
 export interface ConfirmedBookingDetails {
   id: string;
-  roomNumber: string;
-  roomType: string;
+  room: any;
   moveInDate: string;
   status: 'pending' | 'approved' | 'cancelled';
   tokenPaid: number;
   daysUntilMoveIn: number;
   propertyImage: string;
-  roomImage: string;
 }
 
 export interface PaymentSummary {

@@ -63,6 +63,7 @@ export interface OrderDetailsData {
   amount_paid: number;
   paid_date: string;
   order_id: string;
+  movein_date: string;
 }
 
 export interface GetOrderDetailsResponse {

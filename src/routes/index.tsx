@@ -35,6 +35,7 @@ import DateInputTest from "../components/DynamicForm/fields/DateInputTest";
 import LocationCommutePage from "@/features/property-listing/pages/LocationCommutePage";
 import ProtectedRoute, { AuthenticatedRedirect } from "./ProtectedRoute";
 import ReviewBookingPage from "@/features/book-visit/pages/ReviewBookingPage";
+import AllPaymentsPage from "@/features/confirmed-booking/pages/AllPaymentsPage";
 
 export const router = createBrowserRouter([
    {
@@ -155,10 +156,10 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/wishlist",
+      path: "/all-payments",
       element: (
          <ProtectedRoute>
-            <WishlistPage />
+            <AllPaymentsPage />
          </ProtectedRoute>
       ),
    },

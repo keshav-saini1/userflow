@@ -12,14 +12,14 @@ export const sampleBookingDetails: ModifyBookingDetails = {
 };
 
 export const modifyBookingOptions: ModifyBookingOption[] = [
-  {
-    id: 'change-room',
-    title: 'Change Room',
-    description: 'Switch to a different room',
-    icon: '🏠',
-    iconBgColor: 'bg-blue-50',
-    action: 'change-room'
-  },
+  // {
+  //   id: 'change-room',
+  //   title: 'Change Room',
+  //   description: 'Switch to a different room',
+  //   icon: '🏠',
+  //   iconBgColor: 'bg-blue-50',
+  //   action: 'change-room'
+  // },
   {
     id: 'change-date',
     title: 'Change Move-in Date',

@@ -272,7 +272,7 @@ const ReservationStep4: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Move-in Date</span>
-                  <span className="text-sm font-semibold text-gray-900">{formatDate(bookingSummary.moveInDate)}</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatDate(new Date(getOrderDetailsData?.data?.movein_date || ''))}</span>
                 </div>
                 {/* <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Duration</span>

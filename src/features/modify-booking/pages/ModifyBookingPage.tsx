@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { BookingCard, ModifyOption, CancelBookingModal } from '../components';
-import { sampleBookingDetails, modifyBookingOptions } from '../data/sampleData';
+import { modifyBookingOptions } from '../data/sampleData';
 import type { ModifyBookingOption } from '../types';
 import { useNavigate } from 'react-router';
 import default_back from '@/assets/default_back.svg';
 import AddOnServicesBottomSheet from '@/features/property-listing/components/AddOnServicesBottomSheet';
+import { useConfirmedBookingApi } from '@/features/confirmed-booking/api/useConfirmedBookingApi';
 
 const ModifyBookingPage: React.FC = () => {
   const navigate = useNavigate();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isAddOnServicesOpen, setIsAddOnServicesOpen] = useState(false);
+  const { getBookingDetailsData, getBookingDetails } = useConfirmedBookingApi();
+  const propertyId = localStorage.getItem('selectedPropertyId');
+  const [bookingData, setBookingData] = useState<any>();
+
+  useEffect(() => {
+    getBookingDetails({propertyId: propertyId || ''})
+  }, [])
+
+  useEffect(() => {
+    if(getBookingDetailsData?.data) {
+      setBookingData(getBookingDetailsData?.data)
+    }
+  }, [getBookingDetailsData])
 
   const handleOptionClick = (option: ModifyBookingOption) => {
     // Handle navigation to specific modification flow
@@ -73,7 +87,7 @@ const ModifyBookingPage: React.FC = () => {
           {/* Left Column - Booking Card */}
           <div className="lg:order-1">
             <div className="flex justify-center lg:justify-start">
-              <BookingCard booking={sampleBookingDetails} />
+              <BookingCard booking={bookingData} />
             </div>
           </div>
 

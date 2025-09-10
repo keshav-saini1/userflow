@@ -5,6 +5,7 @@ import train from "@/assets/onboarding/train.svg";
 import food from "@/assets/onboarding/food.svg";
 import building from "@/assets/onboarding/building.svg";
 import red_clock from '@/assets/red_clock.svg';
+import check_ok from '@/assets/check_ok.svg';
 import edit_btn from '@/assets/edit_btn.svg';
 import { IoEyeOutline } from 'react-icons/io5';
 import { FiCreditCard } from 'react-icons/fi';
@@ -68,14 +69,14 @@ export default function ConfirmedBookingPage({
     <div className="min-h-screen bg-gray-50 w-screen">
       {/* Hero Section with Property Image */}
       <div className="relative h-[293px] lg:h-[60vh] xl:h-[50vh] w-full">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${bookingDetails?.propertyImage || '/placeholder-property.jpg'}')` }}
         />
         {/* Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
-        
+
         {/* Navigation Buttons */}
         <div className="absolute top-8 lg:top-12 left-4 lg:left-8 right-4 lg:right-8 flex justify-between items-center">
           <button
@@ -103,9 +104,9 @@ export default function ConfirmedBookingPage({
                   {propertyInfo?.location || 'Location'}
                 </span>
               </div>
-              
+
               {/* Commute Times Card */}
-              <div 
+              <div
                 className="backdrop-blur-md bg-white/12 rounded-xl p-3 lg:p-4 border border-white/20 cursor-pointer hover:bg-white/20 transition-colors"
                 onClick={onExploreCommute}
               >
@@ -164,19 +165,26 @@ export default function ConfirmedBookingPage({
                 {/* Room Image */}
                 <div className="w-[70px] h-[70px] lg:w-20 lg:h-20 bg-gray-100 rounded-xl overflow-hidden">
                   <img
-                    src={bookingDetails?.roomImage || '/placeholder-room.jpg'}
+                    src={bookingDetails?.room?.roomImage || bookingDetails?.propertyImage}
                     alt="Room"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
+
                 {/* Booking Info */}
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-sm lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
-                        {bookingDetails?.roomNumber || 'N/A'} | {bookingDetails?.roomType || 'Room Type'}
-                      </h2>
+                      {
+                        bookingDetails?.room && (
+                          <h2 className="text-sm lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">
+                            {bookingDetails?.room?.roomNumber || ''} | {bookingDetails?.room?.roomType || 'Room Type'}
+                          </h2>
+                        )
+                      }
+                      {
+                        !bookingDetails?.room && <h2 className="text-xs lg:text-lg font-semibold text-gray-900 mb-2 lg:mb-3">A room in {propertyInfo?.name}</h2>
+                      }
                       <div className={`inline-flex items-center gap-1 px-2 py-1 lg:px-3 lg:py-2 rounded-full text-xs lg:text-sm font-medium ${getStatusColor(bookingDetails?.status || 'pending')}`}>
                         <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${getStatusDotColor(bookingDetails?.status || 'pending')}`} />
                         {(bookingDetails?.status || 'pending').charAt(0).toUpperCase() + (bookingDetails?.status || 'pending').slice(1)}
@@ -200,14 +208,20 @@ export default function ConfirmedBookingPage({
                   <span className="text-xs lg:text-sm text-gray-600">Move-in Date</span>
                   <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.moveInDate || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
-                  <span className="text-xs lg:text-sm text-gray-600">Room Number</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.roomNumber || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
-                  <span className="text-xs lg:text-sm text-gray-600">Room Type</span>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.roomType || 'N/A'}</span>
-                </div>
+                {
+                  bookingDetails?.room && (
+                    <>
+                      <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
+                        <span className="text-xs lg:text-sm text-gray-600">Room Number</span>
+                        <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.room?.roomNumber || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 lg:py-3 border-b border-gray-50">
+                        <span className="text-xs lg:text-sm text-gray-600">Room Type</span>
+                        <span className="text-xs lg:text-sm font-semibold text-gray-900">{bookingDetails?.room?.roomType || 'N/A'}</span>
+                      </div>
+                    </>
+                  )
+                }
                 <div className="flex justify-between items-center py-2 lg:py-3">
                   <span className="text-xs lg:text-sm text-gray-600">Token Paid</span>
                   <span className="text-xs lg:text-sm font-semibold text-gray-900">₹{bookingDetails?.tokenPaid?.toLocaleString() || '0'}</span>
@@ -218,10 +232,10 @@ export default function ConfirmedBookingPage({
               <div className="flex gap-2.5 lg:gap-4 mt-4 lg:mt-6">
                 {
                   bookingDetails?.status === 'pending' && (
-                    <img src={edit_btn} alt="edit" className="" />
+                    <img src={edit_btn} alt="edit" className="" onClick={onModifyBooking} />
                   )
                 }
-                
+
                 {bookingDetails?.status === 'pending' && (
                   <button
                     onClick={onSendReminder}
@@ -231,7 +245,7 @@ export default function ConfirmedBookingPage({
                     <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
                   </button>
                 )}
-                
+
                 {bookingDetails?.status === 'approved' && (
                   <button
                     onClick={onModifyBooking}
@@ -241,7 +255,7 @@ export default function ConfirmedBookingPage({
                     <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
                   </button>
                 )}
-                
+
                 {bookingDetails?.status === 'cancelled' && (
                   <button
                     onClick={onRequestRefund}
@@ -262,12 +276,16 @@ export default function ConfirmedBookingPage({
 
               {/* Payment Alert */}
               <div className="flex gap-2.5 lg:gap-4 items-start mb-5 lg:mb-6">
-                <img src={red_clock} alt="red_clock" className="" />
+                <img src={!paymentSummary?.totalOutstanding ? check_ok : red_clock} alt="red_clock" className="w-12 h-12" />
                 <div className="flex-1">
                   <h4 className="text-sm lg:text-base font-medium text-gray-900 mb-1 lg:mb-2">
-                    Payment Due Soon
+                    {(paymentSummary?.totalOutstanding || 0) > 0 ? 'Payment Due Soon' : 'No dues found'}
                   </h4>
-                  <p className="text-xs lg:text-sm text-gray-500">Due {paymentSummary?.dueDate || 'N/A'}</p>
+                  <p className="text-xs lg:text-sm text-gray-500">
+                    {(paymentSummary?.totalOutstanding || 0) > 0
+                      ? `Due ${paymentSummary?.dueDate || 'N/A'}`
+                      : 'All payments are up to date'}
+                  </p>
                 </div>
                 <div className="text-right">
                   <div className="text-lg lg:text-2xl font-bold text-gray-900">
@@ -307,10 +325,13 @@ export default function ConfirmedBookingPage({
                   View All
                 </button>
                 <button
+                  disabled={!paymentSummary?.totalOutstanding}
                   onClick={onPayNow}
-                  className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2 lg:gap-3 text-xs lg:text-sm font-semibold hover:bg-gray-800 transition-colors"
+                  className={`flex-1 ${
+                    !paymentSummary?.totalOutstanding ? 'bg-gray-200 text-gray-500' : 'bg-gray-900 text-white'
+                  } rounded-xl py-2.5 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2 lg:gap-3 text-xs lg:text-sm font-semibold hover:bg-gray-800 transition-colors`}
                 >
-                 <FiCreditCard className='w-5 h-5 lg:w-5 lg:h-5' />
+                  <FiCreditCard className='w-5 h-5 lg:w-5 lg:h-5' />
                   Pay Now
                 </button>
               </div>
@@ -332,7 +353,7 @@ export default function ConfirmedBookingPage({
                     onClick={() => onSupportAction(option?.action || 'chat')}
                     className="w-full bg-gray-50 rounded-xl p-2.5 lg:p-4 flex items-center gap-2.5 lg:gap-4 hover:bg-gray-100 transition-colors"
                   >
-                    <div 
+                    <div
                       className="w-5 h-5 lg:w-6 lg:h-6 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: option?.iconBgColor || '#f3f4f6' }}
                     >

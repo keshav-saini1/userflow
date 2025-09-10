@@ -21,8 +21,6 @@ const OnboardingStep2: OnboardingStepComponent = ({
    const submitButtonRef = React.useRef<HTMLButtonElement>(null);
    const { propertyData } = useOnboardingStore();
 
-   console.log({ propertyData })
-
    const {
       register,
       handleSubmit,

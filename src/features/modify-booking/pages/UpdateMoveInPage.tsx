@@ -1,28 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Calendar from "@/components/Calendar";
 import type { DateRange } from "@/components/Calendar";
 import default_back from "@/assets/default_back.svg";
 import type { ModifyBookingDetails } from "../types";
+import { useConfirmedBookingApi } from "@/features/confirmed-booking/api/useConfirmedBookingApi";
+import { useTenantApi } from "@/features/reservation/api/useTenantApi";
+import { showToast } from "@/components";
 
 interface UpdateMoveInPageProps {
    bookingDetails?: ModifyBookingDetails;
 }
 
-const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
-   bookingDetails = {
-      id: "BK001",
-      propertyName: "Premium Private Room",
-      roomNumber: "A-203",
-      roomType: "Premium Private Room",
-      moveInDate: "2025-07-07",
-      monthlyRent: 8000,
-      status: "pending",
-      propertyImage:
-         "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
-   },
-}) => {
+const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = () => {
    const navigate = useNavigate();
+   const { getBookingDetailsData, getBookingDetails } = useConfirmedBookingApi();
+   const { updateTenantDetails, updateTenantData } = useTenantApi();
+   const propertyId = localStorage.getItem('selectedPropertyId');
+   const [bookingData, setBookingData] = useState<any>();
+
+   useEffect(() => {
+      getBookingDetails({propertyId: propertyId || ''})
+    }, [])
+
+    useEffect(() => {
+      if(getBookingDetailsData?.data) {
+        setBookingData(getBookingDetailsData?.data)
+      }
+    }, [getBookingDetailsData])
+
    const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
       startDate: null,
       endDate: null,
@@ -71,19 +77,28 @@ const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
 
    const handleContinue = () => {
       if (selectedDateRange.startDate) {
-         // Navigate to next step or submit the form
-         console.log("Selected move-in date range:", selectedDateRange);
-         // You can navigate to the next step here
-         // navigate('/modify-booking/next-step');
+         updateTenantDetails({
+            property_id: propertyId || '',
+            data: {
+               date_of_joining: formatDate(selectedDateRange.startDate),
+            }
+         })
       }
    };
+
+   useEffect(() => {
+      if(updateTenantData?.data) {
+         navigate(-1);
+         showToast.success('Move-in date updated successfully')
+      }
+   }, [updateTenantData])
 
    const formatDate = (date: Date) => {
       return date
          .toLocaleDateString("en-US", {
             day: "2-digit",
             month: "short",
-            year: "2-digit",
+            year: "numeric",
          })
          .replace(",", "");
    };
@@ -116,8 +131,8 @@ const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                <div className="relative h-40">
                   <img
-                     src={bookingDetails.propertyImage}
-                     alt={bookingDetails.propertyName}
+                     src={bookingData?.property_image}
+                     alt={bookingData?.property_name}
                      className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -127,7 +142,7 @@ const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
                      <div className="flex items-center justify-between">
                         <div className="flex-1">
                            <h3 className="text-white font-semibold text-base mb-1">
-                              {bookingDetails.propertyName}
+                              {bookingData?.property_name}
                            </h3>
                            <div className="flex items-center gap-1">
                               <svg
@@ -142,13 +157,13 @@ const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
                                  />
                               </svg>
                               <span className="text-white text-xs opacity-90">
-                                 Gurugram
+                                 {bookingData?.property_address?.address_line_2}
                               </span>
                            </div>
                         </div>
                         <div className="text-right">
                            <div className="text-white font-semibold text-base">
-                              ₹{bookingDetails.monthlyRent.toLocaleString()}
+                              {/* ₹{bookingData?.monthly_rent.toLocaleString()} */}
                            </div>
                            <div className="text-white text-xs opacity-90">
                               per month
@@ -173,7 +188,7 @@ const UpdateMoveInPage: React.FC<UpdateMoveInPageProps> = ({
                   </p>
                   <p className="text-sm text-blue-600">
                      Current date:{" "}
-                     {formatDate(new Date(bookingDetails.moveInDate))}
+                     {formatDate(new Date(bookingData?.movein_date))}
                   </p>
                </div>
 

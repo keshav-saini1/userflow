@@ -10,6 +10,7 @@ export interface GetOtpRequest {
 export interface VerifyOtpRequest {
   otp: string;
   tenant_phone: string;
+  property_id: string;
 }
 
 export interface ApiSuccess<T> {

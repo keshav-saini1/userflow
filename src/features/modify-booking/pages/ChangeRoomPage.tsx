@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BookingCard, RoomOptionCard } from '../components';
 import { sampleBookingDetails } from '../data/sampleData';
 import { availableRoomOptions } from '../data/roomOptions';
 import default_back from '@/assets/default_back.svg';
 import { useNavigate } from 'react-router';
+import { useConfirmedBookingApi } from '@/features/confirmed-booking/api/useConfirmedBookingApi';
 
 const ChangeRoomPage: React.FC = () => {
   const navigate = useNavigate();
+  const { getBookingDetailsData, getBookingDetails } = useConfirmedBookingApi();
+  const propertyId = localStorage.getItem('selectedPropertyId');
+  const [bookingData, setBookingData] = useState<any>();
+
+  useEffect(() => {
+    getBookingDetails({propertyId: propertyId || ''})
+  }, [])
+
+  useEffect(() => {
+    if(getBookingDetailsData?.data) {
+      setBookingData(getBookingDetailsData?.data)
+    }
+  }, [getBookingDetailsData])
+
   const handleBackClick = () => {
     // Handle back navigation
     navigate("/modify-booking");

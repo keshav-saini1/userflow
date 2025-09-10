@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useMemo } from "react";
 import ConfirmedBookingPage from "../pages/ConfirmedBookingPage";
-import { useConfirmedBookingApi } from "../api/useConfirmedBookingApi";
+import { useConfirmedBookingApi, type PaymentEntry, type TenantPassbookData } from "../api/useConfirmedBookingApi";
 
 const ConfirmedBookingWrapper = () => {
    const navigate = useNavigate();
@@ -13,13 +13,17 @@ const ConfirmedBookingWrapper = () => {
       getBookingDetails,
       getBookingDetailsData,
       isGettingBookingDetails,
-      getBookingDetailsError
+      getBookingDetailsError,
+      getTenantPassbook,
+      getTenantPassbookData,
+      isGettingTenantPassbook,
+      getTenantPassbookError
    } = useConfirmedBookingApi();
 
    const propertyId = localStorage.getItem('selectedPropertyId');
+   const tenantId = localStorage.getItem("tenant_id");
    
-   console.log({getPropertyDetailsData, getBookingDetailsData});
-   
+   console.log({getTenantPassbookData})
    // Get property and booking details on component mount
    useEffect(() => {
       if (propertyId) {
@@ -28,10 +32,77 @@ const ConfirmedBookingWrapper = () => {
       }
    }, [propertyId, getPropertyDetails, getBookingDetails]);
 
+   useEffect(() => {
+      if(getBookingDetailsData && getBookingDetailsData?.data) {
+         getTenantPassbook({
+            pg_id: getBookingDetailsData?.data?.pg_id,
+            pg_number: getBookingDetailsData?.data?.pg_number,
+            tenant_id: tenantId || '',
+            source: 'tenant_app'
+         })
+      }
+   }, [getBookingDetailsData])
+
+   // Process tenant passbook data into structured payment entries
+   const processPassbookData = (passbookData: TenantPassbookData): PaymentEntry[] => {
+      const paymentEntries: PaymentEntry[] = [];
+
+      // Process collection items (payments made)
+      if (passbookData.collection && Array.isArray(passbookData.collection)) {
+         passbookData.collection.forEach(item => {
+            paymentEntries.push({
+               id: item.id,
+               amount: item.amount,
+               due_type: item.due_type,
+               due_date: item.due_date,
+               description: item.description,
+               type: 'collection',
+               paid_date: item.paid_date,
+               status: item.status,
+               receipt_url: item.receipt_url || item.pdf_link,
+               payment_mode: item.payment_mode
+            });
+         });
+      }
+
+      // Process dues items (pending payments)
+      if (passbookData.dues && Array.isArray(passbookData.dues)) {
+         passbookData.dues.forEach(item => {
+            paymentEntries.push({
+               id: item.id,
+               amount: item.amount,
+               due_type: item.due_type,
+               due_date: item.due_date,
+               description: item.description,
+               type: 'due',
+               status: item.status
+            });
+         });
+      }
+
+      // Sort by due_date (most recent first)
+      return paymentEntries.sort((a, b) => {
+         const dateA = new Date(a.due_date).getTime();
+         const dateB = new Date(b.due_date).getTime();
+         return dateB - dateA;
+      });
+   };
+
+   // Process passbook data when available
+   const paymentEntries = useMemo(() => {
+      if (getTenantPassbookData?.data) {
+         return processPassbookData(getTenantPassbookData.data);
+      }
+      return [];
+   }, [getTenantPassbookData]);
+
+   console.log({ paymentEntries });
+
    // Construct confirmed booking data from API response
    const confirmedBookingData: any = useMemo(() => {
       const propertyData = getPropertyDetailsData?.data;
       const bookingData = getBookingDetailsData?.data;
+      const passbookData = getTenantPassbookData?.data;
       
       // Calculate days until move-in
       const calculateDaysUntilMoveIn = (moveInDate: string) => {
@@ -59,6 +130,124 @@ const ConfirmedBookingWrapper = () => {
             return 'TBD';
          }
       };
+
+      // Format date for display
+      const formatDisplayDate = (dateString: string) => {
+         try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', { 
+               day: 'numeric', 
+               month: 'short' 
+            });
+         } catch {
+            return 'N/A';
+         }
+      };
+
+      // Get booking status from numeric code
+      const getBookingStatus = (statusCode: number | undefined): 'approved' | 'pending' | 'lead' | 'invite' | 'deleted tenant' | 'deleted invitation' | 'deleted lead' => {
+         switch (statusCode) {
+            case 1:
+               return 'approved';
+            case 2:
+               return 'pending';
+            case 3:
+               return 'lead';
+            case 4:
+               return 'invite';
+            case 5:
+               return 'deleted tenant';
+            case 6:
+               return 'deleted invitation';
+            case 7:
+               return 'deleted lead';
+            default:
+               return 'pending';
+         }
+      };
+
+      // Create payment summary from passbook data
+      const createPaymentSummary = () => {
+         if (!passbookData) {
+            return {
+               totalOutstanding: 0,
+               dueDate: 'N/A',
+               items: [],
+               paymentEntries: []
+            };
+         }
+
+         // Get next due date from dues array
+         const nextDueDate = passbookData.dues && passbookData.dues.length > 0 
+            ? formatDisplayDate(passbookData.dues[0].due_date)
+            : 'N/A';
+
+         // Process payment entries directly from passbook data
+         const processedEntries: PaymentEntry[] = [];
+
+         // Process collection items (payments made)
+         if (passbookData.collection && Array.isArray(passbookData.collection)) {
+            passbookData.collection.forEach(item => {
+               processedEntries.push({
+                  id: item.id,
+                  amount: item.amount,
+                  due_type: item.due_type,
+                  due_date: item.due_date,
+                  description: item.description,
+                  type: 'collection',
+                  paid_date: item.paid_date,
+                  status: item.status,
+                  receipt_url: item.receipt_url || item.pdf_link,
+                  payment_mode: item.payment_mode
+               });
+            });
+         }
+
+         // Process dues items (pending payments)
+         if (passbookData.dues && Array.isArray(passbookData.dues)) {
+            passbookData.dues.forEach(item => {
+               processedEntries.push({
+                  id: item.id,
+                  amount: item.amount,
+                  due_type: item.due_type,
+                  due_date: item.due_date,
+                  description: item.description,
+                  type: 'due',
+                  status: item.status
+               });
+            });
+         }
+
+         // Sort by due_date (most recent first)
+         const sortedEntries = processedEntries.sort((a, b) => {
+            const dateA = new Date(a.due_date).getTime();
+            const dateB = new Date(b.due_date).getTime();
+            return dateB - dateA;
+         });
+
+         // Convert payment entries to payment summary items
+         const items = sortedEntries.map(entry => ({
+            id: entry.id,
+            name: `${entry.due_type} ${entry.type === 'collection' ? '(Paid)' : '(Due)'}`,
+            amount: typeof entry.amount === 'string' ? parseFloat(entry.amount) : entry.amount,
+            type: entry.due_type.toLowerCase().includes('rent') ? 'rent' : 
+                  entry.due_type.toLowerCase().includes('security') ? 'security-deposit' : 
+                  entry.due_type.toLowerCase().includes('advance') ? 'joining-fee' : 'other',
+            period: entry.type === 'collection' ? 'Paid' : 'Due',
+            isOneTime: entry.due_type.toLowerCase().includes('advance') || entry.due_type.toLowerCase().includes('security'),
+            status: entry.type,
+            due_date: entry.due_date,
+            paid_date: entry.paid_date,
+            receipt_url: entry.receipt_url
+         }));
+
+         return {
+            totalOutstanding: passbookData.total_dues_amount || 0,
+            dueDate: nextDueDate,
+            items: items,
+            paymentEntries: sortedEntries
+         };
+      };
       
       return {
          bookingDetails: {
@@ -66,40 +255,13 @@ const ConfirmedBookingWrapper = () => {
             roomNumber: bookingData?.room_id || propertyData?.pg_number || 'TBD',
             roomType: 'Premium Room', // This could come from property data if available
             moveInDate: bookingData?.movein_date ? formatMoveInDate(bookingData.movein_date) : 'TBD',
-            status: bookingData?.status === 1 ? 'approved' : 'pending',
+            status: getBookingStatus(bookingData?.status),
             tokenPaid: bookingData?.token_paid || propertyData?.min_token_amount || 0,
             daysUntilMoveIn: bookingData?.movein_date ? calculateDaysUntilMoveIn(bookingData.movein_date) : 0,
             propertyImage: propertyData?.image,
             roomImage: propertyData?.image
          },
-         paymentSummary: {
-            totalOutstanding: (propertyData?.rent || 0) * 3, // Example calculation
-            dueDate: '15 Jan',
-            items: [
-               {
-                  id: 'rent-1',
-                  name: 'Monthly Rent',
-                  amount: propertyData?.rent,
-                  type: 'rent' as const,
-                  period: 'Monthly',
-                  isOneTime: false
-               },
-               {
-                  id: 'security-1',
-                  name: 'Security Deposit',
-                  amount: propertyData?.rent,
-                  type: 'security-deposit' as const,
-                  isOneTime: true
-               },
-               {
-                  id: 'token-1',
-                  name: 'Token Amount (Paid)',
-                  amount: propertyData?.min_token_amount,
-                  type: 'joining-fee' as const,
-                  isOneTime: true
-               }
-            ]
-         },
+         paymentSummary: createPaymentSummary(),
          supportOptions: [
             {
                id: 'chat-support',
@@ -128,7 +290,7 @@ const ConfirmedBookingWrapper = () => {
             }
          }
       };
-   }, [getPropertyDetailsData, getBookingDetailsData]);
+   }, [getPropertyDetailsData, getBookingDetailsData, getTenantPassbookData]);
 
    console.log({confirmedBookingData})
 
@@ -145,19 +307,14 @@ const ConfirmedBookingWrapper = () => {
    };
 
    const handlePayNow = () => {
-      console.log("Pay now clicked");
-      // Navigate to payment flow
-      // navigate('/payment');
+      navigate('/payment');
    };
 
    const handleViewAllPayments = () => {
-      console.log("View all payments clicked");
-      // Navigate to payments page
-      // navigate('/payments');
+      navigate('/all-payments');
    };
 
    const handleSupportAction = (action: "chat" | "call") => {
-      console.log("Support action clicked:", action);
       // Handle support action (open chat or initiate call)
    };
 

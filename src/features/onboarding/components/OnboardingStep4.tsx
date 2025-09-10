@@ -48,7 +48,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     },
   });
 
-  const { verifyOtp, verifyOtpError, verifyOtpData } = useOnboardingApi();
+  const { verifyOtp, verifyOtpError, verifyOtpData, getOtp } = useOnboardingApi();
 
   // Watch all OTP values to check completion
   const otpValues = watch();
@@ -121,9 +121,15 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       }
     });
 
+    if(!propertyData?.id) {
+      showToast.error('Property ID not found', 'Please try again');
+      return;
+    }
+
     verifyOtp({
       otp,
       tenant_phone: currentData.personalInfo?.phone || '',
+      property_id: propertyData?.id || '',
     });
   };
 
@@ -153,8 +159,13 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     // Focus first input
     inputRefs.current[0]?.focus();
     
-    // Simulate resend
-    alert('OTP has been sent to your phone number');
+
+    // resend otp
+    getOtp({
+      tenant_phone: currentData.personalInfo?.phone || '',
+      name: currentData.personalInfo?.name || '',
+      selectedPropertyId: propertyData?.id || '',
+    });
   };
 
   const phoneNumber = currentData.personalInfo?.phone || '';

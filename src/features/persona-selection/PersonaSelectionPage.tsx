@@ -27,13 +27,13 @@ const PersonaSelectionPage: React.FC = () => {
    const {propertyData} = useOnboardingStore();
 
    const personaOptions: PersonaOption[] = [
-      {
+      ...(tenantStatus !== "2" ? [{
          id: "new-place",
          title: "I'm looking for a new place",
          description: "Find and book the perfect rental for me",
          icon: newPlace,
          href: "/property-listing",
-      },
+      }] : []),
       ...(tenantStatus !== "3" ? [{
          id: "existing-tenant",
          title: "I'm an existing tenant",
@@ -41,13 +41,13 @@ const PersonaSelectionPage: React.FC = () => {
          icon: existingTenant,
          href: "/bookings",
       }] : []),
-      {
+      ...(tenantStatus !== "2" ? [{
          id: "not-added",
          title: "I wasn't added to the app",
          description: "I'm living here but not registered yet",
          icon: app,
          href: "/property-listing",
-      },
+      }] : []),
    ];
 
    const handlePersonaSelect = (personaId: string) => {

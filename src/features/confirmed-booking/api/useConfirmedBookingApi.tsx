@@ -39,6 +39,10 @@ export interface BookingDetailsData {
   token_paid: number;
   status: number;
   property_name: string;
+  property_address: any;
+  property_image: string;
+  pg_id: string;
+  pg_number: string;
 }
 
 export interface GetBookingDetailsRequest {
@@ -49,6 +53,78 @@ export interface BookingDetailsResponse {
   status: number;
   message: string;
   data: BookingDetailsData;
+}
+
+// Tenant Passbook Types
+export interface GetTenantPassbookRequest {
+  pg_id: string;
+  pg_number: string;
+  tenant_id: string;
+  source: string;
+}
+
+// Payment Entry Types
+export interface PaymentEntry {
+  id: string;
+  amount: string | number;
+  due_type: string;
+  due_date: string;
+  description: string;
+  type: 'collection' | 'due';
+  paid_date?: string;
+  status?: number;
+  receipt_url?: string;
+  payment_mode?: number;
+}
+
+// Collection Item from API
+export interface CollectionItem {
+  id: string;
+  amount: string;
+  due_type: string;
+  due_date: string;
+  paid_date: string;
+  description: string;
+  status: number;
+  receipt_url?: string;
+  payment_mode?: number;
+  pdf_link?: string;
+}
+
+// Due Item from API
+export interface DueItem {
+  id: string;
+  amount: string;
+  due_type: string;
+  due_date: string;
+  description: string;
+  status: number;
+}
+
+export interface TenantPassbookData {
+  dues: DueItem[];
+  collection: CollectionItem[];
+  total_dues_amount: number;
+  total_collection_amount: number;
+  isPartialPayment: boolean;
+  upi_intent: string;
+  tenant_credits: any[];
+  credit_amount: number;
+  most_recent_credit_time: number;
+  most_recent_credit_amount: number;
+  redeemed_amount: number;
+  used_credits: any[];
+  unscratched_credits: any[];
+  owner_credits: any[];
+  total_security_deposit_amount: number;
+  total_security_deposit_returned_amount: number;
+  total_owner_credits: number;
+}
+
+export interface TenantPassbookResponse {
+  status: number;
+  message: string;
+  data: TenantPassbookData;
 }
 
 // Common API Types
@@ -80,6 +156,17 @@ async function getBookingDetails(requestData: GetBookingDetailsRequest): Promise
   return response.data;
 }
 
+async function getTenantPassbook(requestData: GetTenantPassbookRequest): Promise<TenantPassbookResponse> {
+  const { pg_id, pg_number, tenant_id, source } = requestData;
+  const response = await api.post<TenantPassbookResponse>('/tenant/getTenantPassbookForTenantApp/', {
+    pg_id,
+    pg_number,
+    tenant_id,
+    source
+  });
+  return response.data;
+}
+
 // Custom Hook
 export function useConfirmedBookingApi() {
   const getPropertyDetailsMutation = useMutation({
@@ -90,6 +177,11 @@ export function useConfirmedBookingApi() {
   const getBookingDetailsMutation = useMutation({
     mutationKey: ['confirmed-booking', 'booking-details'],
     mutationFn: getBookingDetails,
+  });
+
+  const getTenantPassbookMutation = useMutation({
+    mutationKey: ['confirmed-booking', 'tenant-passbook'],
+    mutationFn: getTenantPassbook,
   });
 
   return {
@@ -106,10 +198,18 @@ export function useConfirmedBookingApi() {
     isGettingBookingDetails: getBookingDetailsMutation.isPending,
     getBookingDetailsError: getBookingDetailsMutation.error as unknown as Error | null,
     getBookingDetailsData: getBookingDetailsMutation.data,
+
+    // Tenant Passbook
+    getTenantPassbook: getTenantPassbookMutation.mutateAsync,
+    getTenantPassbookStatus: getTenantPassbookMutation.status,
+    isGettingTenantPassbook: getTenantPassbookMutation.isPending,
+    getTenantPassbookError: getTenantPassbookMutation.error as unknown as Error | null,
+    getTenantPassbookData: getTenantPassbookMutation.data,
   };
 }
 
 export const ConfirmedBookingApi = {
   getPropertyDetails,
   getBookingDetails,
+  getTenantPassbook,
 };
