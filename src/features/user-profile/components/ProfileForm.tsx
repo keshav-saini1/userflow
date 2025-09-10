@@ -4,6 +4,8 @@ import pending_badge from "@/assets/pending_badge.svg";
 import { UnsavedChangesAlert } from "@/components";
 import DynamicForm from "@/components/DynamicForm";
 import userProfileFormSchema from "../form/config";
+import { useTenantApi } from "@/features/reservation/api/useTenantApi";
+import { usePersonaApi } from "@/features/persona-selection/api/usePersonaApi";
 
 interface DocumentCard {
    id: string;
@@ -24,6 +26,56 @@ interface ProfileFormProps {
    onDocumentAdd?: () => void;
 }
 
+// Field mapping from form field names to tenant database column names
+const FIELD_MAPPING: Record<string, string> = {
+   email: 'email',
+   name: 'name',
+   alternatePhone: 'alternate_phone',
+   dateOfBirth: 'dob',
+   gender: 'gender',
+   collegeCompanyName: 'university',
+   tenantType: 'working_type',
+   currentAddress: 'current_address',
+   phone: 'phone',
+   fatherName: 'father_name',
+   parentPhone: 'father_phone',
+   localGuardianName: 'local_guardian_name',
+   localGuardianPhone: 'local_guardian_phone',
+   pinCode: 'pin_code',
+   remark: 'remark',
+   bankAccountNumber: 'bank_account_number',
+   ifscCode: 'bank_ifsc_code',
+   bankName: 'bank_name',
+   upiId: 'upi_id',
+   companyPan: 'company_pan',
+   companyAddress: 'company_address'
+};
+
+// Reverse mapping from database column names to form field names
+const REVERSE_FIELD_MAPPING: Record<string, string> = {
+   email: 'email',
+   name: 'name',
+   alternate_phone: 'alternatePhone',
+   dob: 'dateOfBirth',
+   gender: 'gender',
+   university: 'collegeCompanyName',
+   working_type: 'tenantType',
+   current_address: 'currentAddress',
+   phone: 'phone',
+   father_name: 'fatherName',
+   father_phone: 'parentPhone',
+   local_guardian_name: 'localGuardianName',
+   local_guardian_phone: 'localGuardianPhone',
+   pin_code: 'pinCode',
+   remark: 'remark',
+   bank_account_number: 'bankAccountNumber',
+   bank_ifsc_code: 'ifscCode',
+   bank_name: 'bankName',
+   upi_id: 'upiId',
+   company_pan: 'companyPan',
+   company_address: 'companyAddress'
+};
+
 const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
    ({ onSave, onContinue, onDocumentAdd }, ref) => {
       const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -33,6 +85,12 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
       >(null);
       const [formData, setFormData] = useState<Record<string, string | number | boolean>>({});
       const [initialFormData, setInitialFormData] = useState<Record<string, string | number | boolean>>({});
+      const [defaultValues, setDefaultValues] = useState<Record<string, string | number | boolean>>({});
+      const [isLoadingTenantData, setIsLoadingTenantData] = useState(true);
+      
+      // Initialize APIs
+      const { updateTenantDetails, isUpdatingTenant, updateTenantError } = useTenantApi();
+      const { getTenantDetails, isGettingTenantDetails, getTenantDetailsError } = usePersonaApi();
 
       // Dummy data for documents
       const [documents] = useState<DocumentCard[]>([
@@ -61,36 +119,119 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
          },
       ]);
 
-      // Default values for the form
-      const defaultValues = {
-         email: "nimitjain@gmail.com",
-         name: "Nimit Jain",
-         alternatePhone: "9756237892",
-         dateOfBirth: "1997-03-02",
-         gender: "male",
-         collegeCompanyName: "Rentok",
-         tenantType: "working-professional",
-         currentAddress: "",
-         phone: "9756237892",
-         fatherName: "Add details",
-         parentPhone: "9756237892",
-         localGuardianName: "Add details",
-         localGuardianPhone: "9756237892",
-         pinCode: "",
-         remark: "",
-         bankAccountNumber: "",
-         ifscCode: "",
-         bankName: "",
-         upiId: "",
-         companyParent: "",
-         companyAddress: ""
-      };
-
-      // Store initial values on component mount
+      // Fetch tenant details on component mount
       useEffect(() => {
-         setInitialFormData(defaultValues);
-         setFormData(defaultValues);
-      }, []);
+         const fetchTenantDetails = async () => {
+            try {
+               setIsLoadingTenantData(true);
+               const response = await getTenantDetails();
+               
+               if (response?.status === 200 && response?.data) {
+                  const tenantData = response.data;
+                  const mappedFormData: Record<string, string | number | boolean> = {};
+                  
+                  // Map tenant data to form fields
+                  Object.keys(tenantData).forEach(dbColumn => {
+                     const formFieldName = REVERSE_FIELD_MAPPING[dbColumn];
+                     if (formFieldName && tenantData[dbColumn] !== null && tenantData[dbColumn] !== undefined) {
+                        mappedFormData[formFieldName] = tenantData[dbColumn];
+                     }
+                  });
+                  
+                  // Set default values with fetched data
+                  const finalDefaultValues = {
+                     email: mappedFormData.email || "",
+                     name: mappedFormData.name || "",
+                     alternatePhone: mappedFormData.alternatePhone || "",
+                     dateOfBirth: mappedFormData.dateOfBirth || "",
+                     gender: mappedFormData.gender || "",
+                     collegeCompanyName: mappedFormData.collegeCompanyName || "",
+                     tenantType: mappedFormData.tenantType || "",
+                     currentAddress: mappedFormData.currentAddress || "",
+                     phone: mappedFormData.phone || "",
+                     fatherName: mappedFormData.fatherName || "",
+                     parentPhone: mappedFormData.parentPhone || "",
+                     localGuardianName: mappedFormData.localGuardianName || "",
+                     localGuardianPhone: mappedFormData.localGuardianPhone || "",
+                     pinCode: mappedFormData.pinCode || "",
+                     remark: mappedFormData.remark || "",
+                     bankAccountNumber: mappedFormData.bankAccountNumber || "",
+                     ifscCode: mappedFormData.ifscCode || "",
+                     bankName: mappedFormData.bankName || "",
+                     upiId: mappedFormData.upiId || "",
+                     companyPan: mappedFormData.companyPan || "",
+                     companyAddress: mappedFormData.companyAddress || ""
+                  };
+                  
+                  setDefaultValues(finalDefaultValues);
+                  setInitialFormData(finalDefaultValues);
+                  setFormData(finalDefaultValues);
+               } else {
+                  // Fallback to empty default values if no data
+                  const emptyDefaults = {
+                     email: "",
+                     name: "",
+                     alternatePhone: "",
+                     dateOfBirth: "",
+                     gender: "",
+                     collegeCompanyName: "",
+                     tenantType: "",
+                     currentAddress: "",
+                     phone: "",
+                     fatherName: "",
+                     parentPhone: "",
+                     localGuardianName: "",
+                     localGuardianPhone: "",
+                     pinCode: "",
+                     remark: "",
+                     bankAccountNumber: "",
+                     ifscCode: "",
+                     bankName: "",
+                     upiId: "",
+                     companyPan: "",
+                     companyAddress: ""
+                  };
+                  setDefaultValues(emptyDefaults);
+                  setInitialFormData(emptyDefaults);
+                  setFormData(emptyDefaults);
+               }
+            } catch (error) {
+               console.error('Failed to fetch tenant details:', error);
+               // Set empty defaults on error
+               const emptyDefaults = {
+                  email: "",
+                  name: "",
+                  alternatePhone: "",
+                  dateOfBirth: "",
+                  gender: "",
+                  collegeCompanyName: "",
+                  tenantType: "",
+                  currentAddress: "",
+                  phone: "",
+                  fatherName: "",
+                  parentPhone: "",
+                  localGuardianName: "",
+                  localGuardianPhone: "",
+                  pinCode: "",
+                  remark: "",
+                  bankAccountNumber: "",
+                  ifscCode: "",
+                  bankName: "",
+                  upiId: "",
+                  companyPan: "",
+                  companyAddress: ""
+               };
+               setDefaultValues(emptyDefaults);
+               setInitialFormData(emptyDefaults);
+               setFormData(emptyDefaults);
+            } finally {
+               setIsLoadingTenantData(false);
+            }
+         };
+         
+         fetchTenantDetails();
+      }, [getTenantDetails]);
+
 
       // Check for changes
       const checkForChanges = () => {
@@ -125,6 +266,31 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
          return () =>
             window.removeEventListener("beforeunload", handleBeforeUnload);
       }, [hasUnsavedChanges]);
+
+      // Handle field blur - update tenant profile
+      const handleFieldBlur = async (fieldName: string, value: any) => {
+         const dbColumnName = FIELD_MAPPING[fieldName];
+         if (!dbColumnName || !value) return;
+
+         try {
+            const propertyId = localStorage.getItem('selectedPropertyId');
+            if (!propertyId) {
+               console.error('Property ID not found in localStorage');
+               return;
+            }
+
+            await updateTenantDetails({
+               property_id: propertyId,
+               data: {
+                  [dbColumnName]: value
+               }
+            });
+
+            console.log(`Updated ${dbColumnName} with value:`, value);
+         } catch (error) {
+            console.error(`Failed to update ${dbColumnName}:`, error);
+         }
+      };
 
       // Handle form submission
       const handleFormSubmit = (data: Record<string, string | number | boolean>) => {
@@ -255,6 +421,28 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
 
       return (
          <div className="space-y-[21px]">
+            {/* Loading State */}
+            {isLoadingTenantData && (
+               <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+                     <span className="text-gray-600">Loading tenant details...</span>
+                  </div>
+               </div>
+            )}
+
+            {/* Error State */}
+            {getTenantDetailsError && (
+               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center gap-2">
+                     <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <span className="text-red-700 text-sm">Failed to load tenant details. Using empty form.</span>
+                  </div>
+               </div>
+            )}
+
             {/* Profile Card */}
             <div className="bg-white rounded-[14px] shadow-sm w-full max-w-[384px] mx-auto">
                <div className="p-[21px] text-center">
@@ -282,7 +470,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
                      </button>
                   </div>
                   <h2 className="text-[#101828] text-[17.5px] font-medium leading-[24.5px] mb-[7px]">
-                     Nimit Jain
+                     {defaultValues.name || 'User Name'}
                   </h2>
                   <div className="bg-[#ffedd4] inline-flex items-center gap-1 px-[7px] py-[3.5px] rounded-full">
                      <span className="text-[#ca3500] text-[10px] font-normal leading-[14px]">
@@ -321,18 +509,44 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
             </div>
 
             {/* Dynamic Form */}
-            <div className="rounded-[21px]">
-               <div className="">
-                  <DynamicForm
-                     schema={userProfileFormSchema}
-                     onSubmit={handleFormSubmit}
-                     submitButtonText="Continue"
-                     defaultValues={defaultValues}
-                     className="space-y-6"
-                     expandAllByDefault={true}
-                  />
+            {!isLoadingTenantData && (
+               <div className="rounded-[21px]">
+                  <div className="">
+                     <DynamicForm
+                        key={JSON.stringify(defaultValues)} // Force re-render when defaultValues change
+                        schema={userProfileFormSchema}
+                        onSubmit={handleFormSubmit}
+                        submitButtonText="Continue"
+                        defaultValues={defaultValues}
+                        className="space-y-6"
+                        expandAllByDefault={true}
+                        onFieldBlur={handleFieldBlur}
+                     />
+                  </div>
                </div>
-            </div>
+            )}
+
+            {/* Loading indicator for API calls */}
+            {isUpdatingTenant && (
+               <div className="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                  <div className="flex items-center gap-2">
+                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                     <span className="text-sm">Saving...</span>
+                  </div>
+               </div>
+            )}
+
+            {/* Error indicator for API calls */}
+            {updateTenantError && (
+               <div className="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                  <div className="flex items-center gap-2">
+                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <span className="text-sm">Save failed</span>
+                  </div>
+               </div>
+            )}
 
             {/* Unsaved Changes Alert */}
             <UnsavedChangesAlert

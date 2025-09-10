@@ -61,68 +61,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         </div>
                      </div>
 
-                     {/* Find Nearby Spots Card - Responsive sizing */}
-                     <div className="bg-white/10 backdrop-blur-[6px] w-[100%] rounded-[14px] lg:rounded-2xl p-[10.5px] py-3 lg:p-4 flex items-center gap-[10.5px] lg:gap-4 max-w-lg lg:mx-auto" onClick={openLocationsSheet}>
-                        {/* Icon */}
-                        <img
-                           src={time}
-                           alt="time"
-                           className="w-10 h-10 lg:w-10 lg:h-10"
-                        />
-
-                        {/* Content */}
-                        <div className="flex-1 flex flex-col items-start gap-1.5 lg:gap-2 min-w-0 lg:w-[30vw]">
-                           <div className="w-full flex items-center justify-start">
-                              <p className="text-white text-[14px] lg:text-sm font-medium leading-[14px] lg:leading-5">
-                                 Find Nearby Spots
-                              </p>
-                           </div>
-
-                           {/* Nearby Spots Info - Responsive layout */}
-                           <div className="flex items-center justify-center gap-3.5 lg:gap-6 flex-wrap">
-                              {(location?.nearbySpots ?? []).map((spot, index) => (
-                                 <div
-                                    key={index}
-                                    className="flex items-center gap-[3.5px] lg:gap-1.5"
-                                 >
-                                    <div className="w-[13.5px] h-[13.5px] lg:w-3 lg:h-3 flex-shrink-0">
-                                       {spot.type === "transport" && (
-                                          <img
-                                             src={building}
-                                             alt="building"
-                                             className="w-full h-full "
-                                          />
-                                       )}
-                                       {spot.type === "healthcare" && (
-                                          <img
-                                             src={train}
-                                             alt="train"
-                                             className="w-full h-full "
-                                          />
-                                       )}
-                                       {spot.type === "food" && (
-                                          <img
-                                             src={food}
-                                             alt="food"
-                                             className="w-full h-full "
-                                          />
-                                       )}
-                                    </div>
-                                    <span className="text-white/90 text-[12.3px] lg:text-sm font-medium leading-[17.5px] whitespace-nowrap">
-                                       {spot.timeEstimate}
-                                    </span>
-                                 </div>
-                              ))}
-                           </div>
-                        </div>
-
-                        {/* Arrow Icon */}
-                        <img
-                           src={rightArrow}
-                           alt="rightArrow"
-                           className="w-6 h-6"
-                        />
-                     </div>
+                     
                   </div>
                </div>
             </div>
@@ -131,3 +70,67 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       </div>
    );
 };
+
+
+// {/* Find Nearby Spots Card - Responsive sizing */}
+//                      {/* <div className="bg-white/10 backdrop-blur-[6px] w-[100%] rounded-[14px] lg:rounded-2xl p-[10.5px] py-3 lg:p-4 flex items-center gap-[10.5px] lg:gap-4 max-w-lg lg:mx-auto" onClick={openLocationsSheet}>
+//                         {/* Icon */}
+//                         <img
+//                            src={time}
+//                            alt="time"
+//                            className="w-10 h-10 lg:w-10 lg:h-10"
+//                         />
+
+//                         {/* Content */}
+//                         <div className="flex-1 flex flex-col items-start gap-1.5 lg:gap-2 min-w-0 lg:w-[30vw]">
+//                            {/* <div className="w-full flex items-center justify-start">
+//                               <p className="text-white text-[14px] lg:text-sm font-medium leading-[14px] lg:leading-5">
+//                                  Find Nearby Spots
+//                               </p>
+//                            </div> */}
+
+//                            {/* Nearby Spots Info - Responsive layout */}
+//                            {/* <div className="flex items-center justify-center gap-3.5 lg:gap-6 flex-wrap">
+//                               {(location?.nearbySpots ?? []).map((spot, index) => (
+//                                  <div
+//                                     key={index}
+//                                     className="flex items-center gap-[3.5px] lg:gap-1.5"
+//                                  >
+//                                     <div className="w-[13.5px] h-[13.5px] lg:w-3 lg:h-3 flex-shrink-0">
+//                                        {spot.type === "transport" && (
+//                                           <img
+//                                              src={building}
+//                                              alt="building"
+//                                              className="w-full h-full "
+//                                           />
+//                                        )}
+//                                        {spot.type === "healthcare" && (
+//                                           <img
+//                                              src={train}
+//                                              alt="train"
+//                                              className="w-full h-full "
+//                                           />
+//                                        )}
+//                                        {spot.type === "food" && (
+//                                           <img
+//                                              src={food}
+//                                              alt="food"
+//                                              className="w-full h-full "
+//                                           />
+//                                        )}
+//                                     </div>
+//                                     <span className="text-white/90 text-[12.3px] lg:text-sm font-medium leading-[17.5px] whitespace-nowrap">
+//                                        {spot.timeEstimate}
+//                                     </span>
+//                                  </div>
+//                               ))}
+//                            </div> */}
+//                         </div>
+
+//                         {/* Arrow Icon */}
+//                         <img
+//                            src={rightArrow}
+//                            alt="rightArrow"
+//                            className="w-6 h-6"
+//                         />
+//                      </div> 

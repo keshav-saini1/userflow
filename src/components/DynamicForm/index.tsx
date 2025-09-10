@@ -57,6 +57,7 @@ export interface DynamicFormProps {
    className?: string;
    defaultValues?: Record<string, any>;
    expandAllByDefault?: boolean;
+   onFieldBlur?: (fieldName: string, value: any) => void;
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
@@ -66,6 +67,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
    className = "",
    defaultValues = {},
    expandAllByDefault = false,
+   onFieldBlur,
 }) => {
    const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
       if (expandAllByDefault && !Array.isArray(schema)) {
@@ -84,6 +86,12 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
    const renderField = (field: FieldConfig) => {
       const { name, type, validation, ...fieldProps } = field;
+
+      const handleFieldBlur = (value: any) => {
+         if (onFieldBlur) {
+            onFieldBlur(name, value);
+         }
+      };
 
       const rules: any = {};
 
@@ -145,7 +153,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <TextInput {...field} {...fieldProps} error={error} />
+                     <TextInput 
+                        {...field} 
+                        {...fieldProps} 
+                        error={error}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
+                     />
                   )}
                />
             );
@@ -157,7 +173,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <TextareaInput {...field} {...fieldProps} error={error} />
+                     <TextareaInput 
+                        {...field} 
+                        {...fieldProps} 
+                        error={error}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
+                     />
                   )}
                />
             );
@@ -169,7 +193,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <NumberInput {...field} {...fieldProps} error={error} />
+                     <NumberInput 
+                        {...field} 
+                        {...fieldProps} 
+                        error={error}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
+                     />
                   )}
                />
             );
@@ -187,7 +219,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                      },
                   }}
                   render={({ field }) => (
-                     <EmailInput {...field} {...fieldProps} error={error} />
+                     <EmailInput 
+                        {...field} 
+                        {...fieldProps} 
+                        error={error}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
+                     />
                   )}
                />
             );
@@ -199,7 +239,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <PasswordInput {...field} {...fieldProps} error={error} />
+                     <PasswordInput 
+                        {...field} 
+                        {...fieldProps} 
+                        error={error}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
+                     />
                   )}
                />
             );
@@ -215,6 +263,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                         {...field}
                         {...fieldProps}
                         error={error?.message}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
                      />
                   )}
                />
@@ -231,6 +283,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                         {...field}
                         {...fieldProps}
                         error={error?.message}
+                        onBlur={() => {
+                           field.onBlur();
+                           handleFieldBlur(field.value);
+                        }}
                      />
                   )}
                />
