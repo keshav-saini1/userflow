@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import newPlace from "../../assets/persona/newplace.svg";
 import existingTenant from "../../assets/persona/existingtenant.svg";
@@ -7,6 +7,7 @@ import { FiArrowRight, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import ConfirmSheet from "../joining-form/components/ConfirmSheet";
 import { useOnboardingStore } from "../onboarding/store/useOnboardingStore";
+import { usePersonaApi } from "./api/usePersonaApi";
 import { BadgeCheck } from "lucide-react";
 interface PersonaOption {
    id: string;
@@ -25,6 +26,43 @@ const PersonaSelectionPage: React.FC = () => {
    const username = localStorage.getItem("username");
    const tenantStatus = localStorage.getItem("tenant_status");
    const {propertyData} = useOnboardingStore();
+   const tenant_id = localStorage.getItem('tenant_id');
+   const property_id = localStorage.getItem('selectedPropertyId');
+
+   // API Integration
+   const {
+      getTenantDetails,
+      getTenantDetailsData,
+      isGettingTenantDetails,
+      getTenantDetailsError,
+      getPropertyDetails,
+      getPropertyDetailsData,
+      isGettingPropertyDetails,
+      getPropertyDetailsError
+   } = usePersonaApi();
+
+   // Fetch tenant details on component mount
+   useEffect(() => {
+      if (tenant_id) {
+         getTenantDetails();
+      }
+   }, [tenant_id, getTenantDetails]);
+
+   // Fetch property details when property_id is available
+   useEffect(() => {
+      if (property_id) {
+         getPropertyDetails({ propertyId: property_id });
+      }
+   }, [property_id, getPropertyDetails]);
+
+   console.log({
+      getTenantDetailsData,
+      getPropertyDetailsData,
+      isGettingTenantDetails,
+      isGettingPropertyDetails,
+      getTenantDetailsError,
+      getPropertyDetailsError
+   });
 
    const personaOptions: PersonaOption[] = [
       ...(tenantStatus !== "2" ? [{
@@ -94,16 +132,16 @@ const PersonaSelectionPage: React.FC = () => {
               rgba(0,0,0,0.4) 0%, 
               rgba(0,0,0,0.5) 50%, 
               rgba(0,0,0,0.5) 100%
-            ), url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')`,
+            ), url(${getPropertyDetailsData?.data?.image})`,
                }}
             >
                {/* User Greeting Overlay */}
                <div className="absolute bottom-6 left-6 right-6 md:left-8 md:right-8 lg:left-12 lg:right-12 flex flex-col gap-1.5">
                   <span className="font-bold text-white text-2xl md:text-3xl lg:text-3xl leading-tight tracking-tight capitalize">
-                     Hey {username}!
+                     Hey {getTenantDetailsData?.data?.name}!
                   </span>
                   <p className="text-white/90 text-sm md:text-base lg:text-base uppercase ">
-                     Welcome to { propertyData?.propertyName }
+                     Welcome to { getPropertyDetailsData?.data?.propertyName }
                   </p> 
                </div>
             </div>
