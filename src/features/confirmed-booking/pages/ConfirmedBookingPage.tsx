@@ -246,7 +246,7 @@ export default function ConfirmedBookingPage({
                   </button>
                 )}
 
-                {bookingDetails?.status === 'approved' && (
+                {/* {bookingDetails?.status !== 'approved' && (
                   <button
                     onClick={onModifyBooking}
                     className="flex-1 bg-gray-900 text-white rounded-xl py-3 lg:py-3 px-3.5 lg:px-4 flex items-center justify-center gap-2.5 lg:gap-3 text-xs lg:text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -254,7 +254,7 @@ export default function ConfirmedBookingPage({
                     Modify Booking
                     <FaArrowRight className="w-4 h-4 lg:w-5 lg:h-5" />
                   </button>
-                )}
+                )} */}
 
                 {bookingDetails?.status === 'cancelled' && (
                   <button

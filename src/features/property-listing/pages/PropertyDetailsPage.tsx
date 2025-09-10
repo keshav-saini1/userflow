@@ -140,7 +140,7 @@ export default function PropertyDetailsPage({
    }
 
    const onReserve = () => { 
-      
+      navigate(`/reservation/${property_id}`)
    }
 
    return (
