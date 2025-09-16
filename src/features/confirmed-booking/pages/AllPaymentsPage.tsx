@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { FaArrowRight } from 'react-icons/fa';
 import { FiCreditCard } from 'react-icons/fi';

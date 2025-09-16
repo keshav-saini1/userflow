@@ -16,8 +16,6 @@ const ConfirmedBookingWrapper = () => {
       getBookingDetailsError,
       getTenantPassbook,
       getTenantPassbookData,
-      isGettingTenantPassbook,
-      getTenantPassbookError
    } = useConfirmedBookingApi();
 
    const propertyId = localStorage.getItem('selectedPropertyId');
@@ -316,6 +314,7 @@ const ConfirmedBookingWrapper = () => {
 
    const handleSupportAction = (action: "chat" | "call") => {
       // Handle support action (open chat or initiate call)
+      console.log("Support action clicked:", action);
    };
 
    const handleExploreCommute = () => {

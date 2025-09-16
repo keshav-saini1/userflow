@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BookingCard, RoomOptionCard } from '../components';
 import { sampleBookingDetails } from '../data/sampleData';
 import { availableRoomOptions } from '../data/roomOptions';
@@ -8,19 +8,19 @@ import { useConfirmedBookingApi } from '@/features/confirmed-booking/api/useConf
 
 const ChangeRoomPage: React.FC = () => {
   const navigate = useNavigate();
-  const { getBookingDetailsData, getBookingDetails } = useConfirmedBookingApi();
+  const { getBookingDetails } = useConfirmedBookingApi();
   const propertyId = localStorage.getItem('selectedPropertyId');
-  const [bookingData, setBookingData] = useState<any>();
+  // const [bookingData, setBookingData] = useState<any>();
 
   useEffect(() => {
     getBookingDetails({propertyId: propertyId || ''})
   }, [])
 
-  useEffect(() => {
-    if(getBookingDetailsData?.data) {
-      setBookingData(getBookingDetailsData?.data)
-    }
-  }, [getBookingDetailsData])
+  // useEffect(() => {
+  //   if(getBookingDetailsData?.data) {
+  //     setBookingData(getBookingDetailsData?.data)
+  //   }
+  // }, [getBookingDetailsData])
 
   const handleBackClick = () => {
     // Handle back navigation

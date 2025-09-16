@@ -6,7 +6,6 @@ import app from "../../assets/persona/app.svg";
 import { FiArrowRight, FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import ConfirmSheet from "../joining-form/components/ConfirmSheet";
-import { useOnboardingStore } from "../onboarding/store/useOnboardingStore";
 import { usePersonaApi } from "./api/usePersonaApi";
 import { BadgeCheck } from "lucide-react";
 interface PersonaOption {
@@ -25,7 +24,7 @@ const PersonaSelectionPage: React.FC = () => {
    const navigate = useNavigate();
    const username = localStorage.getItem("username");
    const tenantStatus = localStorage.getItem("tenant_status");
-   const {propertyData} = useOnboardingStore();
+   // const {propertyData} = useOnboardingStore();
    const tenant_id = localStorage.getItem('tenant_id');
    const property_id = localStorage.getItem('selectedPropertyId');
 

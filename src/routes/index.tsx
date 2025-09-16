@@ -18,7 +18,6 @@ import ChangeRoomExample from "../features/modify-booking/examples/ChangeRoomExa
 import ReservationIntegrationExample from "../features/modify-booking/examples/ReservationIntegrationExample";
 import { CancelBookingSuccessWrapper } from "../features/modify-booking";
 import {
-   WishlistPage,
    MyBookingsPage,
    RentalOptionsPage,
    RoomDetailsPage,

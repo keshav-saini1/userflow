@@ -1,11 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router";
 import type { PropertyLocation } from "../types";
-import time from "@/assets/onboarding/timer.svg";
-import building from "@/assets/onboarding/building.svg";
-import train from "@/assets/onboarding/train.svg";
-import food from "@/assets/onboarding/food.svg";
-import rightArrow from "@/assets/white_arrow 1.svg";
 
 interface HeroSectionProps {
    heroImage: string;
@@ -16,11 +10,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
    heroImage,
    location
 }) => {
-   const navigate = useNavigate();
-
-   const openLocationsSheet = () => {
-      navigate("/location-commute");
-   };
 
    return (
       <div className="relative h-[272px] md:h-[400px] lg:h-[500px] w-full overflow-hidden">

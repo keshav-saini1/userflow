@@ -90,7 +90,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
       
       // Initialize APIs
       const { updateTenantDetails, isUpdatingTenant, updateTenantError } = useTenantApi();
-      const { getTenantDetails, isGettingTenantDetails, getTenantDetailsError } = usePersonaApi();
+      const { getTenantDetails, getTenantDetailsError } = usePersonaApi();
 
       // Dummy data for documents
       const [documents] = useState<DocumentCard[]>([
