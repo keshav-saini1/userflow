@@ -4,7 +4,7 @@ function removeCookie(name: string) {
   document.cookie = `${name}=; Max-Age=0; path=/;`;
 }
 
-const BASE_URL = "http://localhost:3000"
+const BASE_URL = "https://api-dev.rentok.com"
 
 const api = axios.create({
   baseURL: BASE_URL,
