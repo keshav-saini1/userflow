@@ -32,12 +32,8 @@ const PersonaSelectionPage: React.FC = () => {
    const {
       getTenantDetails,
       getTenantDetailsData,
-      isGettingTenantDetails,
-      getTenantDetailsError,
       getPropertyDetails,
-      getPropertyDetailsData,
-      isGettingPropertyDetails,
-      getPropertyDetailsError
+      getPropertyDetailsData, 
    } = usePersonaApi();
 
    // Fetch tenant details on component mount
@@ -54,17 +50,8 @@ const PersonaSelectionPage: React.FC = () => {
       }
    }, [property_id, getPropertyDetails]);
 
-   console.log({
-      getTenantDetailsData,
-      getPropertyDetailsData,
-      isGettingTenantDetails,
-      isGettingPropertyDetails,
-      getTenantDetailsError,
-      getPropertyDetailsError
-   });
-
    const personaOptions: PersonaOption[] = [
-      ...(tenantStatus !== "2" ? [{
+      ...(tenantStatus !== "2" && tenantStatus !== "1" ? [{
          id: "new-place",
          title: "I'm looking for a new place",
          description: "Find and book the perfect rental for me",
@@ -116,8 +103,19 @@ const PersonaSelectionPage: React.FC = () => {
       // Handle back navigation
       localStorage.removeItem("token");
       localStorage.removeItem("username");
+      localStorage.removeItem("selectedPropertyId");
+      localStorage.removeItem("tenant_id");
+      localStorage.removeItem("tenant_status");
       navigate("/");
    };
+
+   useEffect(() => {
+      if (tenantStatus === "2" || tenantStatus === "1") {
+         navigate("/bookings");
+      } else {
+         // do nothing
+      }
+   }, [tenantStatus])
 
    return (
       <div className="bg-white min-h-screen w-screen">

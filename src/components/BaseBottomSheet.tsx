@@ -11,6 +11,7 @@ interface BaseBottomSheetProps {
   headerClassName?: string;
   bodyClassName?: string;
   minHeight?: string;
+  closable?: boolean;
 }
 
 const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
@@ -22,6 +23,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
   headerClassName = "",
   bodyClassName = "",
   minHeight = "55vh",
+  closable = true,
 }) => {
   return (
     <AnimatePresence>
@@ -34,7 +36,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black/50"
-            onClick={onClose}
+            onClick={closable ? onClose : undefined}
           />
 
           {/* Bottom Sheet */}
@@ -86,7 +88,7 @@ const BaseBottomSheet: React.FC<BaseBottomSheetProps> = ({
             )}
             
             {/* Close button for when there's no title */}
-            {!title && (
+            {!title && closable && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}

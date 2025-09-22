@@ -16,22 +16,15 @@ const feature_images: Record<number, string> = {
 };
 
 const OnboardingStep1: OnboardingStepComponent = ({ onNext }) => {
-   // eazypg_id from url query params
-   const [searchParams] = useSearchParams();
-   const eazypgId = searchParams.get('eazypg_id');
+   
    
    // Use Zustand store
    const {
       propertyData,
       pageData,
-      fetchPublicProperty
    } = useOnboardingStore();
 
-   useEffect(() => {
-      if (eazypgId) {
-         fetchPublicProperty(eazypgId);
-      }
-   }, [eazypgId, fetchPublicProperty]);
+   
 
    const handleContinue = () => {
       // Trigger Step 2 overlay

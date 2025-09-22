@@ -35,11 +35,17 @@ api.interceptors.response.use(
   },
   (error) => {
     // Handle 401 Unauthorized: remove auth_token from cookies and localStorage
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 419) {
       // Remove from cookies
-      removeCookie("auth_token");
+      removeCookie("token");
       // Remove from localStorage
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("tenant_status");
+      localStorage.removeItem("tenant_id");
+      localStorage.removeItem("selectedPropertyId");
+      // Redirect to login page
+      window.location.href = "/onboarding";
     }
     return Promise.reject(error);
   }
