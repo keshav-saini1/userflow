@@ -48,7 +48,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     },
   });
 
-  const { verifyOtp, verifyOtpError, verifyOtpData, getOtp } = useOnboardingApi();
+  const { verifyOtp, verifyOtpError, verifyOtpData, getOtp, getOtpData, getOtpError } = useOnboardingApi();
 
   // Watch all OTP values to check completion
   const otpValues = watch();
@@ -70,7 +70,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
   const handleOtpChange = (index: number, value: string, onChange: (value: string) => void) => {
     if (value.length > 1) return; // Only allow single digit
-    
+
     onChange(value);
     clearErrors(); // Clear any form errors when user types
 
@@ -89,15 +89,15 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    
+
     // Set each digit using setValue
     for (let i = 0; i < 6; i++) {
       const fieldName = `otp${i}` as keyof OtpFormData;
       setValue(fieldName, pastedData[i] || '');
     }
-    
+
     clearErrors();
-    
+
     // Focus the next empty input or the last one
     const nextIndex = Math.min(pastedData.length, 5);
     inputRefs.current[nextIndex]?.focus();
@@ -105,7 +105,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
   const onSubmit = (data: OtpFormData) => {
     const otp = Object.values(data).join('');
-    
+
     if (otp.length !== 6) {
       setError('root', { message: 'Please enter the complete 6-digit OTP' });
       return;
@@ -114,14 +114,14 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     if (submitButtonRef.current) {
       animateSuccess(submitButtonRef.current);
     }
-    
-    onUpdateData({ 
+
+    onUpdateData({
       personalInfo: {
         ...currentData.personalInfo,
       }
     });
 
-    if(!propertyData?.id) {
+    if (!propertyData?.id) {
       showToast.error('Property ID not found', 'Please try again');
       return;
     }
@@ -140,7 +140,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
     }
     if (verifyOtpData) {
       showToast.success('OTP verified successfully', verifyOtpData.message);
-      console.log({verifyOtpData});
+      console.log({ verifyOtpData });
       localStorage.setItem('tenant_status', verifyOtpData?.data?.verifyResponse?.tenant_status || '')
       localStorage.setItem('tenant_id', verifyOtpData?.data?.verifyResponse?.tenant_id || '')
       localStorage.setItem('token', verifyOtpData?.data?.token || '');
@@ -150,15 +150,15 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
 
   const handleResend = () => {
     if (!canResend) return;
-    
+
     setResendTimer(30);
     setCanResend(false);
     clearErrors();
     reset(); // Reset all form fields
-    
+
     // Focus first input
     inputRefs.current[0]?.focus();
-    
+
 
     // resend otp
     getOtp({
@@ -167,6 +167,17 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
       selectedPropertyId: propertyData?.id || '',
     });
   };
+  
+  useEffect(() => {
+    if (getOtpError) {
+      const errorMessage = (getOtpError as any)?.response?.data?.message || getOtpError.message || 'Something went wrong';
+      showToast.error('Failed to send OTP', errorMessage);
+    }
+
+    if (getOtpData) {
+      showToast.success('OTP sent successfully', getOtpData.message);
+    }
+  }, [getOtpData, getOtpError])
 
   const phoneNumber = currentData.personalInfo?.phone || '';
   const hasErrors = Object.keys(errors).length > 0;
@@ -224,7 +235,7 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                   Enter verification code 📱
                 </span>
               </div>
-              
+
               <div className="flex flex-col gap-[10.5px] lg:gap-3">
                 <div className="text-center">
                   <p className="text-[#717182] text-[14px] lg:text-base leading-[22.75px] lg:leading-relaxed" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
@@ -266,13 +277,12 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                         onChange={(e) => handleOtpChange(index, e.target.value, onChange)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
                         onPaste={index === 0 ? handlePaste : undefined}
-                        className={`w-[42px] h-[49px] text-black lg:w-14 lg:h-16 text-center text-lg lg:text-xl font-semibold bg-neutral-100 lg:bg-gray-50 border-2 rounded-[12.75px] lg:rounded-xl transition-colors ${
-                          hasErrors 
-                            ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500' 
-                            : value 
-                            ? ' bg-green-50  focus:neutral-800'
-                            : 'border-transparent lg:border-gray-200 focus:border-blue-500 focus:ring-blue-500'
-                        } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
+                        className={`w-[42px] h-[49px] text-black lg:w-14 lg:h-16 text-center text-lg lg:text-xl font-semibold bg-neutral-100 lg:bg-gray-50 border-2 rounded-[12.75px] lg:rounded-xl transition-colors ${hasErrors
+                            ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500'
+                            : value
+                              ? ' bg-green-50  focus:neutral-800'
+                              : 'border-transparent lg:border-gray-200 focus:border-blue-500 focus:ring-blue-500'
+                          } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
                       />
                     )}
                   />
@@ -301,11 +311,10 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
                 <div className="text-center">
                   <span
                     onClick={handleResend}
-                    className={`text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed bg-white transition-colors ${
-                      canResend 
-                        ? 'text-blue-600 hover:text-blue-800 cursor-pointer' 
+                    className={`text-[12.3px] lg:text-sm leading-[17.5px] lg:leading-relaxed bg-white transition-colors ${canResend
+                        ? 'text-blue-600 hover:text-blue-800 cursor-pointer'
                         : 'text-[#717182] cursor-not-allowed'
-                    }`}
+                      }`}
                     style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}
                   >
                     {canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
@@ -342,11 +351,10 @@ const OnboardingStep4: OnboardingStepComponent = ({ onPrev, onUpdateData, curren
             ref={submitButtonRef}
             type="submit"
             disabled={!isOtpComplete}
-            className={`lg:hidden w-full h-[49px] rounded-[14px] flex items-center justify-center gap-[10.5px] mb-[10.5px] transition-all hover:scale-[1.02] active:scale-[0.98] ${
-              isOtpComplete
+            className={`lg:hidden w-full h-[49px] rounded-[14px] flex items-center justify-center gap-[10.5px] mb-[10.5px] transition-all hover:scale-[1.02] active:scale-[0.98] ${isOtpComplete
                 ? "bg-[#030213] shadow-[0px_10px_15px_-3px_rgba(3,2,19,0.2),0px_4px_6px_-4px_rgba(3,2,19,0.2)]"
                 : "bg-[#030213]/40"
-            }`}
+              }`}
           >
             <span className="text-white text-[14px] font-medium leading-[21px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
               Verify & Continue

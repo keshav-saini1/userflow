@@ -5,8 +5,6 @@ import room from "@/assets/onboarding/room.svg";
 import crew from "@/assets/onboarding/crew.svg";
 import adulting from "@/assets/onboarding/adulting.svg";
 import whiteArrow from "@/assets/white_arrow 1.svg";
-import { useSearchParams } from "react-router";
-import { useEffect } from "react";
 import { useOnboardingStore } from "../store/useOnboardingStore";
 
 const feature_images: Record<number, string> = {

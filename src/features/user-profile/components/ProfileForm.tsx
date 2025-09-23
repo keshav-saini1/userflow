@@ -521,6 +521,7 @@ const ProfileForm = React.forwardRef<ProfileFormRef, ProfileFormProps>(
                         className="space-y-6"
                         expandAllByDefault={true}
                         onFieldBlur={handleFieldBlur}
+                        showSubmit={false}
                      />
                   </div>
                </div>

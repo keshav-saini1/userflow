@@ -21,6 +21,7 @@ import {
    MyBookingsPage,
    RentalOptionsPage,
    RoomDetailsPage,
+   WishlistPage,
 } from "../features/property-listing/pages";
 import {
    AddDocumentsPage,
@@ -30,7 +31,6 @@ import {
 } from "../features";
 import JoiningStatusPage from "../features/joining-form/pages/JoiningStatusPage";
 import { FilterPropertiesPage } from "../features/property-filter";
-import DateInputTest from "../components/DynamicForm/fields/DateInputTest";
 import LocationCommutePage from "@/features/property-listing/pages/LocationCommutePage";
 import ProtectedRoute, { AuthenticatedRedirect } from "./ProtectedRoute";
 import ReviewBookingPage from "@/features/book-visit/pages/ReviewBookingPage";
@@ -275,13 +275,13 @@ export const router = createBrowserRouter([
       ),
    },
    {
-      path: "/date-test",
+      path: "/wishlist",
       element: (
          <ProtectedRoute>
-            <DateInputTest />
+            <WishlistPage />
          </ProtectedRoute>
-      ),
-   },
+      ), 
+   }
    // {
    //    path: "/admin",
    //    element: (

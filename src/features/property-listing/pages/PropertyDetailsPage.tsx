@@ -7,9 +7,9 @@ import ImageGallery, {
 import { HighlightsBottomSheet, IncludedServicesBottomSheet, AddOnServicesBottomSheet, PoliciesAndRulesBottomSheet, MarketingDescriptionBottomSheet } from "../components";
 import back from "@/assets/default_back.svg";
 import heart from "@/assets/default_heart.svg";
-import share from "@/assets/default_share.svg";
 import { ImageCarousel, UnitCard, VideoPlayer, VideoModal } from "@/components";
 import { useNavigate, useParams } from "react-router";
+import { useWishlistApi } from "../api/useWishlistApi";
 
 interface PropertyDetailsPageProps {
    propertyData: PropertyDetailPageData;
@@ -34,6 +34,7 @@ export default function PropertyDetailsPage({
 
    const params = useParams();
    const { property_id } = params;
+   const { createWishlistItem } = useWishlistApi();
 
    // Convert property data to gallery categories format
    const galleryCategories: GalleryCategory[] = [
@@ -143,6 +144,14 @@ export default function PropertyDetailsPage({
       navigate(`/reservation/${property_id}`)
    }
 
+   const handleWishlist = () => {
+      if(property_id) {
+         createWishlistItem({
+            property_id: property_id,
+         })
+      }
+   }
+
    return (
       <div className="min-h-screen w-screen bg-gray-50">
          {/* Header */}
@@ -156,8 +165,8 @@ export default function PropertyDetailsPage({
                      </h1>
                   </div>
                   <div className="flex items-center gap-2">
-                     <img src={heart} alt="heart" className="w-10 h-10" />
-                     <img src={share} alt="share" className="w-10 h-10" />
+                     <img src={heart} alt="heart" className="w-10 h-10" onClick={handleWishlist} />
+                     {/* <img src={share} alt="share" className="w-10 h-10" /> */}
                   </div>
                </div>
             </div>

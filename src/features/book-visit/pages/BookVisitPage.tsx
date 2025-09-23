@@ -27,7 +27,7 @@ const BookVisitPage: React.FC<BookVisitPageProps> = ({ onSuccess }) => {
          <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
             <div className="flex items-center gap-4 p-4 sm:p-5 lg:p-6">
                <button
-                  onClick={() => navigate(editMode ? "/my-bookings" : "/property-listing")}
+                  onClick={() => navigate(-1)}
                >
                   <img src={default_back} alt="back" className="w-10 h-10" />
                </button>

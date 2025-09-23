@@ -75,9 +75,9 @@ const TextareaInput: React.FC<TextareaInputProps> = ({
 
   return (
     <div className="py-3.5 px-3.5 border-b border-slate-100">
-      <div className="flex items-center gap-[10.5px]">
+      <div className="flex items-start gap-[10.5px]">
         {icon && (
-          <div className="relative shrink-0 size-[22px] text-[#455067]">
+          <div className="relative shrink-0 size-[22px] text-[#455067] mt-1">
             {renderIcon()}
           </div>
         )}

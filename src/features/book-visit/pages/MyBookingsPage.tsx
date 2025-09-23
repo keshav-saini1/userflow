@@ -47,23 +47,23 @@ const MyBookingsPage: React.FC = () => {
          }
       };
 
-      // Map status to match dummy data status values
-      const getStatus = (apiStatus: string): Booking['status'] => {
-         switch (apiStatus.toLowerCase()) {
-            case 'scheduled':
-            case 'confirmed':
-            case 'in-progress':
-            case 'active':
-               return 'upcoming';
-            case 'completed':
-            case 'finished':
-               return 'completed';
-            case 'cancelled':
-               return 'cancelled';
-            default:
-               return 'upcoming';
-         }
-      };
+      // // Map status to match dummy data status values
+      // const getStatus = (apiStatus: string): Booking['status'] => {
+      //    switch (apiStatus.toLowerCase()) {
+      //       case 'scheduled':
+      //       case 'confirmed':
+      //       case 'in-progress':
+      //       case 'active':
+      //          return 'upcoming';
+      //       case 'completed':
+      //       case 'finished':
+      //          return 'completed';
+      //       case 'cancelled':
+      //          return 'cancelled';
+      //       default:
+      //          return 'upcoming';
+      //    }
+      // };
 
       // Format date and time based on dummy data format
       const formatDate = (dateString: string): string => {
@@ -83,7 +83,7 @@ const MyBookingsPage: React.FC = () => {
          id: visit.id,
          propertyName: visit.propertyName || 'Property Name',
          location: visit.propertyAddress || 'Location',
-         status: getStatus(visit.status),
+         status: visit.status,
          bookingType: getBookingType(visit.visit_type),
          scheduledDate: formatDate(visit.visit_date),
          scheduledTime: visit.visit_time || 'Time TBD',
@@ -102,8 +102,6 @@ const MyBookingsPage: React.FC = () => {
       const bookingsToUse = (listVisitsData?.status == 200 && listVisitsData?.data) 
          ? listVisitsData.data.map(transformVisitToBooking) 
          : [];
-
-         console.log({listVisitsData})
 
       // Apply filters
       let filtered = bookingsToUse;
@@ -130,6 +128,8 @@ const MyBookingsPage: React.FC = () => {
 
       setFilteredBookings(filtered);
    }, [searchQuery, filterType, listVisitsData]);
+
+   console.log({filteredBookings})
 
    const handleCall = (bookingId: string) => {
       console.log("Call booking:", bookingId);

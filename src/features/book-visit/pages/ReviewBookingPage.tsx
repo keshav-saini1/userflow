@@ -279,6 +279,12 @@ const ReviewBookingPage: React.FC = () => {
       console.log("Call support clicked");
    };
 
+   const isPastBooking = () => {
+      const now = new Date();
+      const bookingDate = new Date(booking.scheduledDate);
+      return now > bookingDate;
+   };
+
    return (
       <div className="min-h-screen bg-gray-50 w-screen">
          {/* Header */}
@@ -565,7 +571,7 @@ const ReviewBookingPage: React.FC = () => {
          </div>
 
          {/* Fixed Cancel Button at Bottom - Only show if not cancelled */}
-         {booking.status !== "cancelled" && (
+         {booking.status !== "cancelled" && !isPastBooking() && (
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50">
                <div className="max-w-6xl mx-auto">
                   <button

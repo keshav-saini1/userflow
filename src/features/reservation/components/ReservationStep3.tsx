@@ -213,14 +213,14 @@ const ReservationStep3: React.FC = () => {
             </button>
             <div>
               <h2 className="text-sm font-medium text-gray-900">Reserve Room</h2>
-              <p className="text-xs text-gray-500">Step 4 of 5</p>
+              <p className="text-xs text-gray-500">Step 3 of 4</p>
             </div>
           </div>
-          <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
+          {/* <button className="w-9 h-9 bg-gray-100/50 rounded-full flex items-center justify-center">
             <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 

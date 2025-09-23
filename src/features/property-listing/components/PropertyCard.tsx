@@ -17,6 +17,7 @@ interface PropertyCardProps {
    onPropertyClick?: (propertyId: string) => void;
    isLongCardView?: boolean;
    room_id?: string;
+   showWishlist?: boolean;
 }
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -26,7 +27,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    onBookVisit,
    onPropertyClick,
    isLongCardView = false,
-   room_id
+   room_id,
+   showWishlist = false
 }) => {
    const navigate = useNavigate();
    const { createWishlistItem, createWishlistData, createWishlistError, refetchWishlist } = useWishlistApi();
@@ -80,14 +82,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
    }
 
    useEffect(() => {
-      if(createWishlistData) {
+      if (createWishlistData) {
          refetchWishlist();
          showToast.success("Wishlists updated");
       }
    }, [createWishlistData])
 
    useEffect(() => {
-      if(createWishlistError) {
+      if (createWishlistError) {
          showToast.error("Failed to add property to wishlist");
       }
    }, [createWishlistError])
@@ -131,14 +133,18 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                )} */}
 
                {/* Wishlist Remove Button */}
-                  <div className="absolute top-3.5 right-3.5">
-                     <button
-                        onClick={handleWishlist}
-                        className="backdrop-blur-sm bg-white/80 rounded-2xl p-2 w-12 h-12 flex items-center justify-center shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-white/90 transition-colors"
-                     >
-                        <BsHeartFill className="text-red-500" />
-                     </button>
-                  </div>
+               {
+                  showWishlist && (
+                     <div className="absolute top-3.5 right-3.5">
+                        <button
+                           onClick={handleWishlist}
+                           className="backdrop-blur-sm bg-white/80 rounded-2xl p-2 w-12 h-12 flex items-center justify-center shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-white/90 transition-colors"
+                        >
+                           <BsHeartFill className="text-red-500" />
+                        </button>
+                     </div>
+                  )
+               }
 
                {property.status === "available" && (
                   <div className="absolute bottom-3.5 right-3.5 flex justify-center items-center gap-1.5 px-2 py-1 bg-green-200 border border-green-200 rounded-full shadow-[0_2px_8px_0_rgba(16,185,129,0.10)]">

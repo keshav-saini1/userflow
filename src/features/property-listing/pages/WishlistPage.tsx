@@ -178,6 +178,7 @@ const WishlistPage: React.FC = () => {
                         onReserve={onReserve}
                         onBookVisit={onBookVisit}
                         isLongCardView={true}
+                        showWishlist={true}
                      />
                   ))}
                </div>

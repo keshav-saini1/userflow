@@ -38,6 +38,7 @@ export default function ConfirmedBookingPage({
   onRequestRefund
 }: ConfirmedBookingPageProps) {
   const { bookingDetails, paymentSummary, supportOptions, propertyInfo } = data || {};
+  const tenantStatus = localStorage.getItem("tenant_status");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,11 +80,15 @@ export default function ConfirmedBookingPage({
 
         {/* Navigation Buttons */}
         <div className="absolute top-8 lg:top-12 left-4 lg:left-8 right-4 lg:right-8 flex justify-between items-center">
-          <button
-            onClick={onBackClick}
-          >
-            <img src={default_back} alt="back" className="w-10 h-10" />
-          </button>
+          {
+            tenantStatus !== "1" ? (
+              <button
+                onClick={onBackClick}
+              >
+                <img src={default_back} alt="back" className="w-10 h-10" />
+              </button>
+            ) : <div></div>
+          }
           <button
             onClick={onShareClick}
           >

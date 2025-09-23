@@ -17,16 +17,16 @@ import {
 export interface FieldConfig {
    name: string;
    type:
-      | "text"
-      | "textarea"
-      | "number"
-      | "email"
-      | "password"
-      | "date"
-      | "select"
-      | "radio"
-      | "checkbox"
-      | "file";
+   | "text"
+   | "textarea"
+   | "number"
+   | "email"
+   | "password"
+   | "date"
+   | "select"
+   | "radio"
+   | "checkbox"
+   | "file";
    label?: string;
    placeholder?: string;
    required?: boolean;
@@ -58,6 +58,7 @@ export interface DynamicFormProps {
    defaultValues?: Record<string, any>;
    expandAllByDefault?: boolean;
    onFieldBlur?: (fieldName: string, value: any) => void;
+   showSubmit?: boolean;
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
@@ -68,6 +69,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
    defaultValues = {},
    expandAllByDefault = false,
    onFieldBlur,
+   showSubmit = true,
 }) => {
    const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
       if (expandAllByDefault && !Array.isArray(schema)) {
@@ -103,33 +105,29 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
          if (validation.minLength) {
             rules.minLength = {
                value: validation.minLength,
-               message: `${field.label || name} must be at least ${
-                  validation.minLength
-               } characters`,
+               message: `${field.label || name} must be at least ${validation.minLength
+                  } characters`,
             };
          }
          if (validation.maxLength) {
             rules.maxLength = {
                value: validation.maxLength,
-               message: `${field.label || name} must be at most ${
-                  validation.maxLength
-               } characters`,
+               message: `${field.label || name} must be at most ${validation.maxLength
+                  } characters`,
             };
          }
          if (validation.min) {
             rules.min = {
                value: validation.min,
-               message: `${field.label || name} must be at least ${
-                  validation.min
-               }`,
+               message: `${field.label || name} must be at least ${validation.min
+                  }`,
             };
          }
          if (validation.max) {
             rules.max = {
                value: validation.max,
-               message: `${field.label || name} must be at most ${
-                  validation.max
-               }`,
+               message: `${field.label || name} must be at most ${validation.max
+                  }`,
             };
          }
          if (validation.pattern) {
@@ -153,9 +151,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <TextInput 
-                        {...field} 
-                        {...fieldProps} 
+                     <TextInput
+                        {...field}
+                        {...fieldProps}
                         error={error}
                         onBlur={() => {
                            field.onBlur();
@@ -173,9 +171,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <TextareaInput 
-                        {...field} 
-                        {...fieldProps} 
+                     <TextareaInput
+                        {...field}
+                        {...fieldProps}
                         error={error}
                         onBlur={() => {
                            field.onBlur();
@@ -193,9 +191,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <NumberInput 
-                        {...field} 
-                        {...fieldProps} 
+                     <NumberInput
+                        {...field}
+                        {...fieldProps}
                         error={error}
                         onBlur={() => {
                            field.onBlur();
@@ -219,9 +217,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                      },
                   }}
                   render={({ field }) => (
-                     <EmailInput 
-                        {...field} 
-                        {...fieldProps} 
+                     <EmailInput
+                        {...field}
+                        {...fieldProps}
                         error={error}
                         onBlur={() => {
                            field.onBlur();
@@ -239,9 +237,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   control={control}
                   rules={rules}
                   render={({ field }) => (
-                     <PasswordInput 
-                        {...field} 
-                        {...fieldProps} 
+                     <PasswordInput
+                        {...field}
+                        {...fieldProps}
                         error={error}
                         onBlur={() => {
                            field.onBlur();
@@ -373,9 +371,8 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                      {sectionName}
                   </h3>
                   <svg
-                     className={`w-5 h-5 text-gray-500 transform transition-transform ${
-                        isExpanded ? "rotate-180" : ""
-                     }`}
+                     className={`w-5 h-5 text-gray-500 transform transition-transform ${isExpanded ? "rotate-180" : ""
+                        }`}
                      fill="none"
                      viewBox="0 0 24 24"
                      stroke="currentColor"
@@ -415,32 +412,36 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       <form onSubmit={handleSubmit(onSubmit)} className={className}>
          {isSectioned
             ? Object.entries(fields).map(([sectionName, sectionFields]) =>
-                 renderSection(sectionName, sectionFields)
-              )
+               renderSection(sectionName, sectionFields)
+            )
             : renderFields(fields as FieldConfig[])}
 
-         <div className="mt-6">
-            <button
-               type="submit"
-               disabled={isSubmitting}
-               className="w-full bg-gray-900 text-white font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-               {isSubmitting ? "Submitting..." : submitButtonText}
-               <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-               >
-                  <path
-                     strokeLinecap="round"
-                     strokeLinejoin="round"
-                     strokeWidth={2}
-                     d="M9 5l7 7-7 7"
-                  />
-               </svg>
-            </button>
-         </div>
+         {
+            showSubmit && (
+               <div className="mt-6">
+                  <button
+                     type="submit"
+                     disabled={isSubmitting}
+                     className="w-full bg-gray-900 text-white font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                     {isSubmitting ? "Submitting..." : submitButtonText}
+                     <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                     >
+                        <path
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           strokeWidth={2}
+                           d="M9 5l7 7-7 7"
+                        />
+                     </svg>
+                  </button>
+               </div>
+            )
+         }
       </form>
    );
 };

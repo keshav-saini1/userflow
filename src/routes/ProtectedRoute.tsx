@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 interface ProtectedRouteProps {
@@ -25,8 +25,6 @@ const useAuth = (): AuthState => {
     isAuthenticated: false,
     isLoading: true,
   });
-
-  console.log({authState});
 
   React.useEffect(() => {
     const checkAuth = () => {
@@ -73,6 +71,15 @@ const useAuth = (): AuthState => {
 // Component to redirect authenticated users away from certain pages (like onboarding)
 const AuthenticatedRedirect: React.FC<{ redirectPath: string }> = ({ redirectPath }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const [navigateTo, setNavigateTo] = React.useState<string>(redirectPath);
+
+  const tenantStatus = localStorage.getItem("tenant_status");
+
+  useEffect(() => {
+    if (tenantStatus === "2" || tenantStatus === "1") {
+      setNavigateTo("/bookings")
+   }
+  }, [tenantStatus])
 
   if (isLoading) {
     return (
@@ -84,7 +91,7 @@ const AuthenticatedRedirect: React.FC<{ redirectPath: string }> = ({ redirectPat
   }
 
   if (isAuthenticated) {
-    return <Navigate to={redirectPath} replace />;
+    return <Navigate to={navigateTo} replace />;
   }
 
   return null; // Don't render anything if not authenticated

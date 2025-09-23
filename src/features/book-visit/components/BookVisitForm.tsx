@@ -210,6 +210,7 @@ const BookVisitForm: React.FC<BookVisitFormProps> = ({ onSuccess, editMode = fal
                <TimeSelector
                   selectedTime={formData.selectedTime}
                   onTimeSelect={handleTimeSelect}
+                  selectedDate={formData.selectedDate}
                />
             </>
          </>

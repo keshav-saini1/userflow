@@ -3,7 +3,7 @@ import type { PropertyLocation } from "../types";
 import { useNavigate } from "react-router";
 
 import default_back from "@/assets/default_back.svg";
-import user from "@/assets/user.svg";
+import UserDropdown from "@/components/UserDropdown";
 
 interface PropertyHeaderProps { 
    location: PropertyLocation;
@@ -89,11 +89,7 @@ export const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             </div>
 
             {/* Share Button */}
-            <button
-               onClick={() => navigate("/profile")}
-            >
-               <img src={user} alt="user" className="w-10 h-10" />
-            </button>
+            <UserDropdown />
          </div>
       </div>
    );

@@ -4,23 +4,53 @@ import type { TimeSection } from '../types';
 interface TimeSelectorProps {
   selectedTime: string | null;
   onTimeSelect: (time: string) => void;
+  selectedDate: Date | null;
 }
 
 const TimeSelector: React.FC<TimeSelectorProps> = ({
   selectedTime,
-  onTimeSelect
+  onTimeSelect,
+  selectedDate
 }) => {
+  // Function to check if a time slot is in the past
+  const isTimeInPast = (timeString: string): boolean => {
+    if (!selectedDate) return false;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const selectedDay = new Date(selectedDate);
+    
+    // If the selected date is not today, no need to disable any times
+    if (selectedDay.getTime() !== today.getTime()) {
+      return false;
+    }
+    
+    // Parse the time string (e.g., '2:30 PM')
+    const [time, period] = timeString.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    // Convert to 24-hour format
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    
+    // Create a date object for the time slot
+    const slotTime = new Date(now);
+    slotTime.setHours(hours, minutes, 0, 0);
+    
+    // Check if the slot time is in the past
+    return slotTime < now;
+  };
   const timeSections: TimeSection[] = [
     {
       title: 'Morning',
       emoji: '🌅',
       slots: [
         { id: '9:00-am', time: '9:00 AM', available: true },
-        { id: '9:30-am', time: '9:30 AM', available: false },
-        { id: '10:00-am', time: '10:00 AM', available: false },
+        { id: '9:30-am', time: '9:30 AM', available: true },
+        { id: '10:00-am', time: '10:00 AM', available: true },
         { id: '10:30-am', time: '10:30 AM', available: true },
         { id: '11:00-am', time: '11:00 AM', available: true },
-        { id: '11:30-am', time: '11:30 AM', available: false }
+        { id: '11:30-am', time: '11:30 AM', available: true }
       ]
     },
     {
@@ -30,7 +60,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
         { id: '2:00-pm', time: '2:00 PM', available: true },
         { id: '2:30-pm', time: '2:30 PM', available: true },
         { id: '3:00-pm', time: '3:00 PM', available: true },
-        { id: '3:30-pm', time: '3:30 PM', available: false },
+        { id: '3:30-pm', time: '3:30 PM', available: true },
         { id: '4:00-pm', time: '4:00 PM', available: true },
         { id: '4:30-pm', time: '4:30 PM', available: true }
       ]
@@ -40,8 +70,11 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
       emoji: '🌙',
       slots: [
         { id: '5:00-pm', time: '5:00 PM', available: true },
-        { id: '5:30-pm', time: '5:30 PM', available: false },
-        { id: '6:00-pm', time: '6:00 PM', available: true }
+        { id: '5:30-pm', time: '5:30 PM', available: true },
+        { id: '6:00-pm', time: '6:00 PM', available: true },
+        { id: '6:30-pm', time: '6:30 PM', available: true },
+        { id: '7:00-pm', time: '7:00 PM', available: true },
+        { id: '7:30-pm', time: '7:30 PM', available: true }
       ]
     }
   ];
@@ -67,18 +100,23 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
               {section.slots.map((slot) => (
                 <button
                   key={slot.id}
-                  onClick={() => slot.available && onTimeSelect(slot.time)}
-                  disabled={!slot.available}
+                  onClick={() => {
+                    const isPast = isTimeInPast(slot.time);
+                    if (slot.available && !isPast) {
+                      onTimeSelect(slot.time);
+                    }
+                  }}
+                  disabled={!slot.available || isTimeInPast(slot.time)}
                   className={`px-3 sm:px-4 py-3 sm:py-4 rounded-[12.75px] border-2 transition-all duration-200 ${
                     selectedTime === slot.time
                       ? 'bg-gray-50 border-[#101828]'
-                      : slot.available
-                      ? 'bg-white border-gray-200 hover:border-gray-300'
-                      : 'bg-gray-50 border-gray-100 opacity-50'
+                      : !slot.available || isTimeInPast(slot.time)
+                      ? 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <div className={`text-sm sm:text-[14px] font-medium text-center leading-tight sm:leading-[21px] ${
-                    slot.available ? 'text-[#101828]' : 'text-[#99a1af]'
+                    !slot.available || isTimeInPast(slot.time) ? 'text-gray-400' : 'text-[#101828]'
                   }`}>
                     {slot.time}
                   </div>

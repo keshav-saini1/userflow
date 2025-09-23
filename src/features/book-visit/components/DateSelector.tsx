@@ -14,6 +14,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({
   const generateDateOptions = (): DateOption[] => {
     const options: DateOption[] = [];
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
     
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
@@ -30,13 +31,16 @@ const DateSelector: React.FC<DateSelectorProps> = ({
       if (i === 0) label = 'Today';
       else if (i === 1) label = 'Tomorrow';
       
+      // Only allow future dates (including today)
+      const isPastDate = date < today;
+      
       options.push({
         date,
         dayName,
         dayNumber,
         month,
         label,
-        available: i < 6 // First 6 days are available
+        available: !isPastDate // Disable past dates
       });
     }
     

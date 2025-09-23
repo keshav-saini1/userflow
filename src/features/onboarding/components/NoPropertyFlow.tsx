@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { QrCode, Hash, ChevronRight, Info } from "lucide-react"
+import { Hash, ChevronRight, Info } from "lucide-react"
 import BaseBottomSheet from "@/components/BaseBottomSheet"
 
 interface NoPropertyFlowSheetProps {
@@ -17,7 +17,6 @@ const NoPropertyFlowSheet: React.FC<NoPropertyFlowSheetProps> = ({
   isOpen = true,
   onClose = () => {},
   onSubmitId,
-  onScanQr,
   loading = false,
   error = null,
 }) => {
@@ -108,47 +107,7 @@ const NoPropertyFlowSheet: React.FC<NoPropertyFlowSheetProps> = ({
         </div>
 
         {/* Scan QR Card */}
-        <div
-          className={`rounded-2xl border ${
-            mode === "qr" ? "border-[#155dfc]" : "border-zinc-200"
-          } bg-white p-5 transition-colors`}
-        >
-          <button
-            type="button"
-            onClick={() => setMode("qr")}
-            className="w-full flex items-center gap-3 text-left"
-          >
-            <div className={`p-2 rounded-lg ${mode === "qr" ? "bg-[#155dfc]/10" : "bg-zinc-100"}`}>
-              <QrCode className={`size-5 ${mode === "qr" ? "text-[#155dfc]" : "text-zinc-700"}`} />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-[#101828]">Scan QR Code</p>
-              <p className="text-xs text-[#717182]">Use your camera to scan the property QR</p>
-            </div>
-            <ChevronRight className="size-4 text-zinc-400" />
-          </button>
-
-          {mode === "qr" && (
-            <div className="mt-4 space-y-3">
-              {/* Placeholder for future scanner integration */}
-              <div className="aspect-square rounded-lg border border-dashed border-zinc-300 grid place-items-center bg-zinc-50">
-                <div className="flex flex-col items-center gap-2 text-zinc-500">
-                  <QrCode className="size-8" />
-                  <p className="text-xs">Camera preview will appear here</p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button className="flex-1" onClick={() => onScanQr?.()}>Start Scan</Button>
-                <Button variant="outline" onClick={() => setMode("id")}>Enter ID instead</Button>
-              </div>
-
-              <p className="text-[11px] text-[#717182]">
-                Tip: If scanning doesn’t work, ask your manager to share the Easy PG ID
-              </p>
-            </div>
-          )}
-        </div>
+       
       </div>
       </div>
     </BaseBottomSheet>
@@ -156,3 +115,46 @@ const NoPropertyFlowSheet: React.FC<NoPropertyFlowSheetProps> = ({
 }
 
 export default NoPropertyFlowSheet
+
+
+{/* <div
+className={`rounded-2xl border ${
+  mode === "qr" ? "border-[#155dfc]" : "border-zinc-200"
+} bg-white p-5 transition-colors`}
+>
+<button
+  type="button"
+  onClick={() => setMode("qr")}
+  className="w-full flex items-center gap-3 text-left"
+>
+  <div className={`p-2 rounded-lg ${mode === "qr" ? "bg-[#155dfc]/10" : "bg-zinc-100"}`}>
+    <QrCode className={`size-5 ${mode === "qr" ? "text-[#155dfc]" : "text-zinc-700"}`} />
+  </div>
+  <div className="flex-1">
+    <p className="font-medium text-[#101828]">Scan QR Code</p>
+    <p className="text-xs text-[#717182]">Use your camera to scan the property QR</p>
+  </div>
+  <ChevronRight className="size-4 text-zinc-400" />
+</button>
+
+{mode === "qr" && (
+  <div className="mt-4 space-y-3">
+    {/* Placeholder for future scanner integration */}
+//     <div className="aspect-square rounded-lg border border-dashed border-zinc-300 grid place-items-center bg-zinc-50">
+//       <div className="flex flex-col items-center gap-2 text-zinc-500">
+//         <QrCode className="size-8" />
+//         <p className="text-xs">Camera preview will appear here</p>
+//       </div>
+//     </div>
+
+//     <div className="flex gap-2">
+//       <Button className="flex-1" onClick={() => onScanQr?.()}>Start Scan</Button>
+//       <Button variant="outline" onClick={() => setMode("id")}>Enter ID instead</Button>
+//     </div>
+
+//     <p className="text-[11px] text-[#717182]">
+//       Tip: If scanning doesn’t work, ask your manager to share the Easy PG ID
+//     </p>
+//   </div>
+// )}
+// </div> */}

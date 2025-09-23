@@ -10,7 +10,7 @@ const ReservationStep2: React.FC = () => {
   const navigate = useNavigate();
   const { nextStep } = useReservation();
   const { currentProperty } = useReservationStore();
-  console.log({currentProperty})
+  console.log({ currentProperty })
 
   // Sample property data - fallback if store data not available
   const property: Property = {
@@ -32,6 +32,14 @@ const ReservationStep2: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-[21px]">
         <div className="flex gap-3.5 items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center"
+          >
+            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
           <div className="flex flex-col">
             <div className="text-sm font-medium text-neutral-950">
               Reserve Room
@@ -41,14 +49,14 @@ const ReservationStep2: React.FC = () => {
             </div>
           </div>
         </div>
-        <button 
+        {/* <button 
           onClick={() => navigate(-1)}
           className="bg-[rgba(236,236,240,0.5)] flex items-center justify-center rounded-full w-[35px] h-[35px] hover:bg-[rgba(236,236,240,0.7)] transition-colors"
         >
           <svg className="w-[17.5px] h-[17.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
+        </button> */}
       </div>
 
       {/* Scrollable Content */}
@@ -56,13 +64,13 @@ const ReservationStep2: React.FC = () => {
         {/* Property Card */}
         <div className="px-3.5 pb-[21px]">
           <div className="bg-white h-[156px] relative rounded-[21px] shadow-sm border border-gray-100">
-            <div 
-              className="h-full w-full rounded-[21px] relative" 
-              style={{ 
+            <div
+              className="h-full w-full rounded-[21px] relative"
+              style={{
                 backgroundImage: `url('${currentProperty?.image || room_reserve}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
-              }} 
+              }}
             >
               <div className="absolute bg-gradient-to-t from-[#00000066] inset-0 to-[#00000000] rounded-[21px]" />
               <div className="absolute backdrop-blur-[6px] backdrop-filter bg-[rgba(255,255,255,0.1)] flex items-center justify-between h-[58px] left-1/2 p-[10.5px] rounded-[14px] top-[82px] translate-x-[-50%] w-[calc(100%-24px)]">
@@ -111,7 +119,7 @@ const ReservationStep2: React.FC = () => {
               <div className="text-[#101828] text-[14px] font-semibold leading-[21px]">
                 Secure Now, Pay Later at Move-In!
               </div>
-              
+
               <div className="flex flex-col gap-[14px]">
                 {/* Security Deposit */}
                 <div className="flex items-center justify-between">
@@ -143,7 +151,7 @@ const ReservationStep2: React.FC = () => {
                   ₹{currentProperty?.rent}
                 </div>
               </div>
-              
+
               <div className="text-[#6a7282] text-[12.3px] leading-[17.5px]">
                 *Security deposit is fully refundable if taken
               </div>

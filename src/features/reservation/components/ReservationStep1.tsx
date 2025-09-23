@@ -30,14 +30,14 @@ const ReservationStep1: React.FC = () => {
     // 2. Only start date selected + duration selected
     const hasBothDates = selectedDateRange.startDate && selectedDateRange.endDate;
     const hasStartDateAndDuration = selectedDateRange.startDate && !selectedDateRange.endDate && selectedDuration;
-    
+
     if (hasBothDates || hasStartDateAndDuration) {
       const data = {
         date_of_joining: selectedDateRange.startDate,
         ...(selectedDateRange?.endDate ? { checkout_date: selectedDateRange.endDate } : {}),
       }
       updateTenantDetails({ property_id: currentProperty?.id || '', data });
-      
+
     }
   };
 
@@ -75,7 +75,15 @@ const ReservationStep1: React.FC = () => {
     <div className="bg-white flex flex-col h-screen max-h-screen rounded-tl-[21px] rounded-tr-[21px] relative overflow-hidden">
       {/* Header - Fixed at top */}
       <div className="backdrop-blur backdrop-filter bg-[rgba(255,255,255,0.95)] box-border content-stretch flex flex-col h-[85px] items-start justify-start pb-px pt-0 px-0 rounded-tl-[21px] rounded-tr-[21px] shrink-0 w-full z-10">
-        <div className="box-border content-stretch flex items-center justify-between p-[21px] relative shrink-0 w-full">
+        <div className="box-border content-stretch flex items-center gap-4 p-[21px] relative shrink-0 w-full">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center"
+          >
+            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
           <div className="content-stretch flex gap-3.5 items-center justify-start relative shrink-0">
             <div className="content-stretch flex flex-col items-start justify-start relative shrink-0">
               <div className="content-stretch flex flex-col items-start justify-start relative shrink-0 w-full">
@@ -90,14 +98,14 @@ const ReservationStep1: React.FC = () => {
               </div>
             </div>
           </div>
-          <button 
+          {/* <button 
             onClick={() => navigate(-1)}
             className="bg-[rgba(236,236,240,0.5)] content-stretch flex items-center justify-center relative rounded-full shrink-0 size-[35px] hover:bg-[rgba(236,236,240,0.7)] transition-colors"
           >
             <svg className="relative shrink-0 size-[17.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -109,13 +117,13 @@ const ReservationStep1: React.FC = () => {
             <div className="bg-white h-[156px] relative rounded-[21px] shrink-0 w-full shadow-sm border border-gray-100">
               <div className="box-border content-stretch flex flex-col h-[156px] items-start justify-start overflow-clip p-px relative w-full">
                 <div className="content-stretch flex flex-col items-start justify-center relative shrink-0 w-full">
-                  <div 
-                    className="bg-left bg-no-repeat h-[154px] shrink-0 w-full rounded-[21px]" 
-                    style={{ 
+                  <div
+                    className="bg-left bg-no-repeat h-[154px] shrink-0 w-full rounded-[21px]"
+                    style={{
                       backgroundImage: `url('${currentProperty?.image}')`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
-                    }} 
+                    }}
                   />
                   <div className="absolute bg-gradient-to-t from-[#00000066] inset-0 to-[#00000000] rounded-[21px]" />
                   <div className="absolute backdrop-blur-[6px] backdrop-filter bg-[rgba(255,255,255,0.1)] box-border content-stretch flex gap-[10.5px] h-[58px] items-center justify-start left-1/2 p-[10.5px] rounded-[14px] top-[82px] translate-x-[-50%] w-[calc(100%-24px)]">
@@ -167,11 +175,11 @@ const ReservationStep1: React.FC = () => {
                     {selectedDateRange.endDate ? 'Check-in' : 'Move-in Date'}
                   </div>
                   <div className="text-[12.3px] text-[#6a7282] mt-[3.5px]" style={{ fontFamily: 'SF Pro Text, -apple-system, sans-serif' }}>
-                    {selectedDateRange.startDate 
+                    {selectedDateRange.startDate
                       ? selectedDateRange.startDate.toLocaleDateString('en-US', {
-                          day: 'numeric',
-                          month: 'short'
-                        })
+                        day: 'numeric',
+                        month: 'short'
+                      })
                       : 'Select date'
                     }
                   </div>
@@ -217,38 +225,38 @@ const ReservationStep1: React.FC = () => {
                     <p className="leading-[17.5px]">Choose duration</p>
                   </div>
                 </div>
-              <div className="content-start flex flex-wrap gap-[11px] items-start justify-between relative shrink-0 w-full">
-                {durationOptions.map((option) => (
-                  <div key={option.id} className="relative">
-                    <button
-                      onClick={() => handleDurationSelect(option.id)}
-                      className={`
+                <div className="content-start flex flex-wrap gap-[11px] items-start justify-between relative shrink-0 w-full">
+                  {durationOptions.map((option) => (
+                    <div key={option.id} className="relative">
+                      <button
+                        onClick={() => handleDurationSelect(option.id)}
+                        className={`
                         box-border content-stretch flex flex-col items-start justify-center px-[15px] py-2 relative rounded-[12px] shrink-0 w-[170px] transition-all
                         ${selectedDuration === option.id
-                          ? 'border border-[#030213] bg-[#030213]/5'
-                          : 'border border-[#d1d5dc] hover:border-[#030213]/30'
-                        }
+                            ? 'border border-[#030213] bg-[#030213]/5'
+                            : 'border border-[#d1d5dc] hover:border-[#030213]/30'
+                          }
                       `}
-                    >
-                      <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
-                        <p className="leading-[17.5px] whitespace-pre">{option.label}</p>
-                      </div>
-                      <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
-                        <p className="leading-[17.5px] whitespace-pre">₹{option.price.toLocaleString()}/{option.unit}</p>
-                      </div>
-                    </button>
-                    {option.discount && (
-                      <div className="absolute bg-green-100 right-[-8px] top-[-8px] rounded-[6.75px] border border-[#b9f8cf]">
-                        <div className="box-border content-stretch flex items-center justify-center overflow-clip px-2 py-[2.75px] relative">
-                          <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#008236] text-[10.5px] text-center text-nowrap">
-                            <p className="leading-[14px] whitespace-pre">{option.discount}</p>
+                      >
+                        <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
+                          <p className="leading-[17.5px] whitespace-pre">{option.label}</p>
+                        </div>
+                        <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#4a5565] text-[12.3px] text-center text-nowrap">
+                          <p className="leading-[17.5px] whitespace-pre">₹{option.price.toLocaleString()}/{option.unit}</p>
+                        </div>
+                      </button>
+                      {option.discount && (
+                        <div className="absolute bg-green-100 right-[-8px] top-[-8px] rounded-[6.75px] border border-[#b9f8cf]">
+                          <div className="box-border content-stretch flex items-center justify-center overflow-clip px-2 py-[2.75px] relative">
+                            <div className="flex flex-col font-['SF_Pro_Text',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#008236] text-[10.5px] text-center text-nowrap">
+                              <p className="leading-[14px] whitespace-pre">{option.discount}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -262,8 +270,8 @@ const ReservationStep1: React.FC = () => {
           disabled={isContinueDisabled}
           className={`
             w-full py-3.5 rounded-[14px] font-['SF_Pro_Text',_sans-serif] font-semibold text-[14px] text-center transition-all
-            ${isContinueDisabled 
-              ? 'bg-gray-200 text-[#6a7282]' 
+            ${isContinueDisabled
+              ? 'bg-gray-200 text-[#6a7282]'
               : 'bg-[#030213] text-white hover:bg-[#030213]/90'
             }
           `}

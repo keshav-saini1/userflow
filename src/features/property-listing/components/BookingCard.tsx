@@ -13,7 +13,7 @@ export interface Booking {
   id: string;
   propertyName: string;
   location: string;
-  status: 'active' | 'completed' | 'upcoming' | 'cancelled';
+  status: string;
   bookingType: 'visit' | 'live-tour' | 'call' | 'reservation';
   scheduledDate: string;
   scheduledTime: string;
@@ -88,6 +88,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
     }
   };
 
+  const isPastBooking = () => {
+    const now = new Date();
+    const bookingDate = new Date(booking.scheduledDate);
+    return bookingDate < now;
+  }
+
   return (
     <div
       className="bg-white rounded-[14px] md:rounded-[12px] border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
@@ -96,7 +102,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         if (isCancelBottomSheetOpen) {
           return;
         }
-        
+
         // Close menu if clicking outside of it
         if (isMenuOpen && !(e.target as Element).closest('.menu-container')) {
           setIsMenuOpen(false);
@@ -237,130 +243,134 @@ const BookingCard: React.FC<BookingCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-3.5 md:mt-3 flex gap-[18px] md:gap-3">
-          {booking.bookingType === "visit" && booking.status !== "cancelled" && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCall(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
-              >
-                <img
-                  src={phone_outline}
-                  alt="phone"
-                  className="w-4 h-4 md:w-4 md:h-4"
-                />
-                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
-                  Call
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onGetDirections(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
-              >
-                <ImMap2 className="w-4 h-4 md:w-4 md:h-4" />
-                <span className="text-[14px] md:text-sm font-medium">
-                  Get Directions
-                </span>
-              </button>
-            </>
-          )}
+        {
+          !isPastBooking && (
+            <div className="mt-3.5 md:mt-3 flex gap-[18px] md:gap-3">
+              {booking.bookingType === "visit" && booking.status !== "cancelled" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCall(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+                  >
+                    <img
+                      src={phone_outline}
+                      alt="phone"
+                      className="w-4 h-4 md:w-4 md:h-4"
+                    />
+                    <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                      Call
+                    </span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onGetDirections(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+                  >
+                    <ImMap2 className="w-4 h-4 md:w-4 md:h-4" />
+                    <span className="text-[14px] md:text-sm font-medium">
+                      Get Directions
+                    </span>
+                  </button>
+                </>
+              )}
 
-          {booking.bookingType === "live-tour" && booking.status !== "cancelled" && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCall(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
-              >
-                <img
-                  src={phone_outline}
-                  alt="phone"
-                  className="w-4 h-4 md:w-4 md:h-4"
-                />
-                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
-                  Call
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLiveTour(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
-              >
-                <VscDeviceCameraVideo className="w-4 h-4 md:w-4 md:h-4" />
-                <span className="text-[14px] md:text-sm font-medium">
-                  Live Tour
-                </span>
-              </button>
-            </>
-          )}
+              {booking.bookingType === "live-tour" && booking.status !== "cancelled" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCall(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+                  >
+                    <img
+                      src={phone_outline}
+                      alt="phone"
+                      className="w-4 h-4 md:w-4 md:h-4"
+                    />
+                    <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                      Call
+                    </span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onLiveTour(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+                  >
+                    <VscDeviceCameraVideo className="w-4 h-4 md:w-4 md:h-4" />
+                    <span className="text-[14px] md:text-sm font-medium">
+                      Live Tour
+                    </span>
+                  </button>
+                </>
+              )}
 
-          {booking.bookingType === "reservation" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onReserve(booking.id);
-              }}
-              className="w-full h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
-            >
-              <LuCopy className="w-3.5 h-3.5 md:w-3.5 md:h-3.5" />
-              <span className="text-[14px] md:text-sm font-medium">
-                Reserve
-              </span>
-            </button>
-          )}
+              {booking.bookingType === "reservation" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReserve(booking.id);
+                  }}
+                  className="w-full h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+                >
+                  <LuCopy className="w-3.5 h-3.5 md:w-3.5 md:h-3.5" />
+                  <span className="text-[14px] md:text-sm font-medium">
+                    Reserve
+                  </span>
+                </button>
+              )}
 
-          {booking.bookingType === "call" && booking.status !== "cancelled" && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onModifyBooking(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
-              >
-                <IoDocumentTextOutline className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 text-[#4a5565]" />
-                <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
-                  Modify Booking
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCall(booking.id);
-                }}
-                className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
-              >
-                <img
-                  src={phone_outline_white}
-                  alt="phone"
-                  className="w-4 h-4 md:w-4 md:h-4"
-                />
-                <span className="text-[14px] md:text-sm font-medium">
-                  Call
-                </span>
-              </button>
-            </>
-          )}
-          
-          {/* Cancelled Status Message */}
-          {booking.status === "cancelled" && (
-            <div className="w-full h-[38px] md:h-10 bg-red-50 border border-red-200 rounded-[12.75px] flex items-center justify-center">
-              <span className="text-[14px] md:text-sm text-red-600 font-medium">
-                Visit Cancelled
-              </span>
+              {booking.bookingType === "call" && booking.status !== "cancelled" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onModifyBooking(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 border border-gray-200 rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 hover:bg-gray-50 transition-colors"
+                  >
+                    <IoDocumentTextOutline className="w-3.5 h-3.5 md:w-3.5 md:h-3.5 text-[#4a5565]" />
+                    <span className="text-[14px] md:text-sm text-[#4a5565] font-medium">
+                      Modify Booking
+                    </span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCall(booking.id);
+                    }}
+                    className="flex-1 h-[38px] md:h-10 bg-[#155dfc] rounded-[12.75px] flex items-center justify-center gap-[7px] md:gap-1.5 text-white hover:bg-blue-600 transition-colors"
+                  >
+                    <img
+                      src={phone_outline_white}
+                      alt="phone"
+                      className="w-4 h-4 md:w-4 md:h-4"
+                    />
+                    <span className="text-[14px] md:text-sm font-medium">
+                      Call
+                    </span>
+                  </button>
+                </>
+              )}
+
+              {/* Cancelled Status Message */}
+              {booking.status === "cancelled" && (
+                <div className="w-full h-[38px] md:h-10 bg-red-50 border border-red-200 rounded-[12.75px] flex items-center justify-center">
+                  <span className="text-[14px] md:text-sm text-red-600 font-medium">
+                    Visit Cancelled
+                  </span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          )
+        }
       </div>
 
       {/* Cancel Visit Bottom Sheet */}
